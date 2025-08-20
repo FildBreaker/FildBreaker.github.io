@@ -1,0 +1,144 @@
+body {
+  background: url(FoneS.webp) no-repeat center center fixed;
+  background-size: cover;
+}
+
+.container {
+  width: 101%;
+  background: #1b1b1b;
+  height: 100px;
+  background: #1b1b1b url(HeadSs.jpg) no-repeat 5% 50%;
+  margin-left: -1rem;
+  margin-right: -0.5rem;
+  margin-top: -35px;
+  position: fixed;
+}
+
+.container3 {
+  width: 101%;
+  background: #1b1b1b;
+  height: 100px;
+  background: #1b1b1b url(HeadSs.jpg) no-repeat 5% 50%;
+  margin-left: -1rem;
+  margin-right: -0.5rem;
+  margin-top: -10px;
+  position: fixed;
+}
+
+.container4 {
+  width: 180px;
+  height: 1720px;
+  margin-left: -8px;
+  position: fixed;
+  background: #1b1b1b url(ButtonS.jpg) 65% 60%;
+  margin-top: 90px;
+}
+
+.title {
+  font-size: 50px;
+  text-align: center;
+  color: #940909;
+  letter-spacing: 15px;
+}
+.menu {
+  list-style: none;
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  margin-top: 5px;
+  line-height: 20px;
+}
+.fonts {
+  font-family: "Secular One", sans-serif;
+}
+.logo {
+  width: 60px;
+  height: 60px;
+  margin-top: 20px;
+  margin-left: 40px;
+  position: fixed;
+}
+
+.container2 {
+  width: 180px;
+  height: 1720px;
+  margin-left: -8px;
+  position: fixed;
+  background: #1b1b1b url(ButtonS.jpg) 65% 60%;
+  margin-top: 65px;
+}
+
+.button {
+  color: #d33114;
+  border: #666464;
+  background: #1b1b1b url(ButtonS.jpg) no-repeat 46% 40%;
+  width: 180px;
+  height: 120px;
+  font-size: 20px;
+  border-style: groove;
+}
+
+.button1:hover {
+  background: rgba(226, 219, 219, 0);
+  color: #bb9109;
+  box-shadow: inset 0 0 0 3px #c5cf34;
+  transition: all 500ms ease;
+}
+
+.button2:hover {
+  background: rgba(226, 219, 219, 0);
+  color: #c42b2b;
+  box-shadow: inset 0 0 0 3px #700404;
+  transition: all 500ms ease;
+}
+
+.button3:hover {
+  background: rgba(226, 219, 219, 0);
+  color: #c42b2b;
+  box-shadow: inset 0 0 0 3px #c42b2b;
+  transition: all 500ms ease;
+}
+
+.button4:hover {
+  background: rgba(226, 219, 219, 0);
+  color: #b12525;
+  box-shadow: inset 0 0 0 3px #b12525;
+  transition: all 500ms ease;
+}
+
+.button5:hover {
+  background: rgba(226, 219, 219, 0);
+  color: #c4702b;
+  box-shadow: inset 0 0 0 3px #c4702b;
+  transition: all 500ms ease;
+}
+
+.a {
+  color: #ff0000; /* Цвет обычной ссылки */
+  text-decoration: none; /* Убираем подчеркивание у ссылок */
+  transition: all 500ms ease;
+}
+a:hover {
+  color: #aa4f05; /* Цвет ссылки при наведении на нее курсора мыши */
+  text-decoration: underline; /* Добавляем подчеркивание */
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.ideas {
+  text-align: center;
+  font-size: 35px;
+  color: #db4905;
+
+  margin-left: 220px;
+  margin-right: 10px;
+  font-weight: bold;
+}
