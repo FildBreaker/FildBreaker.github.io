@@ -189,6 +189,7 @@ body::before {
   border-color: #ffb347;
 }
 
+/* Все кнопки "Добавить" – единый стиль */
 .add-subject-btn,
 .add-global-btn,
 .add-folder-btn,
@@ -214,30 +215,12 @@ body::before {
   box-shadow: 0 6px 20px rgba(255, 180, 70, 0.3);
 }
 
-/* ===== ОТСТУПЫ В РАЗДЕЛЕ "ПРЕДМЕТЫ" (ДОМАШКА) ===== */
-.subjects-list {
-  margin-bottom: 0;
-}
+/* Отступ для кнопки "Добавить предмет" в домашке */
 .add-subject-btn {
-  margin-top: 12px !important; /* отделяем кнопку от списка предметов */
+  margin-top: 12px !important;
 }
 
-/* ===== КНОПКИ В ПАПКАХ (РЕСУРСЫ) ===== */
-.folder-item .folder-actions button {
-  background: transparent;
-  border: none;
-  color: #8b949e;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 20px;
-  transition: 0.2s;
-}
-.folder-item .folder-actions button:hover {
-  background: #2d333b;
-  color: #ffb347;
-}
-
-/* ===== УНИВЕРСАЛЬНЫЕ КНОПКИ ДЕЙСТВИЙ ===== */
+/* ===== УНИВЕРСАЛЬНЫЕ КНОПКИ ДЕЙСТВИЙ (редактировать/удалить) ===== */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -380,7 +363,7 @@ body::before {
   box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 80px rgba(255, 180, 70, 0.06);
 }
 
-/* ===== КАРТОЧКИ ===== */
+/* ===== КАРТОЧКИ (общий фон) ===== */
 .teachers-section,
 .schedule-section,
 .exams-hero,
@@ -403,6 +386,7 @@ body::before {
   animation: fadeUp 0.6s ease;
 }
 
+/* ===== ПРИВЕТСТВЕННАЯ ПОЛОСКА ===== */
 .welcome-strip {
   display: flex;
   align-items: center;
@@ -455,7 +439,7 @@ body::before {
   color: #8b949e;
 }
 
-/* ===== ОСТАЛЬНЫЕ СТИЛИ (СОХРАНЯЕМ ВСЁ ОСТАЛЬНОЕ) ===== */
+/* ===== ПРЕПОДАВАТЕЛИ ===== */
 .teachers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -558,15 +542,7 @@ body::before {
   flex-wrap: wrap;
 }
 .add-exam-btn {
-  background: linear-gradient(135deg, #f0a500, #ffb347);
-  color: #0d1117;
-  padding: 10px 24px;
-  font-size: 1rem;
-  border-radius: 40px;
-}
-.add-exam-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(255, 180, 70, 0.3);
+  /* наследует общий стиль для кнопок "Добавить" */
 }
 .exams-grid {
   display: grid;
@@ -638,6 +614,24 @@ body::before {
   width: 24px;
   color: #ffb347;
 }
+/* Стили для списков внутри деталей (если используются ul) */
+.detail-row ul,
+.detail-row .info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.detail-row ul li,
+.detail-row .info-list li {
+  margin: 2px 0;
+  padding-left: 0;
+}
+.detail-row ul li::before,
+.detail-row .info-list li::before {
+  content: "• ";
+  color: #ffb347;
+}
+
 .exam-resources {
   padding: 16px 24px;
   background: #21262d;
@@ -855,11 +849,7 @@ body::before {
   color: transparent;
 }
 .add-task-btn {
-  background: linear-gradient(135deg, #f0a500, #ffb347);
-  color: #0d1117;
-  padding: 10px 24px;
-  border-radius: 40px;
-  font-size: 1rem;
+  /* наследует общий стиль */
 }
 .add-task-btn:disabled {
   opacity: 0.5;
@@ -1009,10 +999,7 @@ body::before {
   color: transparent;
 }
 .add-item-btn {
-  background: linear-gradient(135deg, #f0a500, #ffb347);
-  color: #0d1117;
-  padding: 10px 24px;
-  border-radius: 40px;
+  /* наследует общий стиль */
 }
 .add-item-btn:hover {
   transform: scale(1.05);
@@ -1074,6 +1061,15 @@ body::before {
 .test-actions .delete-test:hover {
   background: #d9534f;
   color: white;
+}
+
+/* Скрываем дублирующийся заголовок "Мероприятия" в карточке (если он есть) */
+.extracurricular-header + .tasks-container .event-card h3:first-child {
+  display: none;
+}
+/* Если есть двойной заголовок "Мероприятия" внутри блока, скрываем первый */
+.event-card .card-header-event + h3 {
+  margin-top: 0;
 }
 
 /* ===== ТАЙМЕРЫ ===== */
