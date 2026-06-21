@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Главная | Б-21ЛЕС</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data/icon.ico">
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="dataManager.js"></script>
+</head>
+<body>
+<div class="app-grid">
+  <header class="site-header">
+    <div class="logo"><h1><i class="fas fa-compass"></i> Б-21ЛЕС</h1></div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active"><i class="fas fa-home"></i> Главная</a></li>
+      <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
+      <li><a href="exam.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
+      <li><a href="resources.html"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
+      <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
+      <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
+      <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
+    </ul>
+  </header>
+
+  <aside class="sidebar">
+    <h3><i class="fas fa-compass"></i> Основное</h3>
+    <div class="nav-buttons">
+      <button class="nav-btn" id="btnEvents"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
+      <button class="nav-btn" id="btnTeachers"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
+      <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
+      <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
+    </div>
+    <div class="sidebar-note"><i class="fas fa-database"></i><p>Данные синхронизируются через Firebase – доступны всем.</p></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="welcome-strip">
+      <div class="strip-image"><img src="data/forest.gif" alt="Лес" loading="lazy"></div>
+      <div class="strip-text"><h2>✨ Добро пожаловать!</h2><p>Единый портал группы Б‑21ЛЕС с актуальным расписанием, экзаменами, домашкой и внеурочкой.</p></div>
+    </div>
+    <div style="background:rgba(79,98,122,0.7); border-radius:32px; padding:20px 28px;">
+      <h3 style="color:#faf0ca;"><i class="fas fa-info-circle"></i> Быстрые ссылки</h3>
+      <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
+        <a href="schedule.html" style="background:#8db5e2; padding:10px 20px; border-radius:40px; text-decoration:none; color:#1e293b; font-weight:600;"><i class="fas fa-calendar-alt"></i> Расписание</a>
+        <a href="exam.html" style="background:#ffb347; padding:10px 20px; border-radius:40px; text-decoration:none; color:#1e293b; font-weight:600;"><i class="fas fa-graduation-cap"></i> Экзамены</a>
+        <a href="homework.html" style="background:#7a98fa; padding:10px 20px; border-radius:40px; text-decoration:none; color:#1e293b; font-weight:600;"><i class="fas fa-tasks"></i> Домашка</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
+  </footer>
+</div>
+
+<script type="module">
+  // Простые уведомления для кнопок сайдбара (можно убрать или оставить)
+  const showToast = (msg) => {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+  };
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса, 20 июня – Конференция'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+</script>
+</body>
+</html>

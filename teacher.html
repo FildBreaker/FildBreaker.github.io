@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Преподаватели | Б-21ЛЕС</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data/icon.ico">
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="dataManager.js"></script>
+</head>
+<body>
+<div class="app-grid">
+  <header class="site-header">
+    <div class="logo"><h1><i class="fas fa-chalkboard-teacher"></i> Б-21ЛЕС</h1></div>
+    <ul class="nav-links">
+      <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
+      <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
+      <li><a href="exam.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
+      <li><a href="resources.html"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
+      <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
+      <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
+      <li><a href="teacher.html" class="active"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
+    </ul>
+  </header>
+
+  <aside class="sidebar">
+    <h3><i class="fas fa-compass"></i> Основное</h3>
+    <div class="nav-buttons">
+      <button class="nav-btn" id="btnEvents"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
+      <button class="nav-btn" id="btnTeachers"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
+      <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
+      <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
+    </div>
+    <div class="sidebar-note"><i class="fas fa-users"></i><p>Преподавательский состав кафедры</p></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="teachers-section">
+      <h2><i class="fas fa-leaf"></i> Профессорско-преподавательский состав</h2>
+      <div class="teachers-grid" id="teachersGridContainer"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
+  </footer>
+</div>
+
+<script type="module">
+  // Данные преподавателей (как в оригинале)
+  const teachersData = [
+    { name: "Гайвас Алексей Алексеевич", position: "кафедра садоводства, лесного хозяйства и защиты растений", degree: "Кандидат сельскохозяйственных наук, доцент", degree2: "Предмет: Энтомология", phone: "(3812) 65-27-63, 13-42", email: "aa.gayvas@omgau.org", photo: "data/Teachers/Gaivas.jpg" },
+    // ... остальные
+  ];
+
+  const container = document.getElementById('teachersGridContainer');
+  teachersData.forEach(teacher => {
+    const card = document.createElement('div');
+    card.className = 'teacher-card';
+    card.innerHTML = `
+      <div class="card-photo"><img src="${teacher.photo}" alt="${teacher.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/130x130?text=Нет+фото'"></div>
+      <div class="teacher-info">
+        <div class="teacher-name"><i class="fas fa-user-tie"></i> ${teacher.name}</div>
+        <div class="teacher-position"><i class="fas fa-briefcase"></i> ${teacher.position}</div>
+        <div class="teacher-degree"><i class="fas fa-graduation-cap"></i> ${teacher.degree}</div>
+        <div class="teacher-degree2"><i class="fas fa-graduation-cap"></i> ${teacher.degree2}</div>
+        <div class="contact-details-card">
+          <p><i class="fas fa-phone-alt"></i> ${teacher.phone}</p>
+          <p><i class="fas fa-envelope"></i> <a href="mailto:${teacher.email}">${teacher.email}</a></p>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // Кнопки сайдбара
+  const showToast = (msg) => { /* ... */ };
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: ...'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+</script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Расписание | Б-21ЛЕС</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data/icon.ico">
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="dataManager.js"></script>
+</head>
+<body>
+<div class="app-grid">
+  <header class="site-header">
+    <div class="logo"><h1><i class="fas fa-calendar-alt"></i> Б-21ЛЕС</h1></div>
+    <ul class="nav-links">
+      <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
+      <li><a href="schedule.html" class="active"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
+      <li><a href="exam.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
+      <li><a href="resources.html"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
+      <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
+      <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
+      <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
+    </ul>
+  </header>
+
+  <aside class="sidebar">
+    <h3><i class="fas fa-compass"></i> Основное</h3>
+    <div class="nav-buttons">
+      <button class="nav-btn" id="btnEvents"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
+      <button class="nav-btn" id="btnTeachers"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
+      <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
+      <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
+    </div>
+    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Все изменения сохраняются в облаке и видны всем.</p></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="schedule-section">
+      <div class="schedule-header">
+        <h2><i class="fas fa-table-list"></i> Расписание занятий</h2>
+        <div class="schedule-actions">
+          <button id="resetScheduleBtn" class="reset-btn"><i class="fas fa-undo-alt"></i> Сбросить</button>
+          <span class="sync-hint"><i class="fas fa-sync-alt"></i> автосинхронизация</span>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="schedule-table" id="scheduleTable">
+          <thead>
+            <tr>
+              <th>Пара</th><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 Б-21ЛЕС · Данные синхронизируются в реальном времени</p>
+  </footer>
+</div>
+
+<!-- Модалка редактирования -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3><i class="fas fa-edit"></i> Редактировать пару</h3>
+    <form id="editForm">
+      <label>Предмет:</label><input type="text" id="editSubject" required>
+      <label>Аудитория:</label><input type="text" id="editRoom" required>
+      <label>Дата окончания (ДД.ММ.ГГГГ):</label><input type="text" id="editEndDate" placeholder="31.05.2026" required>
+      <div class="modal-buttons">
+        <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
+        <button type="button" class="cancel-btn">Отмена</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import { dataManager } from './dataManager.js';
+
+  // --- Исходное расписание (6 пар, как на картинке) ---
+  const defaultSchedule = {
+    0: { // ПН
+      1: { subject: "Проектная деятельность (П)", room: "1-210", endDate: "31.05.2026" },
+      2: { subject: "Основы лесопаркового хозяйства (П)", room: "1-308", endDate: "31.05.2026" },
+      3: { subject: "Лесная энтомология (П)", room: "1-203", endDate: "31.05.2026" },
+      4: { subject: "", room: "", endDate: "" },
+      5: { subject: "", room: "", endDate: "" },
+      6: { subject: "", room: "", endDate: "" }
+    },
+    1: { // ВТ
+      1: { subject: "Экономическая теория (П)", room: "1-303", endDate: "31.05.2026" },
+      2: { subject: "Экономическая теория (П)", room: "1-408а", endDate: "31.05.2026" },
+      3: { subject: "Основы лесопаркового хозяйства (П)", room: "Библиотека 309", endDate: "31.05.2026" },
+      4: { subject: "", room: "", endDate: "" },
+      5: { subject: "", room: "", endDate: "" },
+      6: { subject: "", room: "", endDate: "" }
+    },
+    2: { // СР
+      1: { subject: "Цифровые технологии (П)", room: "4-222", endDate: "31.05.2026" },
+      2: { subject: "Технология лесозащиты (П)", room: "1-308", endDate: "31.05.2026" },
+      3: { subject: "Физ-ра", room: "Спорткомплекс", endDate: "31.05.2026" },
+      4: { subject: "Цифровые технологии (П)", room: "Библиотека 3116", endDate: "31.05.2026" },
+      5: { subject: "", room: "", endDate: "" },
+      6: { subject: "", room: "", endDate: "" }
+    },
+    3: { // ЧТ
+      1: { subject: "Лесная селекция (П)", room: "1-305", endDate: "31.05.2026" },
+      2: { subject: "Лесная селекция (П)", room: "1-210", endDate: "31.05.2026" },
+      3: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" },
+      4: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" },
+      5: { subject: "", room: "", endDate: "" },
+      6: { subject: "", room: "", endDate: "" }
+    },
+    4: { // ПТ
+      1: { subject: "Начертательная геометрия (П)", room: "3-23", endDate: "31.05.2026" },
+      2: { subject: "Начертательная геометрия (П)", room: "3-24", endDate: "31.05.2026" },
+      3: { subject: "Лесная энтомология (П)", room: "1-202", endDate: "31.05.2026" },
+      4: { subject: "", room: "", endDate: "" },
+      5: { subject: "", room: "", endDate: "" },
+      6: { subject: "", room: "", endDate: "" }
+    },
+    5: { // СБ
+      1: { subject: "", room: "", endDate: "" },
+      2: { subject: "", room: "", endDate: "" },
+      3: { subject: "", room: "", endDate: "" },
+      4: { subject: "", room: "", endDate: "" },
+      5: { subject: "", room: "", endDate: "" },
+      6: { subject: "", room: "", endDate: "" }
+    },
+    6: { // ВС
+      1: { subject: "", room: "", endDate: "" },
+      2: { subject: "", room: "", endDate: "" },
+      3: { subject: "", room: "", endDate: "" },
+      4: { subject: "", room: "", endDate: "" },
+      5: { subject: "", room: "", endDate: "" },
+      6: { subject: "", room: "", endDate: "" }
+    }
+  };
+
+  // --- Времена пар и перерывы ---
+  const pairTimes = {
+    1: "1 пара (9:00 – 10:30)",
+    2: "2 пара (10:45 – 12:15)",
+    3: "3 пара (12:30 – 14:00)",
+    4: "4 пара (14:40 – 16:10)",
+    5: "5 пара (16:20 – 17:50)",
+    6: "6 пара (18:00 – 19:30)"
+  };
+  const breaks = {
+    1: "Перерыв: 15 минут",
+    2: "Перерыв: 15 минут",
+    3: "Перерыв: 40 минут",
+    4: "Перерыв: 10 минут",
+    5: "Перерыв: 10 минут"
+  };
+  const dayNames = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
+  const MAX_PAIR = 6;
+
+  let scheduleData = {};
+
+  // --- Загрузка / сохранение ---
+  async function loadSchedule() {
+    const saved = await dataManager.load('schedule');
+    if (saved) {
+      scheduleData = saved;
+    } else {
+      scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
+      await dataManager.save('schedule', scheduleData);
+    }
+    renderSchedule();
+  }
+
+  async function saveSchedule() {
+    await dataManager.save('schedule', scheduleData);
+  }
+
+  // --- Рендер таблицы с перерывами ---
+  function renderSchedule() {
+    const tbody = document.getElementById('scheduleBody');
+    tbody.innerHTML = '';
+
+    for (let pair = 1; pair <= MAX_PAIR; pair++) {
+      // Строка с парами
+      const tr = document.createElement('tr');
+      const tdTime = document.createElement('td');
+      tdTime.className = 'pair-time';
+      tdTime.innerHTML = `<strong>${pairTimes[pair]}</strong>`;
+      tr.appendChild(tdTime);
+
+      for (let day = 0; day < 7; day++) {
+        const td = document.createElement('td');
+        td.className = 'schedule-cell';
+        const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', endDate: '' };
+        td.innerHTML = `
+          <div class="cell-content">
+            <div class="subject">${lesson.subject || '—'}${lesson.room ? ` (${lesson.room})` : ''}</div>
+            ${lesson.endDate ? `<div class="end-date"><i class="far fa-calendar-alt"></i> до ${lesson.endDate}</div>` : ''}
+            <div class="edit-icon"><i class="fas fa-pen"></i></div>
+          </div>
+        `;
+        td.dataset.day = day;
+        td.dataset.pair = pair;
+        td.addEventListener('click', () => openEditModal(day, pair));
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+
+      // Если не последняя пара – добавляем строку с перерывом
+      if (pair < MAX_PAIR) {
+        const breakTr = document.createElement('tr');
+        breakTr.className = 'break-row';
+        const breakTd = document.createElement('td');
+        breakTd.colSpan = 8; // 7 дней + столбец "Пара"
+        breakTd.style.cssText = 'background: #2c3e4e; color: #f9e79f; text-align: center; font-size: 0.8rem; padding: 4px;';
+        breakTd.textContent = breaks[pair] || '';
+        breakTr.appendChild(breakTd);
+        tbody.appendChild(breakTr);
+      }
+    }
+  }
+
+  // --- Модалка редактирования ---
+  let currentEditDay = null, currentEditPair = null;
+  const modal = document.getElementById('editModal');
+  const editSubject = document.getElementById('editSubject');
+  const editRoom = document.getElementById('editRoom');
+  const editEndDate = document.getElementById('editEndDate');
+
+  function openEditModal(day, pair) {
+    currentEditDay = day;
+    currentEditPair = pair;
+    const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', endDate: '' };
+    editSubject.value = lesson.subject || '';
+    editRoom.value = lesson.room || '';
+    editEndDate.value = lesson.endDate || '';
+    modal.style.display = 'flex';
+  }
+
+  function closeModal() {
+    modal.style.display = 'none';
+    currentEditDay = null;
+    currentEditPair = null;
+  }
+
+  async function saveEdit() {
+    if (currentEditDay === null || currentEditPair === null) return;
+    const newSubject = editSubject.value.trim();
+    const newRoom = editRoom.value.trim();
+    let newEndDate = editEndDate.value.trim();
+    if (newEndDate && !/^\d{2}\.\d{2}\.\d{4}$/.test(newEndDate)) {
+      alert('Введите дату в формате ДД.ММ.ГГГГ (например, 31.05.2026)');
+      return;
+    }
+    if (!scheduleData[currentEditDay]) scheduleData[currentEditDay] = {};
+    scheduleData[currentEditDay][currentEditPair] = {
+      subject: newSubject,
+      room: newRoom,
+      endDate: newEndDate
+    };
+    await saveSchedule();
+    renderSchedule();
+    closeModal();
+  }
+
+  async function resetToDefault() {
+    if (!confirm('Сбросить расписание к исходному? Все изменения будут потеряны.')) return;
+    scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
+    await saveSchedule();
+    renderSchedule();
+  }
+
+  // --- Обработчики событий ---
+  document.querySelector('.close-modal')?.addEventListener('click', closeModal);
+  document.querySelector('.cancel-btn')?.addEventListener('click', closeModal);
+  window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
+  document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
+
+  // Кнопки сайдбара (быстрые переходы)
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+  }
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса, 20 июня – Конференция'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
+
+  // Старт
+  loadSchedule();
+</script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Внеурочка | Мероприятия · Опросы · Тесты</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="extracurricular.css">
+    <link rel="icon" href="data/icon.ico">
+</head>
+<body>
+
+<div class="app-grid">
+    <!-- ШАПКА (как на главной) -->
+    <header class="site-header">
+        <div class="logo">
+            <h1><i class="fas fa-calendar-alt"></i> Внеурочная деятельность · Б‑21ЛЕС</h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
+            <li><a href="#"><i class="fas fa-info-circle"></i> Расписание</a></li>
+            <li><a href="exams.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
+            <li><a href="resources.html"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
+            <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
+        </ul>
+    </header>
+
+    <!-- БОКОВАЯ ПАНЕЛЬ: навигация по разделам и кнопка добавления -->
+    <aside class="sidebar">
+        <h3><i class="fas fa-compass"></i> Разделы</h3>
+        <div class="nav-sections">
+            <button class="section-btn active" data-section="events"><i class="fas fa-party-horn"></i> Мероприятия</button>
+            <button class="section-btn" data-section="polls"><i class="fas fa-chart-simple"></i> Опросы</button>
+            <button class="section-btn" data-section="tests"><i class="fas fa-puzzle-piece"></i> Тесты</button>
+        </div>
+        <button class="add-global-btn" id="globalAddBtn"><i class="fas fa-plus-circle"></i> Добавить</button>
+        <div class="sidebar-note">
+            <i class="fas fa-database"></i>
+            <p>Все мероприятия, опросы и тесты сохраняются в вашем браузере. Можно участвовать и добавлять новое.</p>
+        </div>
+    </aside>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ: динамические блоки -->
+    <main class="main-content">
+        <div class="section-header" id="sectionHeader">
+            <h2><i class="fas fa-party-horn"></i> Мероприятия</h2>
+            <p>Ближайшие события, конкурсы, лекции и встречи</p>
+        </div>
+        <div class="content-container" id="contentContainer">
+            <!-- Содержимое будет подгружаться JS -->
+        </div>
+    </main>
+
+    <!-- ФУТЕР -->
+    <footer class="site-footer">
+        <p>© 2025 Учебно-познавательный портал Б‑21ЛЕС — активная внеучебная жизнь.</p>
+        <p style="margin-top: 6px; font-size: 0.8rem;"><i class="fas fa-heart"></i> Участвуйте, создавайте, развивайтесь!</p>
+    </footer>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО для добавления (универсальное) -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h3 id="modalTitle"><i class="fas fa-plus"></i> Добавить</h3>
+        <div id="modalDynamicFields"></div>
+        <div class="modal-buttons">
+            <button id="saveModalBtn" class="save-btn">Сохранить</button>
+            <button id="cancelModalBtn" class="cancel-btn">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО для прохождения теста (отображение вопросов) -->
+<div id="testModal" class="modal">
+    <div class="modal-content test-modal-content">
+        <span class="close-modal" id="closeTestModal">&times;</span>
+        <h3 id="testModalTitle"><i class="fas fa-question-circle"></i> Прохождение теста</h3>
+        <div id="testQuestionsContainer"></div>
+        <div class="modal-buttons">
+            <button id="submitTestBtn" class="save-btn">Отправить ответы</button>
+            <button id="cancelTestBtn" class="cancel-btn">Закрыть</button>
+        </div>
+        <div id="testResult" style="margin-top: 15px; font-weight: bold;"></div>
+    </div>
+</div>
+
+<script>
+    // ======================== МОДЕЛЬ ДАННЫХ ========================
+    let data = {
+        events: [],   // { id, title, date, description, link }
+        polls: [],    // { id, question, options: [{text, votes}], totalVotes, userVoted? (храним флаг) }
+        tests: []     // { id, title, questions: [{text, options:[string], correctIndex}] }
+    };
+
+    // Загрузка из localStorage
+    function loadData() {
+        const saved = localStorage.getItem('extracurricularDB');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                data.events = parsed.events || [];
+                data.polls = parsed.polls || [];
+                data.tests = parsed.tests || [];
+                // Миграция для polls: если нет totalVotes, пересчитать
+                data.polls.forEach(poll => {
+                    if (!poll.totalVotes) poll.totalVotes = poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
+                    if (poll.userVoted === undefined) poll.userVoted = false;
+                });
+            } catch(e) { console.warn(e); }
+        } else {
+            // Демо-данные
+            data.events = [
+                { id: 'ev1', title: 'Лесная олимпиада', date: '2025-06-10', description: 'Командное соревнование по лесоведению.', link: '#' },
+                { id: 'ev2', title: 'Лекция "Современные ГИС"', date: '2025-05-25', description: 'Приглашённый специалист из Рослесинфорг.', link: '#' }
+            ];
+            data.polls = [
+                { id: 'poll1', question: 'Какое направление вам интереснее?', options: [{text:'Лесоводство', votes:12}, {text:'Экология', votes:8}, {text:'ГИС', votes:5}], totalVotes:25, userVoted: false }
+            ];
+            data.tests = [
+                { id: 'test1', title: 'Основы дендрологии', questions: [
+                    { text: 'Какое дерево является хвойным?', options: ['Берёза', 'Сосна', 'Дуб', 'Клён'], correctIndex: 1 },
+                    { text: 'Что такое таксация леса?', options: ['Учёт лесных ресурсов', 'Посадка деревьев', 'Борьба с вредителями', 'Охрана леса'], correctIndex: 0 }
+                ] }
+            ];
+        }
+        renderCurrentSection();
+    }
+
+    function saveToLocalStorage() {
+        localStorage.setItem('extracurricularDB', JSON.stringify(data));
+    }
+
+    // ======================== ОТРИСОВКА ТЕКУЩЕГО РАЗДЕЛА ========================
+    let currentSection = 'events'; // events, polls, tests
+
+    function renderCurrentSection() {
+        const headerEl = document.getElementById('sectionHeader');
+        const container = document.getElementById('contentContainer');
+        if (!container) return;
+
+        if (currentSection === 'events') {
+            headerEl.innerHTML = `<h2><i class="fas fa-party-horn"></i> Мероприятия</h2><p>Ближайшие события, конкурсы, лекции и встречи</p>`;
+            renderEvents(container);
+        } else if (currentSection === 'polls') {
+            headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение, результаты видны всем</p>`;
+            renderPolls(container);
+        } else if (currentSection === 'tests') {
+            headerEl.innerHTML = `<h2><i class="fas fa-puzzle-piece"></i> Тесты</h2><p>Проверьте знания и получите результат</p>`;
+            renderTests(container);
+        }
+    }
+
+    // ---------------- МЕРОПРИЯТИЯ ----------------
+    function renderEvents(container) {
+        if (data.events.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Пока нет мероприятий. Нажмите "Добавить"</p></div>`;
+            return;
+        }
+        container.innerHTML = '';
+        data.events.forEach(ev => {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.innerHTML = `
+                <div class="card-header-event">
+                    <div class="event-date"><i class="fas fa-calendar-day"></i> ${ev.date}</div>
+                    <div class="event-actions">
+                        <button class="edit-event" data-id="${ev.id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-event" data-id="${ev.id}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <h3>${escapeHtml(ev.title)}</h3>
+                <p>${escapeHtml(ev.description)}</p>
+                ${ev.link && ev.link !== '#' ? `<a href="${ev.link}" target="_blank" class="event-link">Подробнее <i class="fas fa-external-link-alt"></i></a>` : ''}
+            `;
+            card.querySelector('.edit-event')?.addEventListener('click', () => openEditModal('events', ev.id));
+            card.querySelector('.delete-event')?.addEventListener('click', () => deleteItem('events', ev.id));
+            container.appendChild(card);
+        });
+    }
+
+    // ---------------- ОПРОСЫ ----------------
+    function renderPolls(container) {
+        if (data.polls.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-chart-simple"></i><p>Нет активных опросов. Создайте первый!</p></div>`;
+            return;
+        }
+        container.innerHTML = '';
+        data.polls.forEach(poll => {
+            const pollCard = document.createElement('div');
+            pollCard.className = 'poll-card';
+            const total = poll.totalVotes || poll.options.reduce((s,o)=>s+(o.votes||0),0);
+            const userVoted = poll.userVoted === true;
+            pollCard.innerHTML = `
+                <div class="poll-header">
+                    <h3><i class="fas fa-poll"></i> ${escapeHtml(poll.question)}</h3>
+                    <button class="delete-poll" data-id="${poll.id}"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                <div class="poll-options" id="poll-${poll.id}">
+                    ${poll.options.map((opt, idx) => `
+                        <div class="poll-option">
+                            <div class="option-text">${escapeHtml(opt.text)}</div>
+                            ${userVoted ? `
+                                <div class="option-bar"><div class="bar-fill" style="width: ${(opt.votes/total*100)}%"></div></div>
+                                <div class="option-stats">${opt.votes} голосов (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>
+                            ` : `
+                                <button class="vote-btn" data-poll="${poll.id}" data-optidx="${idx}">Голосовать</button>
+                            `}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="poll-footer">Всего голосов: ${total}</div>
+            `;
+            if (!userVoted) {
+                const btns = pollCard.querySelectorAll('.vote-btn');
+                btns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const pollId = btn.dataset.poll;
+                        const optIdx = parseInt(btn.dataset.optidx);
+                        voteInPoll(pollId, optIdx);
+                    });
+                });
+            }
+            pollCard.querySelector('.delete-poll')?.addEventListener('click', () => deleteItem('polls', poll.id));
+            container.appendChild(pollCard);
+        });
+    }
+
+    function voteInPoll(pollId, optionIndex) {
+        const poll = data.polls.find(p => p.id === pollId);
+        if (!poll || poll.userVoted) return;
+        poll.options[optionIndex].votes = (poll.options[optionIndex].votes || 0) + 1;
+        poll.totalVotes = (poll.totalVotes || 0) + 1;
+        poll.userVoted = true;
+        saveToLocalStorage();
+        renderCurrentSection();
+    }
+
+    // ---------------- ТЕСТЫ ----------------
+    function renderTests(container) {
+        if (data.tests.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-puzzle-piece"></i><p>Нет тестов. Добавьте новый тест.</p></div>`;
+            return;
+        }
+        container.innerHTML = '';
+        data.tests.forEach(test => {
+            const testCard = document.createElement('div');
+            testCard.className = 'test-card';
+            testCard.innerHTML = `
+                <div class="test-header">
+                    <h3><i class="fas fa-brain"></i> ${escapeHtml(test.title)}</h3>
+                    <div class="test-actions">
+                        <button class="take-test" data-id="${test.id}"><i class="fas fa-play"></i> Пройти</button>
+                        <button class="edit-test" data-id="${test.id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-test" data-id="${test.id}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <p>Вопросов: ${test.questions.length}</p>
+            `;
+            testCard.querySelector('.take-test')?.addEventListener('click', () => openTestModal(test.id));
+            testCard.querySelector('.edit-test')?.addEventListener('click', () => openEditModal('tests', test.id));
+            testCard.querySelector('.delete-test')?.addEventListener('click', () => deleteItem('tests', test.id));
+            container.appendChild(testCard);
+        });
+    }
+
+    function deleteItem(section, id) {
+        if (section === 'events') data.events = data.events.filter(ev => ev.id !== id);
+        if (section === 'polls') data.polls = data.polls.filter(p => p.id !== id);
+        if (section === 'tests') data.tests = data.tests.filter(t => t.id !== id);
+        saveToLocalStorage();
+        renderCurrentSection();
+    }
+
+    // ======================== МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ ========================
+    let editModalSection = null;
+    let editModalId = null;
+    const modal = document.getElementById('editModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalFields = document.getElementById('modalDynamicFields');
+
+    function openEditModal(section, id = null) {
+        editModalSection = section;
+        editModalId = id;
+        modalFields.innerHTML = '';
+        if (section === 'events') {
+            modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать мероприятие' : '<i class="fas fa-plus"></i> Добавить мероприятие';
+            modalFields.innerHTML = `
+                <label>Название</label><input type="text" id="evTitle" placeholder="Название события">
+                <label>Дата (ГГГГ-ММ-ДД)</label><input type="date" id="evDate">
+                <label>Описание</label><textarea id="evDesc" rows="2" placeholder="Краткое описание"></textarea>
+                <label>Ссылка (необязательно)</label><input type="url" id="evLink" placeholder="https://...">
+            `;
+            if (id) {
+                const ev = data.events.find(e => e.id === id);
+                if (ev) {
+                    document.getElementById('evTitle').value = ev.title;
+                    document.getElementById('evDate').value = ev.date;
+                    document.getElementById('evDesc').value = ev.description;
+                    document.getElementById('evLink').value = ev.link || '';
+                }
+            }
+        } else if (section === 'polls') {
+            modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать опрос' : '<i class="fas fa-plus"></i> Создать опрос';
+            modalFields.innerHTML = `
+                <label>Вопрос опроса</label><input type="text" id="pollQuestion" placeholder="Например: Какой формат занятий вам нравится?">
+                <label>Варианты ответов (каждый с новой строки)</label><textarea id="pollOptions" rows="3" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3"></textarea>
+            `;
+            if (id) {
+                const poll = data.polls.find(p => p.id === id);
+                if (poll) {
+                    document.getElementById('pollQuestion').value = poll.question;
+                    document.getElementById('pollOptions').value = poll.options.map(o => o.text).join('\n');
+                }
+            }
+        } else if (section === 'tests') {
+            modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать тест' : '<i class="fas fa-plus"></i> Создать тест';
+            modalFields.innerHTML = `
+                <label>Название теста</label><input type="text" id="testTitle" placeholder="Название">
+                <div id="questionsEditor"></div>
+                <button type="button" id="addQuestionBtn" class="add-link-btn"><i class="fas fa-plus"></i> Добавить вопрос</button>
+            `;
+            let questions = [];
+            if (id) {
+                const test = data.tests.find(t => t.id === id);
+                if (test) questions = test.questions;
+            }
+            function renderQuestionsEditor(qs) {
+                const container = document.getElementById('questionsEditor');
+                if (!container) return;
+                container.innerHTML = '';
+                qs.forEach((q, idx) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'question-editor';
+                    qDiv.innerHTML = `
+                        <div class="question-text"><input type="text" placeholder="Текст вопроса" value="${escapeHtml(q.text)}" class="q-text"></div>
+                        <div class="question-options">
+                            ${q.options.map((opt, optIdx) => `
+                                <div class="opt-row">
+                                    <input type="text" placeholder="Вариант ${optIdx+1}" value="${escapeHtml(opt)}" class="q-opt">
+                                    ${optIdx === q.correctIndex ? '<span class="correct-badge">✓ Правильный</span>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <select class="q-correct">
+                            ${q.options.map((_, optIdx) => `<option value="${optIdx}" ${optIdx === q.correctIndex ? 'selected' : ''}>Правильный ответ: вариант ${optIdx+1}</option>`).join('')}
+                        </select>
+                        <button class="remove-question-btn">Удалить вопрос</button>
+                    `;
+                    // логика удаления
+                    qDiv.querySelector('.remove-question-btn').addEventListener('click', () => {
+                        questions.splice(idx, 1);
+                        renderQuestionsEditor(questions);
+                    });
+                    container.appendChild(qDiv);
+                });
+            }
+            window.questionsArray = questions;
+            renderQuestionsEditor(questions);
+            document.getElementById('addQuestionBtn').addEventListener('click', () => {
+                questions.push({ text: 'Новый вопрос', options: ['Вариант 1', 'Вариант 2'], correctIndex: 0 });
+                renderQuestionsEditor(questions);
+            });
+            if (id) {
+                const test = data.tests.find(t => t.id === id);
+                if (test) document.getElementById('testTitle').value = test.title;
+            }
+        }
+        modal.style.display = 'flex';
+    }
+
+    function saveModalItem() {
+        if (editModalSection === 'events') {
+            const title = document.getElementById('evTitle')?.value.trim();
+            const date = document.getElementById('evDate')?.value;
+            const desc = document.getElementById('evDesc')?.value.trim();
+            const link = document.getElementById('evLink')?.value.trim();
+            if (!title || !date) { alert('Заполните название и дату'); return; }
+            if (editModalId) {
+                const ev = data.events.find(e => e.id === editModalId);
+                if (ev) { ev.title = title; ev.date = date; ev.description = desc; ev.link = link || '#'; }
+            } else {
+                data.events.push({ id: Date.now().toString(), title, date, description: desc, link: link || '#' });
+            }
+        } else if (editModalSection === 'polls') {
+            const question = document.getElementById('pollQuestion')?.value.trim();
+            const optsText = document.getElementById('pollOptions')?.value;
+            if (!question || !optsText) { alert('Введите вопрос и варианты'); return; }
+            const optionsArray = optsText.split('\n').filter(s => s.trim().length > 0).map(t => ({ text: t.trim(), votes: 0 }));
+            if (optionsArray.length < 2) { alert('Нужно минимум 2 варианта'); return; }
+            if (editModalId) {
+                const poll = data.polls.find(p => p.id === editModalId);
+                if (poll) {
+                    poll.question = question;
+                    poll.options = optionsArray;
+                    poll.totalVotes = 0;
+                    poll.userVoted = false;
+                }
+            } else {
+                data.polls.push({ id: Date.now().toString(), question, options: optionsArray, totalVotes: 0, userVoted: false });
+            }
+        } else if (editModalSection === 'tests') {
+            const testTitle = document.getElementById('testTitle')?.value.trim();
+            if (!testTitle) { alert('Введите название теста'); return; }
+            // собираем вопросы из редактора
+            const questions = [];
+            const qDivs = document.querySelectorAll('#questionsEditor .question-editor');
+            qDivs.forEach(div => {
+                const qText = div.querySelector('.q-text')?.value.trim();
+                const optInputs = div.querySelectorAll('.q-opt');
+                const options = Array.from(optInputs).map(inp => inp.value.trim()).filter(s => s);
+                const correctIdx = parseInt(div.querySelector('.q-correct')?.value);
+                if (qText && options.length >= 2) {
+                    questions.push({ text: qText, options, correctIndex: correctIdx });
+                }
+            });
+            if (questions.length === 0) { alert('Добавьте хотя бы один вопрос с вариантами'); return; }
+            if (editModalId) {
+                const test = data.tests.find(t => t.id === editModalId);
+                if (test) { test.title = testTitle; test.questions = questions; }
+            } else {
+                data.tests.push({ id: Date.now().toString(), title: testTitle, questions });
+            }
+        }
+        saveToLocalStorage();
+        closeModal();
+        renderCurrentSection();
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        editModalSection = null;
+        editModalId = null;
+    }
+
+    // ======================== ТЕСТЫ: МОДАЛЬНОЕ ОКНО ПРОХОЖДЕНИЯ ========================
+    let currentTestId = null;
+    const testModal = document.getElementById('testModal');
+    const testQuestionsContainer = document.getElementById('testQuestionsContainer');
+    const testModalTitleSpan = document.getElementById('testModalTitle');
+
+    function openTestModal(testId) {
+        const test = data.tests.find(t => t.id === testId);
+        if (!test) return;
+        currentTestId = testId;
+        testModalTitleSpan.innerHTML = `<i class="fas fa-question-circle"></i> ${escapeHtml(test.title)}`;
+        testQuestionsContainer.innerHTML = '';
+        test.questions.forEach((q, idx) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'test-question';
+            qDiv.innerHTML = `
+                <p><strong>${idx+1}. ${escapeHtml(q.text)}</strong></p>
+                <div class="test-options">
+                    ${q.options.map((opt, optIdx) => `
+                        <label><input type="radio" name="q${idx}" value="${optIdx}"> ${escapeHtml(opt)}</label>
+                    `).join('')}
+                </div>
+            `;
+            testQuestionsContainer.appendChild(qDiv);
+        });
+        document.getElementById('testResult').innerHTML = '';
+        testModal.style.display = 'flex';
+    }
+
+    function submitTest() {
+        const test = data.tests.find(t => t.id === currentTestId);
+        if (!test) return;
+        let score = 0;
+        test.questions.forEach((q, idx) => {
+            const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+            if (selected && parseInt(selected.value) === q.correctIndex) score++;
+        });
+        const resultDiv = document.getElementById('testResult');
+        resultDiv.innerHTML = `<i class="fas fa-chart-line"></i> Ваш результат: ${score} из ${test.questions.length} (${Math.round(score/test.questions.length*100)}%)`;
+        // можно сохранять результат в localStorage, но для простоты оставим так
+    }
+
+    function closeTestModal() {
+        testModal.style.display = 'none';
+        currentTestId = null;
+    }
+
+    // ======================== НАВИГАЦИЯ И ИНИЦИАЛИЗАЦИЯ ========================
+    function init() {
+        loadData();
+        // кнопки переключения разделов
+        document.querySelectorAll('.section-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSection = btn.dataset.section;
+                renderCurrentSection();
+            });
+        });
+        // глобальная кнопка добавления (открывает модалку для текущего раздела)
+        document.getElementById('globalAddBtn').addEventListener('click', () => {
+            openEditModal(currentSection);
+        });
+        // модальные закрытия
+        document.getElementById('closeModalBtn').onclick = closeModal;
+        document.getElementById('cancelModalBtn').onclick = closeModal;
+        document.getElementById('saveModalBtn').onclick = saveModalItem;
+        document.getElementById('closeTestModal').onclick = closeTestModal;
+        document.getElementById('cancelTestBtn').onclick = closeTestModal;
+        document.getElementById('submitTestBtn').onclick = submitTest;
+        window.onclick = (e) => {
+            if (e.target === modal) closeModal();
+            if (e.target === testModal) closeTestModal();
+        };
+    }
+    init();
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+</script>
+</body>
+</html>

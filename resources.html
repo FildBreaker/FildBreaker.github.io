@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ресурсы | Б-21ЛЕС</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data/icon.ico">
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="dataManager.js"></script>
+</head>
+<body>
+<div class="app-grid">
+  <header class="site-header">
+    <div class="logo"><h1><i class="fas fa-folder-open"></i> Б-21ЛЕС</h1></div>
+    <ul class="nav-links">
+      <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
+      <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
+      <li><a href="exam.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
+      <li><a href="resources.html" class="active"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
+      <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
+      <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
+      <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
+    </ul>
+  </header>
+
+  <aside class="sidebar">
+    <h3><i class="fas fa-filter"></i> Фильтры</h3>
+    <div class="filter-buttons">
+      <button class="filter-btn active-filter" data-category="all"><i class="fas fa-th-large"></i> Все</button>
+      <button class="filter-btn" data-category="study"><i class="fas fa-book"></i> Учебники</button>
+      <button class="filter-btn" data-category="video"><i class="fas fa-video"></i> Видео</button>
+      <button class="filter-btn" data-category="test"><i class="fas fa-tasks"></i> Тесты</button>
+      <button class="filter-btn" data-category="soft"><i class="fas fa-laptop-code"></i> ПО</button>
+    </div>
+    <div class="sidebar-note"><i class="fas fa-database"></i><p>Архив содержит более 150+ файлов.</p></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="hero-resources">
+      <div class="hero-text"><h2><i class="fas fa-cloud-upload-alt"></i> Ресурсный центр</h2><p>Электронные книги, видео, тесты, ПО</p></div>
+      <div class="hero-search"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск..."></div></div>
+    </div>
+    <div class="resources-grid" id="resourcesGrid">
+      <!-- Карточки (как в оригинале) -->
+      <div class="resource-card" data-category="study">
+        <div class="card-icon"><i class="fas fa-book-open"></i></div>
+        <div class="card-content"><h3>Лесоводство. Полный курс</h3><p>Учебник PDF, 320 стр.</p><div class="card-meta"><span><i class="fas fa-file-pdf"></i> PDF, 24 МБ</span><a href="#" class="card-link">Скачать <i class="fas fa-arrow-right"></i></a></div></div>
+      </div>
+      <!-- Остальные карточки (повторить) -->
+    </div>
+    <div class="pagination"><span class="page active">1</span><span class="page">2</span><span class="page">3</span></div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
+  </footer>
+</div>
+<script type="module">
+  // фильтрация и поиск (как в оригинале)
+  // ...
+  // Кнопки сайдбара
+  const showToast = (msg) => { /* ... */ };
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: ...'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+</script>
+</body>
+</html>
