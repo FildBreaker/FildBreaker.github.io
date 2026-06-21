@@ -2,7 +2,7 @@
 import { db } from './firebase-config.js';
 import { ref, set, get, child, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-const ROOT = 'IBD2026';
+const ROOT = 'B21LES';
 
 export const dataManager = {
   async load(key) {
@@ -21,5 +21,12 @@ export const dataManager = {
   async remove(key) {
     const pathRef = ref(db, `${ROOT}/${key}`);
     await remove(pathRef);
+  },
+  // Специальные методы для темы
+  async loadTheme() {
+    return await this.load('theme');
+  },
+  async saveTheme(themeName) {
+    await this.save('theme', themeName);
   }
 };
