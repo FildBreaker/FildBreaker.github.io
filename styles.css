@@ -58,7 +58,7 @@ body::before {
   align-items: center;
   justify-content: space-between;
   border: 1px solid #30363d;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 40px rgba(255, 180, 70, 0.03);
   animation: slideDown 0.6s ease;
 }
 .logo h1 {
@@ -110,6 +110,7 @@ body::before {
   position: sticky;
   top: 20px;
   animation: fadeIn 0.8s ease;
+  box-shadow: 0 0 40px rgba(255, 180, 70, 0.02);
 }
 .sidebar h3 {
   font-size: 1.3rem;
@@ -131,7 +132,7 @@ body::before {
   gap: 12px;
 }
 
-/* ОБЩИЙ СТИЛЬ ДЛЯ ВСЕХ КНОПОК В САЙДБАРЕ */
+/* ===== УНИВЕРСАЛЬНЫЕ КНОПКИ ===== */
 .nav-btn,
 .filter-btn,
 .section-btn,
@@ -213,31 +214,173 @@ body::before {
   box-shadow: 0 6px 20px rgba(255, 180, 70, 0.3);
 }
 
-.sidebar-note {
-  background: #21262d;
-  border-radius: 24px;
-  padding: 16px;
-  margin-top: 28px;
-  display: flex;
-  gap: 12px;
-  font-size: 0.85rem;
-  color: #8b949e;
-  border: 1px solid #30363d;
+/* ===== ОТСТУПЫ В РАЗДЕЛЕ "ПРЕДМЕТЫ" (ДОМАШКА) ===== */
+.subjects-list {
+  margin-bottom: 0;
 }
-.sidebar-note i {
-  font-size: 1.8rem;
+.add-subject-btn {
+  margin-top: 12px !important; /* отделяем кнопку от списка предметов */
+}
+
+/* ===== КНОПКИ В ПАПКАХ (РЕСУРСЫ) ===== */
+.folder-item .folder-actions button {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 20px;
+  transition: 0.2s;
+}
+.folder-item .folder-actions button:hover {
+  background: #2d333b;
   color: #ffb347;
 }
 
-/* ===== ОСНОВНОЙ КОНТЕНТ ===== */
-.main-content {
-  grid-area: main;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+/* ===== УНИВЕРСАЛЬНЫЕ КНОПКИ ДЕЙСТВИЙ ===== */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.action-btn:hover {
+  background: #2d333b;
+  border-color: #ffb347;
+  color: #f0e6d0;
+  transform: scale(1.12);
+  box-shadow: 0 0 20px rgba(255, 180, 70, 0.15);
+}
+.action-btn.delete:hover {
+  background: #3d1a1a;
+  border-color: #d9534f;
+  color: #d9534f;
+  box-shadow: 0 0 20px rgba(217, 83, 79, 0.15);
+}
+.action-btn.edit:hover {
+  background: #1a2a3a;
+  border-color: #ffb347;
+  color: #ffb347;
+  box-shadow: 0 0 20px rgba(255, 180, 70, 0.15);
 }
 
-/* ===== УНИВЕРСАЛЬНЫЕ КАРТОЧКИ И БЛОКИ ===== */
+.card-actions,
+.event-actions,
+.exam-actions,
+.resource-actions,
+.task-actions,
+.poll-actions,
+.test-actions,
+.folder-actions,
+.subject-actions {
+  display: flex;
+  gap: 12px !important;
+  align-items: center;
+  flex-shrink: 0;
+}
+.action-btn {
+  margin: 0 !important;
+}
+
+/* ===== БЛОК ВАЖНОЙ ИНФОРМАЦИИ ===== */
+.info-block {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 2px solid #ffb347;
+  border-radius: 28px;
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+  color: #f0e6d0;
+  box-shadow: 0 0 30px rgba(255, 180, 70, 0.1), inset 0 0 30px rgba(255, 180, 70, 0.02);
+  transition: 0.3s;
+}
+.info-block:hover {
+  box-shadow: 0 0 50px rgba(255, 180, 70, 0.2), inset 0 0 40px rgba(255, 180, 70, 0.05);
+  border-color: #ffd080;
+  transform: scale(1.01);
+}
+.info-block i {
+  font-size: 2.8rem;
+  color: #ffb347;
+  flex-shrink: 0;
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.info-text {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.info-text strong {
+  color: #ffb347;
+  font-weight: 700;
+}
+.info-text a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+.info-text a:hover {
+  text-decoration: underline;
+}
+
+/* ===== ОСНОВНЫЕ БЛОКИ – ЛЁГКАЯ ПОДСВЕТКА ===== */
+.schedule-section,
+.exams-hero,
+.hero-resources,
+.homework-header,
+.info-block,
+.welcome-strip,
+.teachers-section,
+.resources-hero,
+.countdown-card,
+.exam-card,
+.teacher-card,
+.resource-card,
+.task-card,
+.poll-card,
+.event-card,
+.test-card,
+.sidebar,
+.site-header,
+.modal-content {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 60px rgba(255, 180, 70, 0.03);
+  transition: box-shadow 0.3s ease;
+}
+.schedule-section:hover,
+.exams-hero:hover,
+.hero-resources:hover,
+.homework-header:hover,
+.info-block:hover,
+.welcome-strip:hover,
+.teachers-section:hover,
+.resources-hero:hover,
+.countdown-card:hover,
+.exam-card:hover,
+.teacher-card:hover,
+.resource-card:hover,
+.task-card:hover,
+.poll-card:hover,
+.event-card:hover,
+.test-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 80px rgba(255, 180, 70, 0.06);
+}
+
+/* ===== КАРТОЧКИ ===== */
 .teachers-section,
 .schedule-section,
 .exams-hero,
@@ -257,8 +400,6 @@ body::before {
   background: #161b22;
   border-radius: 28px;
   border: 1px solid #30363d;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  transition: all 0.3s;
   animation: fadeUp 0.6s ease;
 }
 
@@ -269,12 +410,39 @@ body::before {
   flex-wrap: wrap;
   padding: 24px 28px;
 }
-.strip-image img {
-  width: 160px;
-  height: 120px;
-  object-fit: cover;
+.strip-image {
+  position: relative;
+  flex-shrink: 0;
   border-radius: 24px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(255, 180, 70, 0.15), 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 180, 70, 0.2);
+  transition: all 0.4s ease;
+}
+.strip-image:hover {
+  border-color: #ffb347;
+  box-shadow: 0 0 50px rgba(255, 180, 70, 0.25), 0 12px 32px rgba(0, 0, 0, 0.6);
+  transform: scale(1.02);
+}
+.strip-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.75) saturate(1.2) contrast(1.1);
+  transition: filter 0.4s ease, transform 0.4s ease;
+}
+.strip-image:hover img {
+  filter: brightness(0.9) saturate(1.3) contrast(1.1);
+  transform: scale(1.05);
+}
+.strip-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.5), rgba(22, 27, 34, 0.2), rgba(255, 180, 70, 0.05));
+  pointer-events: none;
+  border-radius: 24px;
 }
 .strip-text h2 {
   font-size: 1.9rem;
@@ -287,7 +455,7 @@ body::before {
   color: #8b949e;
 }
 
-/* ===== КАРТОЧКИ ПРЕПОДАВАТЕЛЕЙ ===== */
+/* ===== ОСТАЛЬНЫЕ СТИЛИ (СОХРАНЯЕМ ВСЁ ОСТАЛЬНОЕ) ===== */
 .teachers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -296,13 +464,10 @@ body::before {
 }
 .teacher-card {
   overflow: hidden;
-  background: #161b22;
-  border: 1px solid #30363d;
 }
 .teacher-card:hover {
   transform: translateY(-8px);
   border-color: #ffb347;
-  box-shadow: 0 24px 36px rgba(0,0,0,0.4);
 }
 .card-photo {
   background: #21262d;
@@ -403,7 +568,6 @@ body::before {
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(255, 180, 70, 0.3);
 }
-
 .exams-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -412,8 +576,6 @@ body::before {
 .exam-card {
   padding: 0;
   overflow: hidden;
-  background: #161b22;
-  border: 1px solid #30363d;
   position: relative;
 }
 .exam-card::before {
@@ -539,22 +701,29 @@ body::before {
   z-index: 2;
 }
 .exam-actions button {
-  background: rgba(22, 27, 34, 0.9);
+  background: rgba(22, 27, 34, 0.92);
+  backdrop-filter: blur(4px);
   border: 1px solid #30363d;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  cursor: pointer;
-  transition: 0.2s;
   color: #c9d1d9;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .exam-actions button:hover {
-  background: #ffb347;
-  color: #0d1117;
+  background: #2d333b;
+  border-color: #ffb347;
+  color: #f0e6d0;
+  transform: scale(1.12);
 }
 .exam-actions .delete-exam:hover {
-  background: #d9534f;
-  color: white;
+  background: #3d1a1a;
+  border-color: #d9534f;
+  color: #d9534f;
 }
 
 /* ===== РЕСУРСЫ ===== */
@@ -576,7 +745,6 @@ body::before {
 .resources-hero p {
   color: #8b949e;
 }
-
 .resources-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -586,8 +754,6 @@ body::before {
   padding: 20px;
   display: flex;
   gap: 18px;
-  border: 1px solid #30363d;
-  background: #161b22;
   position: relative;
 }
 .resource-card:hover {
@@ -650,21 +816,26 @@ body::before {
   gap: 8px;
 }
 .resource-actions button {
-  background: rgba(22, 27, 34, 0.9);
+  background: rgba(22, 27, 34, 0.92);
+  backdrop-filter: blur(4px);
   border: 1px solid #30363d;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  cursor: pointer;
   color: #c9d1d9;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 .resource-actions button:hover {
-  background: #ffb347;
-  color: #0d1117;
+  background: #2d333b;
+  border-color: #ffb347;
+  color: #f0e6d0;
+  transform: scale(1.12);
 }
 .resource-actions .delete-resource:hover {
-  background: #d9534f;
-  color: white;
+  background: #3d1a1a;
+  border-color: #d9534f;
+  color: #d9534f;
 }
 
 /* ===== ДОМАШКА ===== */
@@ -698,7 +869,6 @@ body::before {
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(255, 180, 70, 0.3);
 }
-
 .tasks-container {
   display: flex;
   flex-direction: column;
@@ -710,8 +880,6 @@ body::before {
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
-  border: 1px solid #30363d;
-  background: #161b22;
 }
 .task-card:hover {
   transform: translateY(-4px);
@@ -855,8 +1023,6 @@ body::before {
 .poll-card,
 .test-card {
   padding: 20px 24px;
-  border: 1px solid #30363d;
-  background: #161b22;
 }
 .event-card:hover,
 .poll-card:hover,
@@ -1177,6 +1343,19 @@ body::before {
   background: #30363d;
 }
 
+/* ===== ФУТЕР ===== */
+.site-footer {
+  grid-area: footer;
+  background: #161b22;
+  border-radius: 28px;
+  text-align: center;
+  padding: 20px;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
 /* ===== АНИМАЦИИ ===== */
 @keyframes slideDown {
   from { transform: translateY(-30px); opacity: 0; }
@@ -1198,16 +1377,6 @@ body::before {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
-}
-.add-subject-btn:hover,
-.add-global-btn:hover,
-.add-folder-btn:hover,
-.add-teacher-btn:hover,
-.add-exam-btn:hover,
-.add-task-btn:hover,
-.add-item-btn:hover,
-.edit-date-btn:hover {
-  animation: pulse 0.6s ease;
 }
 
 /* ===== АДАПТИВ ===== */
@@ -1243,6 +1412,10 @@ body::before {
   .welcome-strip {
     flex-direction: column;
     text-align: center;
+  }
+  .strip-image {
+    width: 100%;
+    max-width: 300px;
   }
   .strip-image img {
     width: 100%;
@@ -1284,6 +1457,17 @@ body::before {
   .time-block .number {
     font-size: 1.5rem;
   }
+  .info-block {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px 20px;
+  }
+  .info-block i {
+    font-size: 2rem;
+  }
+  .info-text {
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1309,210 +1493,5 @@ body::before {
   }
   .schedule-actions {
     justify-content: center;
-  }
-}
-
-/* ===== СТИЛИ ДЛЯ ГИФКИ НА ГЛАВНОЙ ===== */
-.strip-image {
-  position: relative;
-  flex-shrink: 0;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(255, 180, 70, 0.15), 0 8px 24px rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(255, 180, 70, 0.2);
-  transition: all 0.4s ease;
-}
-.strip-image:hover {
-  border-color: #ffb347;
-  box-shadow: 0 0 50px rgba(255, 180, 70, 0.25), 0 12px 32px rgba(0, 0, 0, 0.6);
-  transform: scale(1.02);
-}
-.strip-image img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.9) saturate(1.1);
-  transition: filter 0.4s ease;
-}
-.strip-image:hover img {
-  filter: brightness(1) saturate(1.2);
-}
-/* Лёгкий градиент поверх гифки для лучшего сочетания с тёмной темой */
-.strip-image::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(13, 17, 23, 0.3), rgba(22, 27, 34, 0.1));
-  pointer-events: none;
-  border-radius: 24px;
-}
-/* ===== УНИВЕРСАЛЬНЫЕ КНОПКИ ДЕЙСТВИЙ В КАРТОЧКАХ ===== */
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid #30363d;
-  color: #8b949e;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-size: 0.85rem;
-  flex-shrink: 0;
-  background: #161b22;
-}
-.action-btn:hover {
-  background: #2d333b;
-  border-color: #ffb347;
-  color: #f0e6d0;
-  transform: scale(1.12);
-  box-shadow: 0 0 20px rgba(255, 180, 70, 0.15);
-}
-.action-btn.delete:hover {
-  background: #3d1a1a;
-  border-color: #d9534f;
-  color: #d9534f;
-  box-shadow: 0 0 20px rgba(217, 83, 79, 0.15);
-}
-.action-btn.edit:hover {
-  background: #1a2a3a;
-  border-color: #ffb347;
-  color: #ffb347;
-  box-shadow: 0 0 20px rgba(255, 180, 70, 0.15);
-}
-
-/* Группа кнопок в карточках — единый отступ между ними */
-.card-actions,
-.event-actions,
-.exam-actions,
-.resource-actions,
-.task-actions,
-.poll-actions,
-.test-actions,
-.folder-actions,
-.subject-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-/* Дополнительно: если кнопки в абсолютном позиционировании, задаём фон */
-.exam-actions button,
-.resource-actions button,
-.teacher-card .card-actions button {
-  background: rgba(22, 27, 34, 0.92);
-  backdrop-filter: blur(4px);
-  border: 1px solid #30363d;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  color: #c9d1d9;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.exam-actions button:hover,
-.resource-actions button:hover,
-.teacher-card .card-actions button:hover {
-  background: #2d333b;
-  border-color: #ffb347;
-  color: #f0e6d0;
-  transform: scale(1.12);
-}
-.exam-actions .delete-exam:hover,
-.resource-actions .delete-resource:hover,
-.teacher-card .card-actions .delete-teacher:hover {
-  background: #3d1a1a;
-  border-color: #d9534f;
-  color: #d9534f;
-}
-
-/* ===== ДЛЯ МОБИЛЬНЫХ — чуть меньше ===== */
-@media (max-width: 650px) {
-  .action-btn,
-  .exam-actions button,
-  .resource-actions button,
-  .teacher-card .card-actions button {
-    width: 30px;
-    height: 30px;
-    font-size: 0.7rem;
-  }
-  .card-actions,
-  .event-actions,
-  .exam-actions,
-  .resource-actions,
-  .task-actions,
-  .poll-actions,
-  .test-actions,
-  .folder-actions,
-  .subject-actions {
-    gap: 6px;
-  }
-}
-/* ===== БЛОК ВАЖНОЙ ИНФОРМАЦИИ ===== */
-.info-block {
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-  border: 2px solid #ffb347;
-  border-radius: 28px;
-  padding: 20px 28px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin: 10px 0;
-  color: #f0e6d0;
-  box-shadow: 0 0 30px rgba(255, 180, 70, 0.1), inset 0 0 30px rgba(255, 180, 70, 0.02);
-  transition: 0.3s;
-}
-.info-block:hover {
-  box-shadow: 0 0 50px rgba(255, 180, 70, 0.2), inset 0 0 40px rgba(255, 180, 70, 0.05);
-  border-color: #ffd080;
-  transform: scale(1.01);
-}
-.info-block i {
-  font-size: 2.8rem;
-  color: #ffb347;
-  flex-shrink: 0;
-  animation: pulse-icon 2s ease-in-out infinite;
-}
-@keyframes pulse-icon {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-.info-text {
-  flex: 1;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-.info-text strong {
-  color: #ffb347;
-  font-weight: 700;
-}
-.info-text a {
-  color: #58a6ff;
-  text-decoration: none;
-}
-.info-text a:hover {
-  text-decoration: underline;
-}
-
-/* Для мобильных */
-@media (max-width: 650px) {
-  .info-block {
-    flex-direction: column;
-    text-align: center;
-    padding: 16px 20px;
-  }
-  .info-block i {
-    font-size: 2rem;
-  }
-  .info-text {
-    font-size: 0.9rem;
   }
 }
