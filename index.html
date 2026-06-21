@@ -33,42 +33,276 @@
       <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
       <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
     </div>
-    <div class="sidebar-note"><i class="fas fa-database"></i><p>Данные синхронизируются через Firebase – доступны всем.</p></div>
+    <div class="sidebar-note">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <p>Данные синхронизируются через Firebase – доступны всем.</p>
+    </div>
   </aside>
 
   <main class="main-content">
+    <!-- Приветственная секция -->
     <div class="welcome-strip">
       <div class="strip-image"><img src="data/forest.gif" alt="Лес" loading="lazy"></div>
-      <div class="strip-text"><h2>✨ Добро пожаловать!</h2><p>Единый портал группы Б‑21ЛЕС с актуальным расписанием, экзаменами, домашкой и внеурочкой.</p></div>
+      <div class="strip-text">
+        <h2>✨ Добро пожаловать!</h2>
+        <p>Единый портал группы Б‑21ЛЕС с актуальным расписанием, экзаменами, домашкой и внеурочкой.</p>
+      </div>
     </div>
-    <div style="background:rgba(79,98,122,0.7); border-radius:32px; padding:20px 28px;">
-      <h3 style="color:#faf0ca;"><i class="fas fa-info-circle"></i> Быстрые ссылки</h3>
-      <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
-        <a href="schedule.html" style="background:#8db5e2; padding:10px 20px; border-radius:40px; text-decoration:none; color:#1e293b; font-weight:600;"><i class="fas fa-calendar-alt"></i> Расписание</a>
-        <a href="exam.html" style="background:#ffb347; padding:10px 20px; border-radius:40px; text-decoration:none; color:#1e293b; font-weight:600;"><i class="fas fa-graduation-cap"></i> Экзамены</a>
-        <a href="homework.html" style="background:#7a98fa; padding:10px 20px; border-radius:40px; text-decoration:none; color:#1e293b; font-weight:600;"><i class="fas fa-tasks"></i> Домашка</a>
+
+    <!-- Два обратных отсчёта -->
+    <div class="countdown-section">
+      <!-- Карточка 1: до конца обучения -->
+      <div class="countdown-card" id="gradCard">
+        <h3><i class="fas fa-graduation-cap"></i> До конца обучения</h3>
+        <div class="countdown-display" id="gradDisplay">
+          <div class="time-block"><span class="number" id="gradDays">--</span><span class="label">дней</span></div>
+          <div class="time-block"><span class="number" id="gradHours">--</span><span class="label">часов</span></div>
+          <div class="time-block"><span class="number" id="gradMinutes">--</span><span class="label">минут</span></div>
+          <div class="time-block"><span class="number" id="gradSeconds">--</span><span class="label">секунд</span></div>
+        </div>
+        <button class="edit-date-btn" id="editGradBtn"><i class="fas fa-pen"></i> Установить дату</button>
+        <div style="font-size:0.8rem; color:#d4cbaa; margin-top:8px;" id="gradDateLabel">Дата: не задана</div>
+      </div>
+
+      <!-- Карточка 2: до следующей сессии -->
+      <div class="countdown-card" id="sessionCard">
+        <h3><i class="fas fa-calendar-check"></i> До следующей сессии</h3>
+        <div class="countdown-display" id="sessionDisplay">
+          <div class="time-block"><span class="number" id="sessionDays">--</span><span class="label">дней</span></div>
+          <div class="time-block"><span class="number" id="sessionHours">--</span><span class="label">часов</span></div>
+          <div class="time-block"><span class="number" id="sessionMinutes">--</span><span class="label">минут</span></div>
+          <div class="time-block"><span class="number" id="sessionSeconds">--</span><span class="label">секунд</span></div>
+        </div>
+        <button class="edit-date-btn" id="editSessionBtn"><i class="fas fa-pen"></i> Установить дату</button>
+        <div style="font-size:0.8rem; color:#d4cbaa; margin-top:8px;" id="sessionDateLabel">Дата: не задана</div>
       </div>
     </div>
   </main>
 
   <footer class="site-footer">
     <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Данные хранятся в Firebase</p>
   </footer>
 </div>
 
+<!-- МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТИРОВАНИЯ ДАТЫ -->
+<div id="dateModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeDateModal">&times;</span>
+    <h3 id="dateModalTitle"><i class="fas fa-calendar-alt"></i> Установить дату</h3>
+    <label>Выберите дату и время</label>
+    <input type="datetime-local" id="datePicker" style="width:100%; padding:10px; border-radius:28px; border:1px solid #bba87a; margin:8px 0;">
+    <div class="modal-buttons">
+      <button id="saveDateBtn" class="save-btn">Сохранить</button>
+      <button id="cancelDateBtn" class="cancel-btn">Отмена</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
-  // Простые уведомления для кнопок сайдбара (можно убрать или оставить)
-  const showToast = (msg) => {
+  import { dataManager } from './dataManager.js';
+
+  // --- Константы ---
+  const GRAD_KEY = 'graduationDate';
+  const SESSION_KEY = 'sessionDate';
+
+  // --- Состояние ---
+  let gradDate = null;   // timestamp в миллисекундах
+  let sessionDate = null;
+  let currentEditing = null; // 'grad' или 'session'
+
+  // --- DOM-элементы ---
+  const gradDays = document.getElementById('gradDays');
+  const gradHours = document.getElementById('gradHours');
+  const gradMinutes = document.getElementById('gradMinutes');
+  const gradSeconds = document.getElementById('gradSeconds');
+  const sessionDays = document.getElementById('sessionDays');
+  const sessionHours = document.getElementById('sessionHours');
+  const sessionMinutes = document.getElementById('sessionMinutes');
+  const sessionSeconds = document.getElementById('sessionSeconds');
+  const gradDateLabel = document.getElementById('gradDateLabel');
+  const sessionDateLabel = document.getElementById('sessionDateLabel');
+
+  // Модалка
+  const dateModal = document.getElementById('dateModal');
+  const datePicker = document.getElementById('datePicker');
+  const dateModalTitle = document.getElementById('dateModalTitle');
+
+  // --- Загрузка дат из Firebase ---
+  async function loadDates() {
+    const saved = await dataManager.load('countdownDates');
+    if (saved) {
+      if (saved.graduation) gradDate = saved.graduation;
+      if (saved.session) sessionDate = saved.session;
+    } else {
+      // Даты по умолчанию (можно установить свои)
+      // Например, конец обучения: 30 июня 2026 18:00
+      // Следующая сессия: 1 декабря 2025 09:00
+      gradDate = new Date(2026, 5, 30, 18, 0, 0).getTime(); // 30 июня 2026 18:00
+      sessionDate = new Date(2025, 11, 1, 9, 0, 0).getTime(); // 1 декабря 2025 09:00
+      await saveDates();
+    }
+    updateLabels();
+    updateCountdowns();
+  }
+
+  async function saveDates() {
+    await dataManager.save('countdownDates', {
+      graduation: gradDate,
+      session: sessionDate
+    });
+  }
+
+  // --- Обновление подписей с датами ---
+  function updateLabels() {
+    if (gradDate) {
+      const d = new Date(gradDate);
+      gradDateLabel.textContent = `Дата: ${d.toLocaleDateString('ru-RU')} ${d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'})}`;
+    } else {
+      gradDateLabel.textContent = 'Дата не задана';
+    }
+    if (sessionDate) {
+      const d = new Date(sessionDate);
+      sessionDateLabel.textContent = `Дата: ${d.toLocaleDateString('ru-RU')} ${d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'})}`;
+    } else {
+      sessionDateLabel.textContent = 'Дата не задана';
+    }
+  }
+
+  // --- Обновление обратных отсчётов (вызывается каждую секунду) ---
+  function updateCountdowns() {
+    const now = Date.now();
+
+    // Градуация
+    if (gradDate) {
+      const diff = gradDate - now;
+      if (diff <= 0) {
+        gradDays.textContent = '🎓';
+        gradHours.textContent = '';
+        gradMinutes.textContent = '';
+        gradSeconds.textContent = '';
+        // можно показать сообщение, но оставим как есть
+      } else {
+        const d = Math.floor(diff / (1000*60*60*24));
+        const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+        const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+        const s = Math.floor((diff % (1000*60)) / 1000);
+        gradDays.textContent = String(d).padStart(2, '0');
+        gradHours.textContent = String(h).padStart(2, '0');
+        gradMinutes.textContent = String(m).padStart(2, '0');
+        gradSeconds.textContent = String(s).padStart(2, '0');
+      }
+    } else {
+      gradDays.textContent = '--';
+      gradHours.textContent = '--';
+      gradMinutes.textContent = '--';
+      gradSeconds.textContent = '--';
+    }
+
+    // Сессия
+    if (sessionDate) {
+      const diff = sessionDate - now;
+      if (diff <= 0) {
+        sessionDays.textContent = '🎯';
+        sessionHours.textContent = '';
+        sessionMinutes.textContent = '';
+        sessionSeconds.textContent = '';
+      } else {
+        const d = Math.floor(diff / (1000*60*60*24));
+        const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+        const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+        const s = Math.floor((diff % (1000*60)) / 1000);
+        sessionDays.textContent = String(d).padStart(2, '0');
+        sessionHours.textContent = String(h).padStart(2, '0');
+        sessionMinutes.textContent = String(m).padStart(2, '0');
+        sessionSeconds.textContent = String(s).padStart(2, '0');
+      }
+    } else {
+      sessionDays.textContent = '--';
+      sessionHours.textContent = '--';
+      sessionMinutes.textContent = '--';
+      sessionSeconds.textContent = '--';
+    }
+  }
+
+  // --- Модальное окно для редактирования даты ---
+  function openDateModal(type) {
+    currentEditing = type;
+    const title = type === 'grad' ? 'Установить дату окончания обучения' : 'Установить дату начала сессии';
+    dateModalTitle.innerHTML = `<i class="fas fa-calendar-alt"></i> ${title}`;
+    // Заполнить текущее значение
+    const currentDate = type === 'grad' ? gradDate : sessionDate;
+    if (currentDate) {
+      const d = new Date(currentDate);
+      const year = d.getFullYear();
+      const month = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      const hours = String(d.getHours()).padStart(2,'0');
+      const minutes = String(d.getMinutes()).padStart(2,'0');
+      datePicker.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    } else {
+      datePicker.value = '';
+    }
+    dateModal.style.display = 'flex';
+  }
+
+  function closeDateModal() {
+    dateModal.style.display = 'none';
+    currentEditing = null;
+  }
+
+  async function saveDateFromModal() {
+    const val = datePicker.value;
+    if (!val) {
+      alert('Пожалуйста, выберите дату и время');
+      return;
+    }
+    const timestamp = new Date(val).getTime();
+    if (isNaN(timestamp)) {
+      alert('Некорректная дата');
+      return;
+    }
+    if (currentEditing === 'grad') {
+      gradDate = timestamp;
+    } else if (currentEditing === 'session') {
+      sessionDate = timestamp;
+    }
+    await saveDates();
+    updateLabels();
+    closeDateModal();
+    // Таймер обновится сам через интервал
+  }
+
+  // --- Обработчики событий ---
+  document.getElementById('editGradBtn').addEventListener('click', () => openDateModal('grad'));
+  document.getElementById('editSessionBtn').addEventListener('click', () => openDateModal('session'));
+
+  document.getElementById('closeDateModal').addEventListener('click', closeDateModal);
+  document.getElementById('cancelDateBtn').addEventListener('click', closeDateModal);
+  document.getElementById('saveDateBtn').addEventListener('click', saveDateFromModal);
+  window.addEventListener('click', (e) => { if (e.target === dateModal) closeDateModal(); });
+
+  // Кнопки сайдбара (уведомления)
+  function showToast(msg) {
     const t = document.createElement('div');
     t.innerText = msg;
     t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
-  };
-  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса, 20 июня – Конференция'));
-  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
-  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
-  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+  }
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
+
+  // --- Инициализация ---
+  await loadDates();
+
+  // Запускаем таймер обновления каждую секунду
+  setInterval(updateCountdowns, 1000);
+
+  // Первое обновление
+  updateCountdowns();
 </script>
 </body>
 </html>
