@@ -9,12 +9,16 @@
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
 </head>
 <body>
 <div class="app-grid">
-  <!-- ШАПКА -->
+
+  <!-- ===== ШАПКА ===== -->
   <header class="site-header">
-    <div class="logo"><h1><i class="fas fa-calendar-plus"></i> Б-21ЛЕС</h1></div>
+    <div class="logo">
+      <h1><i class="fas fa-calendar-plus"></i> Б-21ЛЕС</h1>
+    </div>
     <ul class="nav-links">
       <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -24,9 +28,13 @@
       <li><a href="extracurricular.html" class="active"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
       <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
+      <i class="fas fa-moon"></i>
+      <span>Тема</span>
+    </button>
   </header>
 
-  <!-- БОКОВАЯ ПАНЕЛЬ -->
+  <!-- ===== САЙДБАР ===== -->
   <aside class="sidebar">
     <h3><i class="fas fa-compass"></i> Основное</h3>
     <div class="nav-buttons">
@@ -41,12 +49,13 @@
     </div>
   </aside>
 
-  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
   <main class="main-content">
+    <!-- Заголовок -->
     <div class="resources-hero" style="padding-bottom:12px;">
       <div>
         <h2><i class="fas fa-calendar-alt"></i> Внеурочная деятельность</h2>
-        <p>Не учавствуйте, деградируйте, ленитесь!</p>
+        <p>Участвуйте, деградируйте, ленитесь!</p>
       </div>
     </div>
 
@@ -67,18 +76,20 @@
     <div id="itemsContainer" class="tasks-container">
       <div class="empty-state">
         <i class="fas fa-calendar-times"></i>
-        <p>Тут пуфто. Нажмите «Добавить».</p>
+        <p>Пока ничего нет. Нажмите «Добавить».</p>
       </div>
     </div>
   </main>
 
+  <!-- ===== ФУТЕР ===== -->
   <footer class="site-footer">
-    <p>© 2026 Б-21ЛЕС · Допустим</p>
-    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-heart"></i> Пассивная внеучебная жизнь</p>
+    <p>© 2026 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-heart" style="color:var(--accent);"></i> Пассивная внеучебная жизнь</p>
   </footer>
+
 </div>
 
-<!-- МОДАЛКА ДЛЯ СОЗДАНИЯ/РЕДАКТИРОВАНИЯ (универсальная) -->
+<!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ (универсальное) ===== -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeModalBtn">&times;</span>
@@ -91,7 +102,7 @@
   </div>
 </div>
 
-<!-- МОДАЛКА ДЛЯ ПРОХОЖДЕНИЯ ТЕСТА -->
+<!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ ПРОХОЖДЕНИЯ ТЕСТА ===== -->
 <div id="testModal" class="modal">
   <div class="modal-content test-modal-content">
     <span class="close-modal" id="closeTestModal">&times;</span>
@@ -106,51 +117,69 @@
 </div>
 
 <script type="module">
+  // ============================================================
+  //  ИМПОРТЫ
+  // ============================================================
   import { dataManager } from './dataManager.js';
 
-  // --- СОСТОЯНИЕ ---
+  // ============================================================
+  //  СОСТОЯНИЕ
+  // ============================================================
   let currentSection = 'events'; // 'events', 'polls', 'tests'
   let data = { events: [], polls: [], tests: [] };
   let editId = null;
+  let modalSection = null;
 
-  // --- ЗАГРУЗКА ---
+  // ============================================================
+  //  ЗАГРУЗКА / СОХРАНЕНИЕ
+  // ============================================================
   async function loadData() {
-    const saved = await dataManager.load('extracurricular');
-    if (saved && saved.events && saved.polls && saved.tests) {
-      data = saved;
-    } else {
-      // Демо-данные
-      data = {
-        events: [
-          { id: 'ev1', title: 'Лесная олимпиада', date: '2025-06-10', description: 'Командное соревнование по лесоведению.', link: '#' },
-          { id: 'ev2', title: 'Лекция "Современные ГИС"', date: '2025-05-25', description: 'Приглашённый специалист из Рослесинфорг.', link: '#' }
-        ],
-        polls: [
-          { id: 'poll1', question: 'Какое направление вам интереснее?', options: [{text:'Лесоводство', votes:12}, {text:'Экология', votes:8}, {text:'ГИС', votes:5}], totalVotes:25, userVoted: false }
-        ],
-        tests: [
-          { id: 'test1', title: 'Основы дендрологии', questions: [
-            { text: 'Какое дерево является хвойным?', options: ['Берёза', 'Сосна', 'Дуб', 'Клён'], correctIndex: 1 },
-            { text: 'Что такое таксация леса?', options: ['Учёт лесных ресурсов', 'Посадка деревьев', 'Борьба с вредителями', 'Охрана леса'], correctIndex: 0 }
-          ] }
-        ]
-      };
-      await dataManager.save('extracurricular', data);
+    try {
+      const saved = await dataManager.load('extracurricular');
+      if (saved && saved.events && saved.polls && saved.tests) {
+        data = saved;
+      } else {
+        // Демо-данные
+        data = {
+          events: [
+            { id: 'ev1', title: 'Лесная олимпиада', date: '2025-06-10', description: 'Командное соревнование по лесоведению.', link: '#' },
+            { id: 'ev2', title: 'Лекция "Современные ГИС"', date: '2025-05-25', description: 'Приглашённый специалист из Рослесинфорг.', link: '#' }
+          ],
+          polls: [
+            { id: 'poll1', question: 'Какое направление вам интереснее?', options: [{text:'Лесоводство', votes:12}, {text:'Экология', votes:8}, {text:'ГИС', votes:5}], totalVotes:25, userVoted: false }
+          ],
+          tests: [
+            { id: 'test1', title: 'Основы дендрологии', questions: [
+              { text: 'Какое дерево является хвойным?', options: ['Берёза', 'Сосна', 'Дуб', 'Клён'], correctIndex: 1 },
+              { text: 'Что такое таксация леса?', options: ['Учёт лесных ресурсов', 'Посадка деревьев', 'Борьба с вредителями', 'Охрана леса'], correctIndex: 0 }
+            ] }
+          ]
+        };
+        await dataManager.save('extracurricular', data);
+      }
+    } catch (e) {
+      console.warn('Ошибка загрузки внеурочных данных:', e);
+      data = { events: [], polls: [], tests: [] };
     }
     renderCurrentSection();
   }
 
   async function saveData() {
-    await dataManager.save('extracurricular', data);
+    try {
+      await dataManager.save('extracurricular', data);
+    } catch (e) {
+      console.warn('Ошибка сохранения внеурочных данных:', e);
+    }
   }
 
-  // --- РЕНДЕР ---
+  // ============================================================
+  //  ОТРИСОВКА ТЕКУЩЕГО РАЗДЕЛА
+  // ============================================================
   function renderCurrentSection() {
     const container = document.getElementById('itemsContainer');
     const titleEl = document.getElementById('sectionTitle');
     const addBtn = document.getElementById('addItemBtn');
 
-    // Обновляем заголовок и кнопку
     if (currentSection === 'events') {
       titleEl.innerHTML = '<i class="fas fa-party-horn"></i> Мероприятия';
       addBtn.innerHTML = '<i class="fas fa-plus"></i> Добавить мероприятие';
@@ -166,7 +195,9 @@
     }
   }
 
-  // --- МЕРОПРИЯТИЯ ---
+  // ============================================================
+  //  МЕРОПРИЯТИЯ
+  // ============================================================
   function renderEvents(container) {
     if (data.events.length === 0) {
       container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Нет мероприятий. Добавьте первое!</p></div>`;
@@ -181,8 +212,8 @@
         <div class="card-header-event">
           <div class="event-date"><i class="fas fa-calendar-day"></i> ${escapeHtml(ev.date)}</div>
           <div class="event-actions">
-            <button class="edit-event" data-id="${ev.id}"><i class="fas fa-edit"></i></button>
-            <button class="delete-event" data-id="${ev.id}"><i class="fas fa-trash-alt"></i></button>
+            <button class="edit-event action-btn edit" data-id="${ev.id}"><i class="fas fa-edit"></i></button>
+            <button class="delete-event action-btn delete" data-id="${ev.id}"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
         <h3>${escapeHtml(ev.title)}</h3>
@@ -201,7 +232,9 @@
     });
   }
 
-  // --- ОПРОСЫ ---
+  // ============================================================
+  //  ОПРОСЫ
+  // ============================================================
   function renderPolls(container) {
     if (data.polls.length === 0) {
       container.innerHTML = `<div class="empty-state"><i class="fas fa-chart-simple"></i><p>Нет опросов. Создайте первый!</p></div>`;
@@ -218,7 +251,7 @@
         <div class="poll-header">
           <h3><i class="fas fa-poll"></i> ${escapeHtml(poll.question)}</h3>
           <div class="poll-actions">
-            <button class="delete-poll" data-id="${poll.id}"><i class="fas fa-trash-alt"></i></button>
+            <button class="delete-poll action-btn delete" data-id="${poll.id}"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
         <div class="poll-options" id="poll-${poll.id}">
@@ -227,7 +260,7 @@
               <div class="option-text">${escapeHtml(opt.text)}</div>
               ${userVoted ? `
                 <div class="option-bar"><div class="bar-fill" style="width: ${(opt.votes/total*100)}%"></div></div>
-                <div style="font-size:0.8rem;">${opt.votes} голосов (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">${opt.votes} голосов (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>
               ` : `
                 <button class="vote-btn" data-poll="${poll.id}" data-optidx="${idx}">Голосовать</button>
               `}
@@ -266,7 +299,9 @@
     renderCurrentSection();
   }
 
-  // --- ТЕСТЫ ---
+  // ============================================================
+  //  ТЕСТЫ
+  // ============================================================
   function renderTests(container) {
     if (data.tests.length === 0) {
       container.innerHTML = `<div class="empty-state"><i class="fas fa-puzzle-piece"></i><p>Нет тестов. Добавьте новый тест.</p></div>`;
@@ -282,8 +317,8 @@
           <h3><i class="fas fa-brain"></i> ${escapeHtml(test.title)}</h3>
           <div class="test-actions">
             <button class="take-test" data-id="${test.id}"><i class="fas fa-play"></i> Пройти</button>
-            <button class="edit-test" data-id="${test.id}"><i class="fas fa-edit"></i></button>
-            <button class="delete-test" data-id="${test.id}"><i class="fas fa-trash-alt"></i></button>
+            <button class="edit-test action-btn edit" data-id="${test.id}"><i class="fas fa-edit"></i></button>
+            <button class="delete-test action-btn delete" data-id="${test.id}"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
         <p>Вопросов: ${test.questions.length}</p>
@@ -301,7 +336,9 @@
     });
   }
 
-  // --- УДАЛЕНИЕ ---
+  // ============================================================
+  //  УДАЛЕНИЕ ЭЛЕМЕНТОВ
+  // ============================================================
   async function deleteItem(section, id) {
     if (section === 'events') data.events = data.events.filter(e => e.id !== id);
     if (section === 'polls') data.polls = data.polls.filter(p => p.id !== id);
@@ -310,11 +347,12 @@
     renderCurrentSection();
   }
 
-  // --- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ ---
+  // ============================================================
+  //  МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ (универсальное)
+  // ============================================================
   const modal = document.getElementById('editModal');
   const modalTitle = document.getElementById('modalTitle');
   const modalFields = document.getElementById('modalDynamicFields');
-  let modalSection = null;
 
   function openEditModal(section, id = null) {
     modalSection = section;
@@ -370,21 +408,21 @@
         qs.forEach((q, idx) => {
           const qDiv = document.createElement('div');
           qDiv.className = 'question-editor';
-          qDiv.style.cssText = 'background:#f3ecd6; padding:12px; border-radius:24px; margin-bottom:16px;';
+          qDiv.style.cssText = 'background:var(--bg-hover); padding:12px; border-radius:24px; margin-bottom:16px;';
           qDiv.innerHTML = `
-            <div><input type="text" placeholder="Текст вопроса" value="${escapeHtml(q.text)}" class="q-text" style="width:100%; padding:8px; border-radius:20px; border:1px solid #bba87a;"></div>
+            <div><input type="text" placeholder="Текст вопроса" value="${escapeHtml(q.text)}" class="q-text" style="width:100%; padding:8px; border-radius:20px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary);"></div>
             <div class="question-options">
               ${q.options.map((opt, optIdx) => `
                 <div style="display:flex; gap:8px; margin:6px 0; align-items:center;">
-                  <input type="text" placeholder="Вариант ${optIdx+1}" value="${escapeHtml(opt)}" class="q-opt" style="flex:1; padding:6px 12px; border-radius:20px; border:1px solid #bba87a;">
-                  ${optIdx === q.correctIndex ? '<span class="correct-badge" style="background:#2d6a4f; color:white; padding:2px 8px; border-radius:20px; font-size:0.7rem;">✓ Правильный</span>' : ''}
+                  <input type="text" placeholder="Вариант ${optIdx+1}" value="${escapeHtml(opt)}" class="q-opt" style="flex:1; padding:6px 12px; border-radius:20px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary);">
+                  ${optIdx === q.correctIndex ? '<span class="correct-badge" style="background:var(--success); color:white; padding:2px 8px; border-radius:20px; font-size:0.7rem;">✓ Правильный</span>' : ''}
                 </div>
               `).join('')}
             </div>
-            <select class="q-correct" style="width:100%; padding:6px 12px; border-radius:20px; border:1px solid #bba87a; margin:8px 0;">
+            <select class="q-correct" style="width:100%; padding:6px 12px; border-radius:20px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary); margin:8px 0;">
               ${q.options.map((_, optIdx) => `<option value="${optIdx}" ${optIdx === q.correctIndex ? 'selected' : ''}>Правильный ответ: вариант ${optIdx+1}</option>`).join('')}
             </select>
-            <button type="button" class="remove-question-btn" style="background:#d9534f; color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">Удалить вопрос</button>
+            <button type="button" class="remove-question-btn" style="background:var(--danger); color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">Удалить вопрос</button>
           `;
           qDiv.querySelector('.remove-question-btn').addEventListener('click', () => {
             questions.splice(idx, 1);
@@ -470,7 +508,9 @@
     renderCurrentSection();
   }
 
-  // --- ТЕСТ: МОДАЛЬНОЕ ОКНО ПРОХОЖДЕНИЯ ---
+  // ============================================================
+  //  ТЕСТ: МОДАЛЬНОЕ ОКНО ПРОХОЖДЕНИЯ
+  // ============================================================
   let currentTestId = null;
   const testModal = document.getElementById('testModal');
   const testQuestionsContainer = document.getElementById('testQuestionsContainer');
@@ -516,7 +556,19 @@
     resultDiv.innerHTML = `<i class="fas fa-chart-line"></i> Ваш результат: ${score} из ${test.questions.length} (${Math.round(score/test.questions.length*100)}%)`;
   }
 
-  // --- ОБРАБОТЧИКИ ---
+  // ============================================================
+  //  ВСПОМОГАТЕЛЬНЫЕ
+  // ============================================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ============================================================
+  //  ОБРАБОТЧИКИ СОБЫТИЙ
+  // ============================================================
   document.addEventListener('DOMContentLoaded', () => {
     // Вкладки
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -553,7 +605,7 @@
     function showToast(msg) {
       const t = document.createElement('div');
       t.innerText = msg;
-      t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+      t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); color:var(--text-primary); padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid var(--border-color); transition: opacity 0.4s;';
       document.body.appendChild(t);
       setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
     }
@@ -562,17 +614,9 @@
     document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
     document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
-    // Загрузка
+    // Загрузка данных
     loadData();
   });
-
-  // --- ВСПОМОГАТЕЛЬНЫЕ ---
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
 </script>
 </body>
 </html>
