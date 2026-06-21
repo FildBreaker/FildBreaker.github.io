@@ -924,279 +924,226 @@ body::before {
 .resource-card:nth-child(3) { animation-delay: 0.15s; }
 /* можно добавить больше через JS */
 
-/* ===== АДАПТИВ ===== */
-@media (max-width: 650px) {
-  .site-header { flex-direction: column; align-items: stretch; gap: 12px; }
-  .nav-links { justify-content: center; }
-  .teachers-grid, .exams-grid, .resources-grid { grid-template-columns: 1fr; }
-  .welcome-strip { flex-direction: column; text-align: center; }
-  .strip-image img { width: 100%; height: auto; }
-  .homework-header { flex-direction: column; align-items: flex-start; }
-  .task-card { flex-direction: column; }
-  .task-actions { align-self: flex-end; }
-}
-/* ===== СТРАНИЦА ЭКЗАМЕНОВ ===== */
-.exams-hero {
-  background: rgba(79, 98, 122, 0.75);
-  backdrop-filter: blur(4px);
-  border-radius: 32px;
-  padding: 24px 28px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  border: 1px solid rgba(255, 215, 150, 0.3);
-  animation: fadeUp 0.6s ease;
-}
-.hero-text h2 {
-  font-size: 1.9rem;
-  background: linear-gradient(135deg, #ffe6b3, #ffc857);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-}
-.hero-text p {
-  color: #f1e7d3;
-  margin-top: 6px;
-}
-.hero-badge {
-  background: #2d3e4e;
-  padding: 10px 20px;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #ffd966;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-.exams-header-actions {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.add-exam-btn {
-  background: #f0a500;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 40px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #1e293b;
-}
-.add-exam-btn:hover {
-  background: #ffb347;
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+/* ===== АДАПТИВ (ИСПРАВЛЕННЫЙ) ===== */
+@media (max-width: 850px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: "header" "sidebar" "main" "footer";
+    gap: 20px;
+    padding: 16px;
+  }
+
+  /* Отключаем липкость сайдбара на мобильных */
+  .sidebar {
+    position: static !important;
+    top: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Убираем backdrop-filter на мобильных для производительности */
+  .schedule-section,
+  .exams-hero,
+  .hero-resources,
+  .homework-header,
+  .info-block,
+  .welcome-strip,
+  .teachers-section,
+  .resources-hero,
+  .countdown-card {
+    backdrop-filter: none !important;
+    background: rgba(30, 34, 51, 0.92) !important;
+  }
+
+  /* Шапка на мобильных */
+  .site-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+  .nav-links {
+    justify-content: center;
+    gap: 12px;
+  }
+  .nav-links a {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+  }
+
+  /* Сетки на мобильных – в одну колонку */
+  .teachers-grid,
+  .exams-grid,
+  .resources-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Приветственная полоска */
+  .welcome-strip {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  .strip-image img {
+    width: 100%;
+    height: auto;
+    max-height: 160px;
+    object-fit: cover;
+  }
+
+  /* Таймеры */
+  .countdown-section {
+    grid-template-columns: 1fr;
+  }
+  .countdown-card {
+    padding: 16px;
+  }
+  .time-block {
+    min-width: 50px;
+    padding: 6px 10px;
+  }
+  .time-block .number {
+    font-size: 1.5rem;
+  }
+
+  /* Заголовки */
+  .schedule-header h2,
+  .teachers-header h2,
+  .resources-hero h2,
+  .exams-hero .hero-text h2,
+  .homework-header h2,
+  .extracurricular-header h2 {
+    font-size: 1.3rem;
+  }
+
+  /* Кнопки */
+  .add-teacher-btn,
+  .add-exam-btn,
+  .add-task-btn,
+  .add-item-btn,
+  .add-folder-btn,
+  .add-subject-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Карточки */
+  .exam-card .card-header {
+    flex-wrap: wrap;
+  }
+  .resource-card {
+    flex-wrap: wrap;
+  }
+  .resource-card .card-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.8rem;
+  }
+
+  /* Таблица расписания */
+  .schedule-table {
+    font-size: 0.7rem;
+    min-width: 480px;
+  }
+  .schedule-table th,
+  .schedule-table td {
+    padding: 6px 4px;
+  }
+  .schedule-table .pair-time {
+    width: 60px;
+    font-size: 0.6rem;
+  }
+  .cell-content .subject {
+    font-size: 0.65rem;
+  }
+  .cell-content .end-date {
+    font-size: 0.55rem;
+  }
+
+  /* Модалки */
+  .modal-content {
+    padding: 20px;
+    max-width: 95%;
+  }
+
+  /* Сайдбар-кнопки в ряд на мобильных */
+  .nav-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .nav-buttons .nav-btn {
+    flex: 1 1 calc(50% - 6px);
+    text-align: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    padding: 10px 8px;
+  }
+  .nav-buttons .nav-btn i {
+    margin-right: 4px;
+  }
+
+  /* Вкладки внеурочки */
+  .section-tabs {
+    justify-content: center;
+  }
+  .tab-btn {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+  }
+
+  /* Футер */
+  .site-footer {
+    padding: 16px;
+    font-size: 0.75rem;
+  }
 }
 
-.exams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 28px;
-  margin: 20px 0;
-}
-.exam-card {
-  background: #fef9ef;
-  border-radius: 32px;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.2,0,0,1);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  animation: fadeUp 0.5s ease forwards;
-  opacity: 0;
-}
-.exam-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 6px;
-  background: linear-gradient(90deg, #f7971e, #ffd200);
-}
-.exam-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 24px 36px rgba(0,0,0,0.2);
-}
-.exam-card.removing {
-  animation: fadeOut 0.3s ease forwards;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 24px 12px 24px;
-}
-.exam-icon {
-  width: 55px;
-  height: 55px;
-  background: #4a4e69;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffdd99;
-  font-size: 1.9rem;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-  flex-shrink: 0;
-}
-.exam-title h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #2c3e4e;
-  margin-bottom: 4px;
-}
-.exam-type {
-  font-size: 0.7rem;
-  background: #e9ecef;
-  padding: 4px 12px;
-  border-radius: 40px;
-  font-weight: 600;
-  color: #2d6a4f;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.card-details {
-  padding: 0 24px 12px;
-  border-bottom: 1px solid #e2dccd;
-}
-.detail-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.85rem;
-  padding: 4px 0;
-  color: #2d3e4e;
-}
-.detail-row i {
-  width: 24px;
-  color: #e67e22;
-}
-.exam-resources {
-  padding: 16px 24px;
-  background: rgba(230, 215, 170, 0.2);
-  margin: 8px 12px;
-  border-radius: 24px;
-  flex: 1;
-}
-.resources-title {
-  font-weight: 600;
-  margin-bottom: 12px;
-  font-size: 0.9rem;
-  color: #7b2c00;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.resource-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.res-link {
-  background: #f1e7d3;
-  padding: 6px 14px;
-  border-radius: 60px;
-  font-size: 0.75rem;
-  text-decoration: none;
-  color: #2c3e4e;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-  border: 1px solid #cfc29e;
-}
-.res-link i { font-size: 0.8rem; color: #c46d0b; }
-.res-link:hover {
-  background: #ffdc97;
-  transform: translateY(-2px);
-  border-color: #f5b042;
-}
-.card-footer-note {
-  padding: 14px 24px 20px;
-  font-size: 0.8rem;
-  border-top: 1px dashed #d8cfb0;
-  margin-top: auto;
-  color: #5f4c2b;
-}
-.card-footer-note a {
-  color: #d97917;
-  text-decoration: none;
-  font-weight: 500;
-  transition: 0.2s;
-}
-.card-footer-note a:hover {
-  text-decoration: underline;
-  color: #b35103;
-}
-.exam-actions {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  display: flex;
-  gap: 8px;
-  z-index: 2;
-}
-.exam-actions button {
-  background: rgba(255,255,255,0.85);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.8rem;
-  color: #2c3e4e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-}
-.exam-actions button:hover {
-  background: #ffb347;
-  transform: scale(1.1);
-}
-.exam-actions .delete-exam:hover {
-  background: #d9534f;
-  color: white;
-}
-.info-block {
-  background: #2b3b46;
-  border-radius: 28px;
-  padding: 20px 28px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin: 10px 0;
-  color: #fff1cf;
-}
-.info-block i {
-  font-size: 2.5rem;
-  color: #ffbc6e;
-}
-.info-text {
-  flex: 1;
-  font-size: 0.95rem;
-}
-
-/* Адаптив */
-@media (max-width: 650px) {
-  .exams-grid { grid-template-columns: 1fr; }
-  .hero-text h2 { font-size: 1.6rem; }
-  .exam-actions { top: 8px; right: 12px; }
+/* Дополнительно для совсем маленьких экранов */
+@media (max-width: 480px) {
+  .app-grid {
+    padding: 10px;
+    gap: 12px;
+  }
+  .nav-links {
+    gap: 6px;
+  }
+  .nav-links a {
+    font-size: 0.7rem;
+    padding: 4px 6px;
+  }
+  .nav-links a i {
+    font-size: 0.8rem;
+  }
+  .schedule-table {
+    font-size: 0.6rem;
+    min-width: 360px;
+  }
+  .schedule-table .pair-time {
+    width: 45px;
+    font-size: 0.5rem;
+  }
+  .cell-content .subject {
+    font-size: 0.55rem;
+  }
+  .schedule-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .schedule-actions {
+    justify-content: center;
+  }
+  .reset-btn {
+    font-size: 0.7rem;
+    padding: 6px 14px;
+  }
+  .sync-hint {
+    font-size: 0.6rem;
+    padding: 3px 10px;
+  }
 }
 
 /* ===== СТРАНИЦА РЕСУРСОВ (ПАПКИ) ===== */
