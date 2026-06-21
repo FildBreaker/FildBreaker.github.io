@@ -42,7 +42,7 @@
         <h2><i class="fas fa-table-list"></i> Расписание занятий</h2>
         <div class="schedule-actions">
           <button id="resetScheduleBtn" class="reset-btn"><i class="fas fa-undo-alt"></i> Сбросить</button>
-          <span class="sync-hint"><i class="fas fa-sync-alt"></i> автосинхронизация</span>
+          <span class="sync-hint"><i class="fas fa-sync-alt fa-fw"></i> автосинхронизация</span>
         </div>
       </div>
       <div class="table-wrapper">
@@ -83,9 +83,9 @@
 <script type="module">
   import { dataManager } from './dataManager.js';
 
-  // --- Исходное расписание (6 пар, как на картинке) ---
+  // --- Исходное расписание (6 пар) ---
   const defaultSchedule = {
-    0: { // ПН
+    0: {
       1: { subject: "Проектная деятельность (П)", room: "1-210", endDate: "31.05.2026" },
       2: { subject: "Основы лесопаркового хозяйства (П)", room: "1-308", endDate: "31.05.2026" },
       3: { subject: "Лесная энтомология (П)", room: "1-203", endDate: "31.05.2026" },
@@ -93,7 +93,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    1: { // ВТ
+    1: {
       1: { subject: "Экономическая теория (П)", room: "1-303", endDate: "31.05.2026" },
       2: { subject: "Экономическая теория (П)", room: "1-408а", endDate: "31.05.2026" },
       3: { subject: "Основы лесопаркового хозяйства (П)", room: "Библиотека 309", endDate: "31.05.2026" },
@@ -101,7 +101,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    2: { // СР
+    2: {
       1: { subject: "Цифровые технологии (П)", room: "4-222", endDate: "31.05.2026" },
       2: { subject: "Технология лесозащиты (П)", room: "1-308", endDate: "31.05.2026" },
       3: { subject: "Физ-ра", room: "Спорткомплекс", endDate: "31.05.2026" },
@@ -109,7 +109,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    3: { // ЧТ
+    3: {
       1: { subject: "Лесная селекция (П)", room: "1-305", endDate: "31.05.2026" },
       2: { subject: "Лесная селекция (П)", room: "1-210", endDate: "31.05.2026" },
       3: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" },
@@ -117,7 +117,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    4: { // ПТ
+    4: {
       1: { subject: "Начертательная геометрия (П)", room: "3-23", endDate: "31.05.2026" },
       2: { subject: "Начертательная геометрия (П)", room: "3-24", endDate: "31.05.2026" },
       3: { subject: "Лесная энтомология (П)", room: "1-202", endDate: "31.05.2026" },
@@ -125,7 +125,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    5: { // СБ
+    5: {
       1: { subject: "", room: "", endDate: "" },
       2: { subject: "", room: "", endDate: "" },
       3: { subject: "", room: "", endDate: "" },
@@ -133,7 +133,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    6: { // ВС
+    6: {
       1: { subject: "", room: "", endDate: "" },
       2: { subject: "", room: "", endDate: "" },
       3: { subject: "", room: "", endDate: "" },
@@ -143,7 +143,6 @@
     }
   };
 
-  // --- Времена пар и перерывы ---
   const pairTimes = {
     1: "1 пара (9:00 – 10:30)",
     2: "2 пара (10:45 – 12:15)",
@@ -163,7 +162,6 @@
 
   let scheduleData = {};
 
-  // --- Загрузка / сохранение ---
   async function loadSchedule() {
     const saved = await dataManager.load('schedule');
     if (saved) {
@@ -179,13 +177,10 @@
     await dataManager.save('schedule', scheduleData);
   }
 
-  // --- Рендер таблицы с перерывами ---
   function renderSchedule() {
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
-
     for (let pair = 1; pair <= MAX_PAIR; pair++) {
-      // Строка с парами
       const tr = document.createElement('tr');
       const tdTime = document.createElement('td');
       tdTime.className = 'pair-time';
@@ -196,10 +191,14 @@
         const td = document.createElement('td');
         td.className = 'schedule-cell';
         const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', endDate: '' };
+        const subjectHtml = lesson.subject
+          ? `<span class="subject">${lesson.subject}${lesson.room ? ` <span class="room">(${lesson.room})</span>` : ''}</span>`
+          : `<span class="subject">—</span>`;
+        const endDateHtml = lesson.endDate ? `<span class="end-date"><i class="far fa-calendar-alt"></i> до ${lesson.endDate}</span>` : '';
         td.innerHTML = `
           <div class="cell-content">
-            <div class="subject">${lesson.subject || '—'}${lesson.room ? ` (${lesson.room})` : ''}</div>
-            ${lesson.endDate ? `<div class="end-date"><i class="far fa-calendar-alt"></i> до ${lesson.endDate}</div>` : ''}
+            ${subjectHtml}
+            ${endDateHtml}
             <div class="edit-icon"><i class="fas fa-pen"></i></div>
           </div>
         `;
@@ -210,13 +209,11 @@
       }
       tbody.appendChild(tr);
 
-      // Если не последняя пара – добавляем строку с перерывом
       if (pair < MAX_PAIR) {
         const breakTr = document.createElement('tr');
         breakTr.className = 'break-row';
         const breakTd = document.createElement('td');
-        breakTd.colSpan = 8; // 7 дней + столбец "Пара"
-        breakTd.style.cssText = 'background: #2c3e4e; color: #f9e79f; text-align: center; font-size: 0.8rem; padding: 4px;';
+        breakTd.colSpan = 8;
         breakTd.textContent = breaks[pair] || '';
         breakTr.appendChild(breakTd);
         tbody.appendChild(breakTr);
@@ -224,7 +221,7 @@
     }
   }
 
-  // --- Модалка редактирования ---
+  // --- Модалка ---
   let currentEditDay = null, currentEditPair = null;
   const modal = document.getElementById('editModal');
   const editSubject = document.getElementById('editSubject');
@@ -253,7 +250,7 @@
     const newRoom = editRoom.value.trim();
     let newEndDate = editEndDate.value.trim();
     if (newEndDate && !/^\d{2}\.\d{2}\.\d{4}$/.test(newEndDate)) {
-      alert('Введите дату в формате ДД.ММ.ГГГГ (например, 31.05.2026)');
+      alert('Введите дату в формате ДД.ММ.ГГГГ');
       return;
     }
     if (!scheduleData[currentEditDay]) scheduleData[currentEditDay] = {};
@@ -268,20 +265,20 @@
   }
 
   async function resetToDefault() {
-    if (!confirm('Сбросить расписание к исходному? Все изменения будут потеряны.')) return;
+    if (!confirm('Сбросить расписание к исходному?')) return;
     scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
     await saveSchedule();
     renderSchedule();
   }
 
-  // --- Обработчики событий ---
+  // --- Обработчики ---
   document.querySelector('.close-modal')?.addEventListener('click', closeModal);
   document.querySelector('.cancel-btn')?.addEventListener('click', closeModal);
   window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
   document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
 
-  // Кнопки сайдбара (быстрые переходы)
+  // Кнопки сайдбара
   function showToast(msg) {
     const t = document.createElement('div');
     t.innerText = msg;
@@ -289,14 +286,11 @@
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
   }
-
-  // Обработчики для кнопок сайдбара – они НЕ делают редирект, только показывают тосты или переходят по ссылке
-  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса, 20 июня – Конференция'));
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
-  // Старт
   loadSchedule();
 </script>
 </body>
