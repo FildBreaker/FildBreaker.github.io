@@ -1,26 +1,23 @@
 <!DOCTYPE html>
 <html lang="ru">
-<header class="site-header">
-  <div class="logo"><h1><i class="fas fa-compass"></i> Б-21ЛЕС</h1></div>
-  <ul class="nav-links">
-    <li><a href="index.html" class="active"><i class="fas fa-home"></i> Главная</a></li>
-    <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
-    <li><a href="exam.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
-    <li><a href="resources.html"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
-    <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
-    <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
-    <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
-  </ul>
-  <!-- Кнопка темы -->
-  <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
-    <i class="fas fa-moon"></i>
-    <span>Тема</span>
-  </button>
-</header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Главная | Б-21ЛЕС</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data/icon.ico">
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
+</head>
 <body>
 <div class="app-grid">
+  <!-- ===== ШАПКА ===== -->
   <header class="site-header">
-    <div class="logo"><h1><i class="fas fa-compass"></i> Б-21ЛЕС</h1></div>
+    <div class="logo">
+      <h1><i class="fas fa-compass"></i> Б-21ЛЕС</h1>
+    </div>
     <ul class="nav-links">
       <li><a href="index.html" class="active"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -30,8 +27,14 @@
       <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
       <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
+    <!-- Кнопка выбора темы -->
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
+      <i class="fas fa-moon"></i>
+      <span>Тема</span>
+    </button>
   </header>
 
+  <!-- ===== САЙДБАР ===== -->
   <aside class="sidebar">
     <h3><i class="fas fa-compass"></i> Основное</h3>
     <div class="nav-buttons">
@@ -46,13 +49,16 @@
     </div>
   </aside>
 
+  <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
   <main class="main-content">
     <!-- Приветственная секция -->
     <div class="welcome-strip">
-      <div class="strip-image"><img src="data/forest.gif" alt="Лес" loading="lazy"></div>
+      <div class="strip-image">
+        <img src="data/forest.gif" alt="Лес" loading="lazy">
+      </div>
       <div class="strip-text">
         <h2>✨ Добро пожаловать!</h2>
-        <p>Единый портал группы Б‑21ЛЕС с актуальным расписанием, экзаменами, домашкой и всяким шлаком.</p>
+        <p>Единый портал группы Б‑21ЛЕС с актуальным расписанием, экзаменами, домашкой и прочим, прочим.</p>
       </div>
     </div>
 
@@ -68,7 +74,7 @@
           <div class="time-block"><span class="number" id="gradSeconds">--</span><span class="label">секунд</span></div>
         </div>
         <button class="edit-date-btn" id="editGradBtn"><i class="fas fa-pen"></i> Установить дату</button>
-        <div style="font-size:0.8rem; color:#d4cbaa; margin-top:8px;" id="gradDateLabel">Дата: не задана</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;" id="gradDateLabel">Дата: не задана</div>
       </div>
 
       <!-- Карточка 2: до следующей сессии -->
@@ -81,24 +87,32 @@
           <div class="time-block"><span class="number" id="sessionSeconds">--</span><span class="label">секунд</span></div>
         </div>
         <button class="edit-date-btn" id="editSessionBtn"><i class="fas fa-pen"></i> Установить дату</button>
-        <div style="font-size:0.8rem; color:#d4cbaa; margin-top:8px;" id="sessionDateLabel">Дата: не задана</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;" id="sessionDateLabel">Дата: не задана</div>
       </div>
+    </div>
+
+    <!-- Быстрые ссылки -->
+    <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:8px;">
+      <a href="schedule.html" class="nav-btn" style="width:auto; padding:12px 28px; text-align:center; justify-content:center;"><i class="fas fa-calendar-alt"></i> Расписание</a>
+      <a href="exam.html" class="nav-btn" style="width:auto; padding:12px 28px; text-align:center; justify-content:center;"><i class="fas fa-graduation-cap"></i> Экзамены</a>
+      <a href="homework.html" class="nav-btn" style="width:auto; padding:12px 28px; text-align:center; justify-content:center;"><i class="fas fa-tasks"></i> Домашка</a>
     </div>
   </main>
 
+  <!-- ===== ФУТЕР ===== -->
   <footer class="site-footer">
     <p>© 2026 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
-    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Данные хранятся в Firebase</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-heart" style="color:var(--accent);"></i> Сделано с душой</p>
   </footer>
 </div>
 
-<!-- МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТИРОВАНИЯ ДАТЫ -->
+<!-- ===== МОДАЛКА ДЛЯ РЕДАКТИРОВАНИЯ ДАТ ТАЙМЕРОВ ===== -->
 <div id="dateModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeDateModal">&times;</span>
     <h3 id="dateModalTitle"><i class="fas fa-calendar-alt"></i> Установить дату</h3>
     <label>Выберите дату и время</label>
-    <input type="datetime-local" id="datePicker" style="width:100%; padding:10px; border-radius:28px; border:1px solid #bba87a; margin:8px 0;">
+    <input type="datetime-local" id="datePicker" style="width:100%; padding:10px; border-radius:28px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary); margin:8px 0;">
     <div class="modal-buttons">
       <button id="saveDateBtn" class="save-btn">Сохранить</button>
       <button id="cancelDateBtn" class="cancel-btn">Отмена</button>
@@ -106,19 +120,17 @@
   </div>
 </div>
 
+<!-- ===== СКРИПТ ДЛЯ ТАЙМЕРОВ ===== -->
 <script type="module">
   import { dataManager } from './dataManager.js';
 
-  // --- Константы ---
   const GRAD_KEY = 'graduationDate';
   const SESSION_KEY = 'sessionDate';
 
-  // --- Состояние ---
-  let gradDate = null;   // timestamp в миллисекундах
+  let gradDate = null;
   let sessionDate = null;
-  let currentEditing = null; // 'grad' или 'session'
+  let currentEditing = null;
 
-  // --- DOM-элементы ---
   const gradDays = document.getElementById('gradDays');
   const gradHours = document.getElementById('gradHours');
   const gradMinutes = document.getElementById('gradMinutes');
@@ -130,23 +142,20 @@
   const gradDateLabel = document.getElementById('gradDateLabel');
   const sessionDateLabel = document.getElementById('sessionDateLabel');
 
-  // Модалка
   const dateModal = document.getElementById('dateModal');
   const datePicker = document.getElementById('datePicker');
   const dateModalTitle = document.getElementById('dateModalTitle');
 
-  // --- Загрузка дат из Firebase ---
+  // === Загрузка дат ===
   async function loadDates() {
     const saved = await dataManager.load('countdownDates');
     if (saved) {
       if (saved.graduation) gradDate = saved.graduation;
       if (saved.session) sessionDate = saved.session;
     } else {
-      // Даты по умолчанию (можно установить свои)
-      // Например, конец обучения: 30 июня 2026 18:00
-      // Следующая сессия: 1 декабря 2025 09:00
-      gradDate = new Date(2026, 5, 30, 18, 0, 0).getTime(); // 30 июня 2026 18:00
-      sessionDate = new Date(2025, 11, 1, 9, 0, 0).getTime(); // 1 декабря 2025 09:00
+      // Значения по умолчанию
+      gradDate = new Date(2026, 5, 30, 18, 0, 0).getTime();
+      sessionDate = new Date(2025, 11, 1, 9, 0, 0).getTime();
       await saveDates();
     }
     updateLabels();
@@ -160,7 +169,7 @@
     });
   }
 
-  // --- Обновление подписей с датами ---
+  // === Обновление подписей ===
   function updateLabels() {
     if (gradDate) {
       const d = new Date(gradDate);
@@ -176,7 +185,7 @@
     }
   }
 
-  // --- Обновление обратных отсчётов (вызывается каждую секунду) ---
+  // === Обновление таймеров ===
   function updateCountdowns() {
     const now = Date.now();
 
@@ -188,7 +197,6 @@
         gradHours.textContent = '';
         gradMinutes.textContent = '';
         gradSeconds.textContent = '';
-        // можно показать сообщение, но оставим как есть
       } else {
         const d = Math.floor(diff / (1000*60*60*24));
         const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
@@ -232,12 +240,11 @@
     }
   }
 
-  // --- Модальное окно для редактирования даты ---
+  // === Модалка для редактирования даты ===
   function openDateModal(type) {
     currentEditing = type;
     const title = type === 'grad' ? 'Установить дату окончания обучения' : 'Установить дату начала сессии';
     dateModalTitle.innerHTML = `<i class="fas fa-calendar-alt"></i> ${title}`;
-    // Заполнить текущее значение
     const currentDate = type === 'grad' ? gradDate : sessionDate;
     if (currentDate) {
       const d = new Date(currentDate);
@@ -277,23 +284,21 @@
     await saveDates();
     updateLabels();
     closeDateModal();
-    // Таймер обновится сам через интервал
   }
 
-  // --- Обработчики событий ---
+  // === Обработчики ===
   document.getElementById('editGradBtn').addEventListener('click', () => openDateModal('grad'));
   document.getElementById('editSessionBtn').addEventListener('click', () => openDateModal('session'));
-
   document.getElementById('closeDateModal').addEventListener('click', closeDateModal);
   document.getElementById('cancelDateBtn').addEventListener('click', closeDateModal);
   document.getElementById('saveDateBtn').addEventListener('click', saveDateFromModal);
   window.addEventListener('click', (e) => { if (e.target === dateModal) closeDateModal(); });
 
-  // Кнопки сайдбара (уведомления)
+  // === Кнопки сайдбара (быстрые переходы) ===
   function showToast(msg) {
     const t = document.createElement('div');
     t.innerText = msg;
-    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); color:var(--text-secondary); padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid var(--border-color); transition: opacity 0.4s;';
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
   }
@@ -302,13 +307,9 @@
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
-  // --- Инициализация ---
+  // === Запуск ===
   await loadDates();
-
-  // Запускаем таймер обновления каждую секунду
   setInterval(updateCountdowns, 1000);
-
-  // Первое обновление
   updateCountdowns();
 </script>
 </body>
