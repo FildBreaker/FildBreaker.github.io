@@ -12,6 +12,7 @@
 </head>
 <body>
 <div class="app-grid">
+  <!-- ШАПКА -->
   <header class="site-header">
     <div class="logo"><h1><i class="fas fa-graduation-cap"></i> Б-21ЛЕС</h1></div>
     <ul class="nav-links">
@@ -25,6 +26,7 @@
     </ul>
   </header>
 
+  <!-- БОКОВАЯ ПАНЕЛЬ -->
   <aside class="sidebar">
     <h3><i class="fas fa-compass"></i> Основное</h3>
     <div class="nav-buttons">
@@ -33,56 +35,322 @@
       <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
       <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
     </div>
-    <div class="sidebar-note"><i class="fas fa-info-circle"></i><p>Информация о экзаменах обновляется преподавателями.</p></div>
+    <div class="sidebar-note">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <p>Информация о экзаменах обновляется преподавателями.</p>
+    </div>
   </aside>
 
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
   <main class="main-content">
     <div class="exams-hero">
       <div class="hero-text">
         <h2><i class="fas fa-chalkboard"></i> Стенд экзаменов</h2>
         <p>Вся необходимая информация для подготовки: даты, преподаватели, ссылки на методички.</p>
       </div>
-      <div class="hero-badge"><i class="fas fa-calendar-alt"></i> Летняя сессия 2025</div>
+      <div class="exams-header-actions">
+        <div class="hero-badge">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Летняя сессия 2025</span>
+        </div>
+        <button class="add-exam-btn" id="addExamBtn"><i class="fas fa-plus"></i> Добавить экзамен</button>
+      </div>
     </div>
 
-    <div class="exams-grid">
-      <!-- Карточки экзаменов (оставляем как в оригинале) -->
-      <div class="exam-card">
-        <div class="card-header">
-          <div class="exam-icon"><i class="fas fa-tree"></i></div>
-          <div class="exam-title"><h3>Лесоводство и таксация</h3><span class="exam-type"><i class="fas fa-check-circle"></i> Экзамен</span></div>
-        </div>
-        <div class="card-details">
-          <div class="detail-row"><i class="fas fa-calendar-day"></i> <strong>Дата:</strong> 17 июня 2025, 10:00</div>
-          <div class="detail-row"><i class="fas fa-location-dot"></i> <strong>Ауд.:</strong> 202 (лесной факультет)</div>
-          <div class="detail-row"><i class="fas fa-user-graduate"></i> <strong>Преподаватель:</strong> доцент Сидорова Е.В.</div>
-          <div class="detail-row"><i class="fas fa-clock"></i> <strong>Формат:</strong> устный билет + практика</div>
-        </div>
-        <div class="exam-resources">
-          <p class="resources-title"><i class="fas fa-link"></i> Ресурсы:</p>
-          <div class="resource-buttons">
-            <a href="#" class="res-link"><i class="fas fa-file-pdf"></i> Билеты</a>
-            <a href="#" class="res-link"><i class="fas fa-globe"></i> Wiki</a>
-            <a href="#" class="res-link"><i class="fas fa-video"></i> Видео</a>
-          </div>
-        </div>
-        <div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">методичка.pdf</a></div>
+    <div class="exams-grid" id="examsGrid"></div>
+
+    <div class="info-block">
+      <i class="fas fa-circle-info"></i>
+      <div class="info-text">
+        <strong>Важно:</strong> Все изменения сохраняются в облаке и видны всем. Для добавления экзамена используйте кнопку выше.
       </div>
-      <!-- Остальные карточки (повторить по аналогии) – для экономии места здесь только одна, но в реальном файле их 6 -->
     </div>
   </main>
 
+  <!-- ФУТЕР -->
   <footer class="site-footer">
     <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Экзамены хранятся в Firebase</p>
   </footer>
 </div>
+
+<!-- МОДАЛЬНОЕ ОКНО для экзамена -->
+<div id="examModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeExamModal">&times;</span>
+    <h3 id="examModalTitle"><i class="fas fa-edit"></i> Экзамен</h3>
+    <form id="examForm">
+      <label>Название дисциплины</label>
+      <input type="text" id="examTitle" placeholder="Например: Лесоводство и таксация леса" required>
+
+      <label>Тип (экзамен / зачёт)</label>
+      <input type="text" id="examType" placeholder="Экзамен / Зачёт с оценкой" required>
+
+      <label>Дата и время</label>
+      <input type="text" id="examDate" placeholder="17 июня 2025, 10:00" required>
+
+      <label>Аудитория</label>
+      <input type="text" id="examRoom" placeholder="202 (лесной факультет)" required>
+
+      <label>Преподаватель</label>
+      <input type="text" id="examTeacher" placeholder="доцент Сидорова Е.В." required>
+
+      <label>Формат</label>
+      <input type="text" id="examFormat" placeholder="устный билет + практическое задание" required>
+
+      <label>Ресурсы (ссылки / названия, через запятую)</label>
+      <input type="text" id="examResources" placeholder="Билеты, Wiki, Видео, методичка.pdf">
+
+      <label>Дополнительная заметка (необязательно)</label>
+      <input type="text" id="examNote" placeholder="Например: ссылка на облако с материалами">
+
+      <div class="modal-buttons">
+        <button type="submit" class="save-btn">Сохранить</button>
+        <button type="button" class="cancel-btn" id="cancelExamBtn">Отмена</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script type="module">
-  // Уведомления
-  const showToast = (msg) => { /* ... */ };
-  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: ...'));
-  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
-  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
-  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+  import { dataManager } from './dataManager.js';
+
+  let examsData = [];
+  let currentExamId = null;
+  const examsGrid = document.getElementById('examsGrid');
+
+  // --- ЗАГРУЗКА И СОХРАНЕНИЕ ---
+  async function loadExams() {
+    const saved = await dataManager.load('exams');
+    if (saved && Array.isArray(saved)) {
+      examsData = saved;
+    } else {
+      // Демо-данные (соответствуют картинке)
+      examsData = [
+        {
+          id: '1',
+          title: 'Лесоводство и таксация леса',
+          type: 'Экзамен',
+          date: '17 июня 2025, 10:00',
+          room: '202 (лесной факультет)',
+          teacher: 'доцент Сидорова Е.В.',
+          format: 'устный билет + практическое задание',
+          resources: 'Билеты, Wiki, Видео, методичка.pdf',
+          note: 'доп. материалы в облаке: методичка_таксация.pdf'
+        },
+        {
+          id: '2',
+          title: 'Экология лесных экосистем',
+          type: 'Зачёт с оценкой',
+          date: '21 июня 2025, 09:30',
+          room: '14 (лекционная)',
+          teacher: 'проф. Громов А.И.',
+          format: 'тестирование + кейс-задача',
+          resources: 'Лекции (слайды), IPCC, Лаб.практикум, Сборник статей',
+          note: 'методичка_ecology_2025.pdf, список_вопросов.pdf'
+        }
+      ];
+      await dataManager.save('exams', examsData);
+    }
+    renderExams();
+  }
+
+  async function saveExams() {
+    await dataManager.save('exams', examsData);
+  }
+
+  // --- ОТРИСОВКА ---
+  function renderExams() {
+    if (!examsData || examsData.length === 0) {
+      examsGrid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:40px; background:rgba(79,98,122,0.5); border-radius:32px; color:#e0d6b0;">
+          <i class="fas fa-clipboard-list" style="font-size:3rem; display:block; margin-bottom:16px;"></i>
+          <p>Нет экзаменов. Нажмите «Добавить экзамен».</p>
+        </div>
+      `;
+      return;
+    }
+    examsGrid.innerHTML = '';
+    examsData.forEach((exam, index) => {
+      const card = document.createElement('div');
+      card.className = 'exam-card';
+      card.style.animationDelay = `${index * 0.08}s`;
+
+      // Иконка (случайная или по имени)
+      const iconMap = {
+        'лесоводство': 'fa-tree',
+        'экология': 'fa-leaf',
+        'дендрология': 'fa-seedling',
+        'гис': 'fa-map-location-dot',
+        'защита': 'fa-bug',
+        'древесиноведение': 'fa-cubes'
+      };
+      let icon = 'fa-graduation-cap';
+      const lowerTitle = exam.title.toLowerCase();
+      for (const [key, val] of Object.entries(iconMap)) {
+        if (lowerTitle.includes(key)) { icon = val; break; }
+      }
+
+      // Ресурсы
+      let resourcesHtml = '';
+      if (exam.resources) {
+        const items = exam.resources.split(',').map(s => s.trim()).filter(s => s);
+        if (items.length) {
+          resourcesHtml = `
+            <div class="exam-resources">
+              <p class="resources-title"><i class="fas fa-link"></i> Ресурсы для подготовки:</p>
+              <div class="resource-buttons">
+                ${items.map(item => `<span class="res-link"><i class="fas fa-file"></i> ${escapeHtml(item)}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      card.innerHTML = `
+        <div class="exam-actions">
+          <button class="edit-exam" data-id="${exam.id}"><i class="fas fa-pen"></i></button>
+          <button class="delete-exam" data-id="${exam.id}"><i class="fas fa-trash-alt"></i></button>
+        </div>
+        <div class="card-header">
+          <div class="exam-icon"><i class="fas ${icon}"></i></div>
+          <div class="exam-title">
+            <h3>${escapeHtml(exam.title)}</h3>
+            <span class="exam-type"><i class="fas fa-check-circle"></i> ${escapeHtml(exam.type)}</span>
+          </div>
+        </div>
+        <div class="card-details">
+          <div class="detail-row"><i class="fas fa-calendar-day"></i> <strong>Дата:</strong> ${escapeHtml(exam.date)}</div>
+          <div class="detail-row"><i class="fas fa-location-dot"></i> <strong>Ауд.:</strong> ${escapeHtml(exam.room)}</div>
+          <div class="detail-row"><i class="fas fa-user-graduate"></i> <strong>Преподаватель:</strong> ${escapeHtml(exam.teacher)}</div>
+          <div class="detail-row"><i class="fas fa-clock"></i> <strong>Формат:</strong> ${escapeHtml(exam.format)}</div>
+        </div>
+        ${resourcesHtml}
+        ${exam.note ? `<div class="card-footer-note"><i class="fas fa-arrow-right"></i> ${escapeHtml(exam.note)}</div>` : ''}
+      `;
+
+      // Обработчики
+      card.querySelector('.edit-exam').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openExamModal(exam.id);
+      });
+      card.querySelector('.delete-exam').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm(`Удалить экзамен "${exam.title}"?`)) return;
+        card.classList.add('removing');
+        setTimeout(async () => {
+          await deleteExam(exam.id);
+        }, 300);
+      });
+
+      examsGrid.appendChild(card);
+    });
+  }
+
+  // --- CRUD ---
+  async function deleteExam(id) {
+    examsData = examsData.filter(e => e.id !== id);
+    await saveExams();
+    renderExams();
+  }
+
+  async function saveExamFromModal() {
+    const title = document.getElementById('examTitle').value.trim();
+    const type = document.getElementById('examType').value.trim();
+    const date = document.getElementById('examDate').value.trim();
+    const room = document.getElementById('examRoom').value.trim();
+    const teacher = document.getElementById('examTeacher').value.trim();
+    const format = document.getElementById('examFormat').value.trim();
+    const resources = document.getElementById('examResources').value.trim();
+    const note = document.getElementById('examNote').value.trim();
+
+    if (!title || !type || !date || !room || !teacher || !format) {
+      alert('Заполните все обязательные поля (кроме ресурсов и заметки).');
+      return;
+    }
+
+    const examData = { title, type, date, room, teacher, format, resources, note };
+
+    if (currentExamId) {
+      // Редактирование
+      const idx = examsData.findIndex(e => e.id === currentExamId);
+      if (idx !== -1) {
+        examsData[idx] = { ...examsData[idx], ...examData };
+      }
+    } else {
+      // Добавление
+      const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
+      examsData.push({ id: newId, ...examData });
+    }
+
+    await saveExams();
+    renderExams();
+    closeExamModal();
+  }
+
+  // --- МОДАЛЬНОЕ ОКНО ---
+  const examModal = document.getElementById('examModal');
+  const examModalTitle = document.getElementById('examModalTitle');
+
+  function openExamModal(examId = null) {
+    currentExamId = examId;
+    if (examId) {
+      const exam = examsData.find(e => e.id === examId);
+      if (!exam) return;
+      examModalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать экзамен';
+      document.getElementById('examTitle').value = exam.title;
+      document.getElementById('examType').value = exam.type;
+      document.getElementById('examDate').value = exam.date;
+      document.getElementById('examRoom').value = exam.room;
+      document.getElementById('examTeacher').value = exam.teacher;
+      document.getElementById('examFormat').value = exam.format;
+      document.getElementById('examResources').value = exam.resources || '';
+      document.getElementById('examNote').value = exam.note || '';
+    } else {
+      examModalTitle.innerHTML = '<i class="fas fa-plus"></i> Добавить экзамен';
+      document.getElementById('examForm').reset();
+    }
+    examModal.style.display = 'flex';
+  }
+
+  function closeExamModal() {
+    examModal.style.display = 'none';
+    currentExamId = null;
+  }
+
+  // --- ОБРАБОТЧИКИ ---
+  document.getElementById('addExamBtn').addEventListener('click', () => openExamModal());
+  document.getElementById('closeExamModal').addEventListener('click', closeExamModal);
+  document.getElementById('cancelExamBtn').addEventListener('click', closeExamModal);
+  window.addEventListener('click', (e) => { if (e.target === examModal) closeExamModal(); });
+  document.getElementById('examForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveExamFromModal();
+  });
+
+  // Кнопки сайдбара
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+  }
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
+
+  // Загрузка
+  loadExams();
+
+  // Вспомогательная функция
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 </script>
 </body>
 </html>
