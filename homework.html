@@ -9,11 +9,12 @@
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
 </head>
 <body>
-
 <div class="app-grid">
-  <!-- ШАПКА -->
+
+  <!-- ===== ШАПКА ===== -->
   <header class="site-header">
     <div class="logo">
       <h1><i class="fas fa-tasks"></i> Б-21ЛЕС</h1>
@@ -27,22 +28,26 @@
       <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
       <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
+      <i class="fas fa-moon"></i>
+      <span>Тема</span>
+    </button>
   </header>
 
-  <!-- БОКОВАЯ ПАНЕЛЬ -->
+  <!-- ===== САЙДБАР ===== -->
   <aside class="sidebar">
     <h3><i class="fas fa-book"></i> Предметы</h3>
     <div class="subjects-list" id="subjectsList"></div>
     <button class="add-subject-btn" id="addSubjectBtn"><i class="fas fa-plus-circle"></i> Добавить предмет</button>
     <div class="sidebar-note">
       <i class="fas fa-cloud-upload-alt"></i>
-      <p>Все изменения сохраняются в облаке и видны всем участникам группы.</p>
+      <p>Все изменения сохраняются в облаке.</p>
     </div>
   </aside>
 
-  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
   <main class="main-content">
-    <div class="homework-header" id="homeworkHeader">
+    <div class="homework-header">
       <h2 id="currentSubjectTitle"><i class="fas fa-folder"></i> Выберите предмет</h2>
       <button class="add-task-btn" id="addTaskBtn" disabled><i class="fas fa-plus"></i> Добавить задание</button>
     </div>
@@ -54,14 +59,15 @@
     </div>
   </main>
 
-  <!-- ФУТЕР -->
+  <!-- ===== ФУТЕР ===== -->
   <footer class="site-footer">
-    <p>© 2026 Б-21ЛЕС · Только попробуйте стереть, руки поотрываю</p>
-    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-heart" style="color:#ef4444;"></i> Домашка всегда под рукой</p>
+    <p>© 2026 Б-21ЛЕС · Для хранения всякого говна пойдёт</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-heart" style="color:var(--accent);"></i> Домашка всегда под рукой</p>
   </footer>
+
 </div>
 
-<!-- МОДАЛКА ПРЕДМЕТА -->
+<!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ ПРЕДМЕТА ===== -->
 <div id="subjectModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeSubjectModal">&times;</span>
@@ -74,7 +80,7 @@
   </div>
 </div>
 
-<!-- МОДАЛКА ЗАДАНИЯ -->
+<!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ ЗАДАНИЯ ===== -->
 <div id="taskModal" class="modal">
   <div class="modal-content task-modal">
     <span class="close-modal" id="closeTaskModal">&times;</span>
@@ -96,55 +102,66 @@
   </div>
 </div>
 
-<!-- СКРИПТ -->
 <script type="module">
+  // ============================================================
+  //  ИМПОРТЫ
+  // ============================================================
   import { dataManager } from './dataManager.js';
 
-  // --- МОДЕЛЬ ДАННЫХ ---
+  // ============================================================
+  //  СОСТОЯНИЕ
+  // ============================================================
   let homeworkData = { subjects: [] };
   let currentSubjectId = null;
   let editSubjectId = null;
   let editTaskId = null;
 
-  // --- ЗАГРУЗКА И СОХРАНЕНИЕ ---
+  // ============================================================
+  //  ЗАГРУЗКА / СОХРАНЕНИЕ
+  // ============================================================
   async function loadData() {
-    const saved = await dataManager.load('homework');
-    if (saved && saved.subjects) {
-      homeworkData = saved;
-    } else {
-      // Начальные демо-данные
-      homeworkData = {
-        subjects: [
-          {
-            id: 'subj1',
-            name: 'Лесоводство',
-            tasks: [
-              {
-                id: 'task1',
-                desc: 'Прочитать главы 3-5 учебника "Лесоводство". Подготовить конспект.',
-                links: [{ url: '#', title: 'Скачать учебник' }, { url: 'https://ru.wikipedia.org/wiki/Лесоводство', title: 'Википедия' }],
-                tags: 'конспект, теория'
-              }
-            ]
-          },
-          {
-            id: 'subj2',
-            name: 'Экология леса',
-            tasks: [
-              {
-                id: 'task2',
-                desc: 'Написать эссе на тему "Влияние климата на лесные экосистемы". Срок: 20.05.2025',
-                links: [{ url: '#', title: 'Методичка' }, { url: 'https://www.ipcc.ch/', title: 'IPCC' }],
-                tags: 'эссе, климат'
-              }
-            ]
-          }
-        ]
-      };
-      await dataManager.save('homework', homeworkData);
+    try {
+      const saved = await dataManager.load('homework');
+      if (saved && saved.subjects) {
+        homeworkData = saved;
+      } else {
+        // Демо-данные
+        homeworkData = {
+          subjects: [
+            {
+              id: 'subj1',
+              name: 'Лесоводство',
+              tasks: [
+                {
+                  id: 'task1',
+                  desc: 'Прочитать главы 3-5 учебника "Лесоводство". Подготовить конспект.',
+                  links: [{ url: '#', title: 'Скачать учебник' }, { url: 'https://ru.wikipedia.org/wiki/Лесоводство', title: 'Википедия' }],
+                  tags: 'конспект, теория'
+                }
+              ]
+            },
+            {
+              id: 'subj2',
+              name: 'Экология леса',
+              tasks: [
+                {
+                  id: 'task2',
+                  desc: 'Написать эссе на тему "Влияние климата на лесные экосистемы". Срок: 20.05.2025',
+                  links: [{ url: '#', title: 'Методичка' }, { url: 'https://www.ipcc.ch/', title: 'IPCC' }],
+                  tags: 'эссе, климат'
+                }
+              ]
+            }
+          ]
+        };
+        await dataManager.save('homework', homeworkData);
+      }
+    } catch (e) {
+      console.warn('Ошибка загрузки домашних заданий:', e);
+      homeworkData = { subjects: [] };
     }
     renderSubjects();
-    // Восстанавливаем активный предмет из sessionStorage
+    // Восстанавливаем активный предмет
     const activeId = sessionStorage.getItem('activeSubjectId');
     if (activeId && homeworkData.subjects.find(s => s.id === activeId)) {
       selectSubject(activeId);
@@ -156,10 +173,16 @@
   }
 
   async function saveData() {
-    await dataManager.save('homework', homeworkData);
+    try {
+      await dataManager.save('homework', homeworkData);
+    } catch (e) {
+      console.warn('Ошибка сохранения домашних заданий:', e);
+    }
   }
 
-  // --- ОТРИСОВКА ПРЕДМЕТОВ ---
+  // ============================================================
+  //  ОТРИСОВКА ПРЕДМЕТОВ
+  // ============================================================
   function renderSubjects() {
     const container = document.getElementById('subjectsList');
     container.innerHTML = '';
@@ -169,8 +192,8 @@
       div.innerHTML = `
         <span class="subject-name"><i class="fas fa-chalkboard"></i> ${escapeHtml(subj.name)}</span>
         <div class="subject-actions">
-          <button class="edit-subject" data-id="${subj.id}"><i class="fas fa-edit"></i></button>
-          <button class="delete-subject" data-id="${subj.id}"><i class="fas fa-trash"></i></button>
+          <button class="edit-subject action-btn edit" data-id="${subj.id}"><i class="fas fa-edit"></i></button>
+          <button class="delete-subject action-btn delete" data-id="${subj.id}"><i class="fas fa-trash"></i></button>
         </div>
       `;
       div.querySelector('.subject-name').addEventListener('click', () => selectSubject(subj.id));
@@ -188,7 +211,9 @@
     document.getElementById('addTaskBtn').disabled = !currentSubjectId;
   }
 
-  // --- ВЫБОР ПРЕДМЕТА ---
+  // ============================================================
+  //  ВЫБОР ПРЕДМЕТА
+  // ============================================================
   function selectSubject(subjectId) {
     currentSubjectId = subjectId;
     sessionStorage.setItem('activeSubjectId', subjectId);
@@ -204,21 +229,29 @@
 
   function clearTasksView() {
     document.getElementById('currentSubjectTitle').innerHTML = '<i class="fas fa-folder"></i> Не выбран предмет';
-    document.getElementById('tasksContainer').innerHTML = `<div class="empty-state"><i class="fas fa-hand-point-left"></i><p>Выберите предмет слева</p></div>`;
+    document.getElementById('tasksContainer').innerHTML = `
+      <div class="empty-state"><i class="fas fa-hand-point-left"></i><p>Выберите предмет слева</p></div>
+    `;
     document.getElementById('addTaskBtn').disabled = true;
   }
 
-  // --- ОТРИСОВКА ЗАДАНИЙ ---
+  // ============================================================
+  //  ОТРИСОВКА ЗАДАНИЙ
+  // ============================================================
   function renderTasks(tasks) {
     const container = document.getElementById('tasksContainer');
     if (!tasks || tasks.length === 0) {
-      container.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Нет заданий. Нажмите "Добавить задание".</p></div>`;
+      container.innerHTML = `
+        <div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Нет заданий. Нажмите «Добавить задание».</p></div>
+      `;
       return;
     }
     container.innerHTML = '';
-    tasks.forEach(task => {
+    tasks.forEach((task, index) => {
       const card = document.createElement('div');
       card.className = 'task-card';
+      card.style.animationDelay = `${index * 0.08}s`;
+
       let linksHtml = '';
       if (task.links && task.links.length) {
         linksHtml = '<div class="task-links"><i class="fas fa-link"></i> Ресурсы: ';
@@ -228,6 +261,7 @@
         linksHtml += '</div>';
       }
       const tagsHtml = task.tags ? `<div class="task-tags"><i class="fas fa-tags"></i> ${escapeHtml(task.tags)}</div>` : '';
+
       card.innerHTML = `
         <div class="task-content">
           <p class="task-desc">${escapeHtml(task.desc)}</p>
@@ -235,17 +269,27 @@
           ${tagsHtml}
         </div>
         <div class="task-actions">
-          <button class="edit-task" data-id="${task.id}"><i class="fas fa-pen"></i></button>
-          <button class="delete-task" data-id="${task.id}"><i class="fas fa-trash-alt"></i></button>
+          <button class="edit-task action-btn edit" data-id="${task.id}"><i class="fas fa-pen"></i></button>
+          <button class="delete-task action-btn delete" data-id="${task.id}"><i class="fas fa-trash-alt"></i></button>
         </div>
       `;
+
       card.querySelector('.edit-task').addEventListener('click', () => openTaskModal(task.id));
-      card.querySelector('.delete-task').addEventListener('click', async () => await deleteTask(task.id));
+      card.querySelector('.delete-task').addEventListener('click', async () => {
+        if (!confirm(`Удалить задание?`)) return;
+        card.classList.add('removing');
+        setTimeout(async () => {
+          await deleteTask(task.id);
+        }, 300);
+      });
+
       container.appendChild(card);
     });
   }
 
-  // --- ОПЕРАЦИИ С ПРЕДМЕТАМИ ---
+  // ============================================================
+  //  ОПЕРАЦИИ С ПРЕДМЕТАМИ
+  // ============================================================
   async function addSubject(name) {
     if (!name.trim()) return;
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
@@ -280,7 +324,9 @@
     renderSubjects();
   }
 
-  // --- ОПЕРАЦИИ С ЗАДАНИЯМИ ---
+  // ============================================================
+  //  ОПЕРАЦИИ С ЗАДАНИЯМИ
+  // ============================================================
   async function addTask(subjectId, taskData) {
     const subject = homeworkData.subjects.find(s => s.id === subjectId);
     if (!subject) return;
@@ -319,7 +365,9 @@
     renderTasks(subject.tasks);
   }
 
-  // --- МОДАЛКА ПРЕДМЕТА ---
+  // ============================================================
+  //  МОДАЛЬНОЕ ОКНО ПРЕДМЕТА
+  // ============================================================
   const subjectModal = document.getElementById('subjectModal');
   const subjectNameInput = document.getElementById('subjectNameInput');
   const subjectModalTitle = document.getElementById('subjectModalTitle');
@@ -355,7 +403,9 @@
     closeSubjectModal();
   }
 
-  // --- МОДАЛКА ЗАДАНИЯ ---
+  // ============================================================
+  //  МОДАЛЬНОЕ ОКНО ЗАДАНИЯ
+  // ============================================================
   const taskModal = document.getElementById('taskModal');
   const taskDesc = document.getElementById('taskDesc');
   const taskTags = document.getElementById('taskTags');
@@ -436,7 +486,9 @@
     closeTaskModal();
   }
 
-  // --- ВСПОМОГАТЕЛЬНЫЕ ---
+  // ============================================================
+  //  ВСПОМОГАТЕЛЬНЫЕ
+  // ============================================================
   function escapeHtml(str) {
     if (!str) return '';
     const div = document.createElement('div');
@@ -444,23 +496,18 @@
     return div.innerHTML;
   }
 
-  function showToast(msg) {
-    const t = document.createElement('div');
-    t.innerText = msg;
-    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
-  }
-
-  // --- ОБРАБОТЧИКИ ---
+  // ============================================================
+  //  ОБРАБОТЧИКИ СОБЫТИЙ
+  // ============================================================
   document.addEventListener('DOMContentLoaded', () => {
     // Кнопки сайдбара
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        this.style.transform = 'scale(0.98)';
-        setTimeout(() => this.style.transform = '', 120);
-      });
-    });
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.innerText = msg;
+      t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); color:var(--text-primary); padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid var(--border-color); transition: opacity 0.4s;';
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+    }
     document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
     document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
     document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
