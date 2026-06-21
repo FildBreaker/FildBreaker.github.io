@@ -9,11 +9,16 @@
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
 </head>
 <body>
 <div class="app-grid">
+
+  <!-- ===== ШАПКА ===== -->
   <header class="site-header">
-    <div class="logo"><h1><i class="fas fa-calendar-alt"></i> Б-21ЛЕС</h1></div>
+    <div class="logo">
+      <h1><i class="fas fa-calendar-alt"></i> Б-21ЛЕС</h1>
+    </div>
     <ul class="nav-links">
       <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html" class="active"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -23,8 +28,13 @@
       <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
       <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
+      <i class="fas fa-moon"></i>
+      <span>Тема</span>
+    </button>
   </header>
 
+  <!-- ===== САЙДБАР ===== -->
   <aside class="sidebar">
     <h3><i class="fas fa-compass"></i> Основное</h3>
     <div class="nav-buttons">
@@ -33,9 +43,13 @@
       <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
       <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
     </div>
-    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Все изменения сохраняются в облаке.</p></div>
+    <div class="sidebar-note">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <p>Все изменения сохраняются в облаке.</p>
+    </div>
   </aside>
 
+  <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
   <main class="main-content">
     <div class="schedule-section">
       <div class="schedule-header">
@@ -58,34 +72,43 @@
     </div>
   </main>
 
+  <!-- ===== ФУТЕР ===== -->
   <footer class="site-footer">
-    <p>© 2026 Б-21ЛЕС · НОРМАЛЬНО выглядещее расписание</p>
+    <p>© 2026 Б-21ЛЕС · Нормально оформленное расписание (неужели)</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Данные хранятся в Firebase</p>
   </footer>
+
 </div>
 
-<!-- Модалка редактирования -->
+<!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТИРОВАНИЯ ЯЧЕЙКИ ===== -->
 <div id="editModal" class="modal">
   <div class="modal-content">
-    <span class="close-modal">&times;</span>
-    <h3><i class="fas fa-edit"></i> Редактировать пару</h3>
+    <span class="close-modal" id="closeModalBtn">&times;</span>
+    <h3 id="modalTitle"><i class="fas fa-edit"></i> Редактировать пару</h3>
     <form id="editForm">
-      <label>Предмет:</label><input type="text" id="editSubject" required>
-      <label>Аудитория:</label><input type="text" id="editRoom" required>
-      <label>Дата окончания (ДД.ММ.ГГГГ):</label><input type="text" id="editEndDate" placeholder="31.05.2026" required>
+      <label>Предмет</label>
+      <input type="text" id="editSubject" placeholder="Название предмета" required>
+      <label>Аудитория</label>
+      <input type="text" id="editRoom" placeholder="Номер аудитории" required>
+      <label>Дата окончания (ДД.ММ.ГГГГ)</label>
+      <input type="text" id="editEndDate" placeholder="31.05.2026" required>
       <div class="modal-buttons">
         <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
-        <button type="button" class="cancel-btn">Отмена</button>
+        <button type="button" class="cancel-btn" id="cancelModalBtn">Отмена</button>
       </div>
     </form>
   </div>
 </div>
 
 <script type="module">
+  // Импорты
   import { dataManager } from './dataManager.js';
 
-  // --- Исходное расписание (6 пар) ---
+  // ============================================================
+  //  ИСХОДНОЕ РАСПИСАНИЕ (6 пар + перерывы)
+  // ============================================================
   const defaultSchedule = {
-    0: {
+    0: { // ПН
       1: { subject: "Проектная деятельность (П)", room: "1-210", endDate: "31.05.2026" },
       2: { subject: "Основы лесопаркового хозяйства (П)", room: "1-308", endDate: "31.05.2026" },
       3: { subject: "Лесная энтомология (П)", room: "1-203", endDate: "31.05.2026" },
@@ -93,7 +116,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    1: {
+    1: { // ВТ
       1: { subject: "Экономическая теория (П)", room: "1-303", endDate: "31.05.2026" },
       2: { subject: "Экономическая теория (П)", room: "1-408а", endDate: "31.05.2026" },
       3: { subject: "Основы лесопаркового хозяйства (П)", room: "Библиотека 309", endDate: "31.05.2026" },
@@ -101,7 +124,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    2: {
+    2: { // СР
       1: { subject: "Цифровые технологии (П)", room: "4-222", endDate: "31.05.2026" },
       2: { subject: "Технология лесозащиты (П)", room: "1-308", endDate: "31.05.2026" },
       3: { subject: "Физ-ра", room: "Спорткомплекс", endDate: "31.05.2026" },
@@ -109,7 +132,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    3: {
+    3: { // ЧТ
       1: { subject: "Лесная селекция (П)", room: "1-305", endDate: "31.05.2026" },
       2: { subject: "Лесная селекция (П)", room: "1-210", endDate: "31.05.2026" },
       3: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" },
@@ -117,7 +140,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    4: {
+    4: { // ПТ
       1: { subject: "Начертательная геометрия (П)", room: "3-23", endDate: "31.05.2026" },
       2: { subject: "Начертательная геометрия (П)", room: "3-24", endDate: "31.05.2026" },
       3: { subject: "Лесная энтомология (П)", room: "1-202", endDate: "31.05.2026" },
@@ -125,7 +148,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    5: {
+    5: { // СБ
       1: { subject: "", room: "", endDate: "" },
       2: { subject: "", room: "", endDate: "" },
       3: { subject: "", room: "", endDate: "" },
@@ -133,7 +156,7 @@
       5: { subject: "", room: "", endDate: "" },
       6: { subject: "", room: "", endDate: "" }
     },
-    6: {
+    6: { // ВС
       1: { subject: "", room: "", endDate: "" },
       2: { subject: "", room: "", endDate: "" },
       3: { subject: "", room: "", endDate: "" },
@@ -143,6 +166,7 @@
     }
   };
 
+  // Времена пар и перерывы
   const pairTimes = {
     1: "1 пара (9:00 – 10:30)",
     2: "2 пара (10:45 – 12:15)",
@@ -159,42 +183,64 @@
     5: "Перерыв: 10 минут"
   };
   const MAX_PAIR = 6;
+  const DAYS = 7;
 
+  // ============================================================
+  //  СОСТОЯНИЕ
+  // ============================================================
   let scheduleData = {};
+  let currentEditDay = null, currentEditPair = null;
 
+  // ============================================================
+  //  ЗАГРУЗКА / СОХРАНЕНИЕ
+  // ============================================================
   async function loadSchedule() {
-    const saved = await dataManager.load('schedule');
-    if (saved) {
-      scheduleData = saved;
-    } else {
+    try {
+      const saved = await dataManager.load('schedule');
+      if (saved) {
+        scheduleData = saved;
+      } else {
+        scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
+        await dataManager.save('schedule', scheduleData);
+      }
+    } catch (e) {
+      console.warn('Ошибка загрузки расписания, используем дефолтное:', e);
       scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
-      await dataManager.save('schedule', scheduleData);
     }
     renderSchedule();
   }
 
   async function saveSchedule() {
-    await dataManager.save('schedule', scheduleData);
+    try {
+      await dataManager.save('schedule', scheduleData);
+    } catch (e) {
+      console.warn('Ошибка сохранения расписания:', e);
+    }
   }
 
+  // ============================================================
+  //  ОТРИСОВКА ТАБЛИЦЫ
+  // ============================================================
   function renderSchedule() {
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
+
     for (let pair = 1; pair <= MAX_PAIR; pair++) {
+      // Строка с парами
       const tr = document.createElement('tr');
       const tdTime = document.createElement('td');
       tdTime.className = 'pair-time';
       tdTime.innerHTML = `<strong>${pairTimes[pair]}</strong>`;
       tr.appendChild(tdTime);
 
-      for (let day = 0; day < 7; day++) {
+      for (let day = 0; day < DAYS; day++) {
         const td = document.createElement('td');
         td.className = 'schedule-cell';
         const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', endDate: '' };
         const subjectHtml = lesson.subject
-          ? `<span class="subject">${lesson.subject}${lesson.room ? ` <span class="room">(${lesson.room})</span>` : ''}</span>`
+          ? `<span class="subject">${escapeHtml(lesson.subject)}${lesson.room ? ` <span class="room">(${escapeHtml(lesson.room)})</span>` : ''}</span>`
           : `<span class="subject">—</span>`;
-        const endDateHtml = lesson.endDate ? `<span class="end-date"><i class="far fa-calendar-alt"></i> до ${lesson.endDate}</span>` : '';
+        const endDateHtml = lesson.endDate ? `<span class="end-date"><i class="far fa-calendar-alt"></i> до ${escapeHtml(lesson.endDate)}</span>` : '';
         td.innerHTML = `
           <div class="cell-content">
             ${subjectHtml}
@@ -209,11 +255,12 @@
       }
       tbody.appendChild(tr);
 
+      // Строка перерыва (кроме последней пары)
       if (pair < MAX_PAIR) {
         const breakTr = document.createElement('tr');
         breakTr.className = 'break-row';
         const breakTd = document.createElement('td');
-        breakTd.colSpan = 8;
+        breakTd.colSpan = DAYS + 1; // +1 для столбца "Пара"
         breakTd.textContent = breaks[pair] || '';
         breakTr.appendChild(breakTd);
         tbody.appendChild(breakTr);
@@ -221,9 +268,11 @@
     }
   }
 
-  // --- Модалка ---
-  let currentEditDay = null, currentEditPair = null;
+  // ============================================================
+  //  МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ
+  // ============================================================
   const modal = document.getElementById('editModal');
+  const modalTitle = document.getElementById('modalTitle');
   const editSubject = document.getElementById('editSubject');
   const editRoom = document.getElementById('editRoom');
   const editEndDate = document.getElementById('editEndDate');
@@ -232,6 +281,7 @@
     currentEditDay = day;
     currentEditPair = pair;
     const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', endDate: '' };
+    modalTitle.innerHTML = `<i class="fas fa-edit"></i> Редактировать: ${dayNames[day]}, ${pairTimes[pair]}`;
     editSubject.value = lesson.subject || '';
     editRoom.value = lesson.room || '';
     editEndDate.value = lesson.endDate || '';
@@ -250,7 +300,7 @@
     const newRoom = editRoom.value.trim();
     let newEndDate = editEndDate.value.trim();
     if (newEndDate && !/^\d{2}\.\d{2}\.\d{4}$/.test(newEndDate)) {
-      alert('Введите дату в формате ДД.ММ.ГГГГ');
+      alert('Введите дату в формате ДД.ММ.ГГГГ (например, 31.05.2026)');
       return;
     }
     if (!scheduleData[currentEditDay]) scheduleData[currentEditDay] = {};
@@ -264,25 +314,45 @@
     closeModal();
   }
 
+  // ============================================================
+  //  СБРОС К ДЕФОЛТУ
+  // ============================================================
   async function resetToDefault() {
-    if (!confirm('Сбросить расписание к исходному?')) return;
+    if (!confirm('Сбросить расписание к исходному? Все изменения будут потеряны.')) return;
     scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
     await saveSchedule();
     renderSchedule();
   }
 
-  // --- Обработчики ---
-  document.querySelector('.close-modal')?.addEventListener('click', closeModal);
-  document.querySelector('.cancel-btn')?.addEventListener('click', closeModal);
+  // ============================================================
+  //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  // ============================================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  const dayNames = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+
+  // ============================================================
+  //  ОБРАБОТЧИКИ СОБЫТИЙ
+  // ============================================================
+  document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+  document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
   window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-  document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
-  document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
+  document.getElementById('editForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveEdit();
+  });
+  document.getElementById('resetScheduleBtn').addEventListener('click', resetToDefault);
 
   // Кнопки сайдбара
   function showToast(msg) {
     const t = document.createElement('div');
     t.innerText = msg;
-    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); color:var(--text-primary); padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid var(--border-color); transition: opacity 0.4s;';
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
   }
@@ -291,6 +361,9 @@
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
+  // ============================================================
+  //  ЗАПУСК
+  // ============================================================
   loadSchedule();
 </script>
 </body>
