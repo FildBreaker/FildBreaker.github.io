@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Главная | Б-21ЛЕС</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data/icon.ico">
-  <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="dataManager.js"></script>
-</head>
+<header class="site-header">
+  <div class="logo"><h1><i class="fas fa-compass"></i> Б-21ЛЕС</h1></div>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active"><i class="fas fa-home"></i> Главная</a></li>
+    <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
+    <li><a href="exam.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
+    <li><a href="resources.html"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
+    <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
+    <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
+    <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
+  </ul>
+  <!-- Кнопка темы -->
+  <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
+    <i class="fas fa-moon"></i>
+    <span>Тема</span>
+  </button>
+</header>
 <body>
 <div class="app-grid">
   <header class="site-header">
