@@ -9,12 +9,16 @@
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
 </head>
 <body>
 <div class="app-grid">
-  <!-- ШАПКА -->
+
+  <!-- ===== ШАПКА ===== -->
   <header class="site-header">
-    <div class="logo"><h1><i class="fas fa-chalkboard-teacher"></i> Б-21ЛЕС</h1></div>
+    <div class="logo">
+      <h1><i class="fas fa-chalkboard-teacher"></i> Б-21ЛЕС</h1>
+    </div>
     <ul class="nav-links">
       <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -24,9 +28,13 @@
       <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
       <li><a href="teacher.html" class="active"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
+      <i class="fas fa-moon"></i>
+      <span>Тема</span>
+    </button>
   </header>
 
-  <!-- БОКОВАЯ ПАНЕЛЬ -->
+  <!-- ===== САЙДБАР ===== -->
   <aside class="sidebar">
     <h3><i class="fas fa-compass"></i> Основное</h3>
     <div class="nav-buttons">
@@ -41,24 +49,31 @@
     </div>
   </aside>
 
-  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
   <main class="main-content">
     <div class="teachers-section">
       <div class="teachers-header">
-        <h2><i class="fas fa-leaf"></i> Выбери своего бойца</h2>
+        <h2><i class="fas fa-leaf"></i> Выбери своего бойца!</h2>
         <button class="add-teacher-btn" id="addTeacherBtn"><i class="fas fa-plus"></i> Добавить преподавателя</button>
       </div>
-      <div class="teachers-grid" id="teachersGrid"></div>
+      <div class="teachers-grid" id="teachersGrid">
+        <div class="empty-state" style="grid-column:1/-1;">
+          <i class="fas fa-users" style="font-size:3rem; display:block; margin-bottom:16px;"></i>
+          <p>Загрузка данных...</p>
+        </div>
+      </div>
     </div>
   </main>
 
+  <!-- ===== ФУТЕР ===== -->
   <footer class="site-footer">
-    <p>© 2026 Б-21ЛЕС · Только тебе решать, за какую рассу тебе играть</p>
+    <p>© 2026 Б-21ЛЕС · Все ваши любимчики здесь</p>
     <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Данные хранятся в Firebase</p>
   </footer>
+
 </div>
 
-<!-- МОДАЛКА ДЛЯ ПРЕПОДАВАТЕЛЯ -->
+<!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ ПРЕПОДАВАТЕЛЯ ===== -->
 <div id="teacherModal" class="modal teacher-modal">
   <div class="modal-content">
     <span class="close-modal" id="closeTeacherModal">&times;</span>
@@ -94,65 +109,84 @@
 </div>
 
 <script type="module">
+  // ============================================================
+  //  ИМПОРТЫ
+  // ============================================================
   import { dataManager } from './dataManager.js';
 
+  // ============================================================
+  //  СОСТОЯНИЕ
+  // ============================================================
   let teachersData = [];
   let editTeacherId = null;
   const grid = document.getElementById('teachersGrid');
 
-  // --- Загрузка ---
+  // ============================================================
+  //  ЗАГРУЗКА / СОХРАНЕНИЕ
+  // ============================================================
   async function loadTeachers() {
-    const saved = await dataManager.load('teachers');
-    if (saved && Array.isArray(saved)) {
-      teachersData = saved;
-    } else {
-      // Демо-данные (как на картинке)
-      teachersData = [
-        {
-          id: 't1',
-          name: 'Гайвас Алексей Алексеевич',
-          position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
-          degree: 'Кандидат сельскохозяйственных наук, доцент',
-          subject: 'Предмет: Энтомология',
-          phone: '(3812) 65-27-63, 13-42',
-          email: 'aa.gayvas@omgau.org',
-          photo: 'data/Teachers/Gaivas.jpg'
-        },
-        {
-          id: 't2',
-          name: 'Ненашев Николай Сергеевич',
-          position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
-          degree: 'Кандидат сельскохозяйственных наук, доцент',
-          subject: 'Предмет: Таксация',
-          phone: '(3812) 65-14-55, (3812) 65-17-45, 13-15',
-          email: 'ns.nenashev@omgau.org',
-          photo: 'data/Teachers/Nenashev.jpg'
-        },
-        {
-          id: 't3',
-          name: 'Коцюбинская Ольга Андреевна',
-          position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
-          degree: 'Кандидат сельскохозяйственных наук, доцент',
-          subject: 'Предмет: Основы лесопаркового хозяйства (практика), основы проектной деятельности, селекция растений (практика)',
-          phone: '(3812) 66-17-45',
-          email: 'oa.kotsyubinskaya@omgau.org',
-          photo: 'data/Teachers/Kotsyubinskaya.jpg'
-        }
-      ];
-      await dataManager.save('teachers', teachersData);
+    try {
+      const saved = await dataManager.load('teachers');
+      if (saved && Array.isArray(saved)) {
+        teachersData = saved;
+      } else {
+        // Демо-данные
+        teachersData = [
+          {
+            id: 't1',
+            name: 'Гайвас Алексей Алексеевич',
+            position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
+            degree: 'Кандидат сельскохозяйственных наук, доцент',
+            subject: 'Предмет: Энтомология',
+            phone: '(3812) 65-27-63, 13-42',
+            email: 'aa.gayvas@omgau.org',
+            photo: 'data/Teachers/Gaivas.jpg'
+          },
+          {
+            id: 't2',
+            name: 'Ненашев Николай Сергеевич',
+            position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
+            degree: 'Кандидат сельскохозяйственных наук, доцент',
+            subject: 'Предмет: Таксация',
+            phone: '(3812) 65-14-55, (3812) 65-17-45, 13-15',
+            email: 'ns.nenashev@omgau.org',
+            photo: 'data/Teachers/Nenashev.jpg'
+          },
+          {
+            id: 't3',
+            name: 'Коцюбинская Ольга Андреевна',
+            position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
+            degree: 'Кандидат сельскохозяйственных наук, доцент',
+            subject: 'Предмет: Основы лесопаркового хозяйства (практика), основы проектной деятельности, селекция растений (практика)',
+            phone: '(3812) 66-17-45',
+            email: 'oa.kotsyubinskaya@omgau.org',
+            photo: 'data/Teachers/Kotsyubinskaya.jpg'
+          }
+        ];
+        await dataManager.save('teachers', teachersData);
+      }
+    } catch (e) {
+      console.warn('Ошибка загрузки преподавателей:', e);
+      teachersData = [];
     }
     renderTeachers();
   }
 
   async function saveTeachers() {
-    await dataManager.save('teachers', teachersData);
+    try {
+      await dataManager.save('teachers', teachersData);
+    } catch (e) {
+      console.warn('Ошибка сохранения преподавателей:', e);
+    }
   }
 
-  // --- Отрисовка ---
+  // ============================================================
+  //  ОТРИСОВКА КАРТОЧЕК
+  // ============================================================
   function renderTeachers() {
-    if (teachersData.length === 0) {
+    if (!teachersData || teachersData.length === 0) {
       grid.innerHTML = `
-        <div style="grid-column:1/-1; text-align:center; padding:40px; background:rgba(79,98,122,0.5); border-radius:32px; color:#e0d6b0;">
+        <div class="empty-state" style="grid-column:1/-1;">
           <i class="fas fa-users" style="font-size:3rem; display:block; margin-bottom:16px;"></i>
           <p>Пока нет преподавателей. Нажмите «Добавить преподавателя».</p>
         </div>
@@ -167,8 +201,8 @@
       const photoUrl = teacher.photo || 'https://via.placeholder.com/130x130?text=Нет+фото';
       card.innerHTML = `
         <div class="card-actions">
-          <button class="edit-teacher" data-id="${teacher.id}"><i class="fas fa-pen"></i></button>
-          <button class="delete-teacher" data-id="${teacher.id}"><i class="fas fa-trash-alt"></i></button>
+          <button class="edit-teacher action-btn edit" data-id="${teacher.id}"><i class="fas fa-pen"></i></button>
+          <button class="delete-teacher action-btn delete" data-id="${teacher.id}"><i class="fas fa-trash-alt"></i></button>
         </div>
         <div class="card-photo">
           <img src="${photoUrl}" alt="Фото ${teacher.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/130x130?text=Нет+фото'">
@@ -197,7 +231,9 @@
     });
   }
 
-  // --- CRUD ---
+  // ============================================================
+  //  CRUD ОПЕРАЦИИ
+  // ============================================================
   async function deleteTeacher(id) {
     teachersData = teachersData.filter(t => t.id !== id);
     await saveTeachers();
@@ -234,7 +270,9 @@
     closeTeacherModal();
   }
 
-  // --- Модалка ---
+  // ============================================================
+  //  МОДАЛЬНОЕ ОКНО
+  // ============================================================
   const modal = document.getElementById('teacherModal');
   const modalTitle = document.getElementById('teacherModalTitle');
 
@@ -263,38 +301,50 @@
     editTeacherId = null;
   }
 
-  // --- Обработчики ---
-  document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
-  document.getElementById('closeTeacherModal').addEventListener('click', closeTeacherModal);
-  document.getElementById('cancelTeacherBtn').addEventListener('click', closeTeacherModal);
-  window.addEventListener('click', (e) => { if (e.target === modal) closeTeacherModal(); });
-  document.getElementById('teacherForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    saveTeacherFromModal();
-  });
-
-  // Кнопки сайдбара
-  function showToast(msg) {
-    const t = document.createElement('div');
-    t.innerText = msg;
-    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
-  }
-  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
-  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
-  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
-  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
-
-  // Загрузка
-  loadTeachers();
-
+  // ============================================================
+  //  ВСПОМОГАТЕЛЬНЫЕ
+  // ============================================================
   function escapeHtml(str) {
     if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
+
+  // ============================================================
+  //  ОБРАБОТЧИКИ СОБЫТИЙ
+  // ============================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    // Кнопка "Добавить преподавателя"
+    document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
+
+    // Закрытие модалки
+    document.getElementById('closeTeacherModal').addEventListener('click', closeTeacherModal);
+    document.getElementById('cancelTeacherBtn').addEventListener('click', closeTeacherModal);
+    window.addEventListener('click', (e) => { if (e.target === modal) closeTeacherModal(); });
+
+    // Отправка формы
+    document.getElementById('teacherForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveTeacherFromModal();
+    });
+
+    // Кнопки сайдбара
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.innerText = msg;
+      t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); color:var(--text-primary); padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid var(--border-color); transition: opacity 0.4s;';
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+    }
+    document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
+    document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
+    document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
+    document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
+
+    // Загрузка данных
+    loadTeachers();
+  });
 </script>
 </body>
 </html>
