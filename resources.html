@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ресурсы | Б-21ЛЕС</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data/icon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data/icon.ico" />
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
 </head>
 <body>
 <div class="app-grid">
+
+  <!-- ===== ШАПКА ===== -->
   <header class="site-header">
-    <div class="logo"><h1><i class="fas fa-folder-open"></i> Б-21ЛЕС</h1></div>
+    <div class="logo">
+      <h1><i class="fas fa-folder-open"></i> Б-21ЛЕС</h1>
+    </div>
     <ul class="nav-links">
       <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -23,9 +28,14 @@
       <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
       <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
+      <i class="fas fa-moon"></i>
+      <span>Тема</span>
+    </button>
   </header>
 
-  <aside class="sidebar" id="sidebar">
+  <!-- ===== САЙДБАР ===== -->
+  <aside class="sidebar">
     <h3><i class="fas fa-folder"></i> Папки</h3>
     <div class="folder-list" id="folderList"></div>
     <button class="add-folder-btn" id="addFolderBtn"><i class="fas fa-plus-circle"></i> Создать папку</button>
@@ -35,6 +45,7 @@
     </div>
   </aside>
 
+  <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
   <main class="main-content">
     <div class="resources-hero">
       <div>
@@ -45,25 +56,26 @@
     </div>
 
     <div class="resources-grid" id="resourcesGrid">
-      <div class="empty-state">
-        <i class="fas fa-hand-point-left"></i>
+      <div class="empty-state" style="grid-column:1/-1; text-align:center; padding:40px; background:var(--bg-hover); border-radius:28px; color:var(--text-muted);">
+        <i class="fas fa-hand-point-left" style="font-size:3rem; display:block; margin-bottom:16px;"></i>
         <p>Выберите папку слева или создайте новую.</p>
       </div>
     </div>
   </main>
 
+  <!-- ===== ФУТЕР ===== -->
   <footer class="site-footer">
     <p>© 2026 Б-21ЛЕС · ЭИОС идёт нахрен</p>
-    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Хотя бы не слетает от захода более 10 человек одновременно.</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Хотя бы не слетает, когда заходят более 10 человек одновременно</p>
   </footer>
 </div>
 
-<!-- МОДАЛКА ПАПКИ -->
+<!-- ===== МОДАЛКА ДЛЯ ПАПКИ ===== -->
 <div id="folderModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeFolderModal">&times;</span>
     <h3 id="folderModalTitle"><i class="fas fa-folder-plus"></i> Новая папка</h3>
-    <input type="text" id="folderNameInput" placeholder="Название папки" autocomplete="off">
+    <input type="text" id="folderNameInput" placeholder="Название папки" autocomplete="off" />
     <div class="modal-buttons">
       <button id="saveFolderBtn" class="save-btn">Сохранить</button>
       <button id="cancelFolderBtn" class="cancel-btn">Отмена</button>
@@ -71,17 +83,17 @@
   </div>
 </div>
 
-<!-- МОДАЛКА РЕСУРСА -->
+<!-- ===== МОДАЛКА ДЛЯ РЕСУРСА ===== -->
 <div id="resourceModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeResourceModal">&times;</span>
     <h3 id="resourceModalTitle"><i class="fas fa-plus-circle"></i> Добавить ресурс</h3>
     <form id="resourceForm">
       <label>Название</label>
-      <input type="text" id="resTitle" placeholder="Название ресурса" required>
+      <input type="text" id="resTitle" placeholder="Название ресурса" required />
 
       <label>Описание</label>
-      <input type="text" id="resDesc" placeholder="Краткое описание" required>
+      <input type="text" id="resDesc" placeholder="Краткое описание" required />
 
       <label>Тип (иконка)</label>
       <select id="resIcon">
@@ -97,10 +109,10 @@
       </select>
 
       <label>Ссылка (URL или путь)</label>
-      <input type="text" id="resLink" placeholder="https://... или #">
+      <input type="text" id="resLink" placeholder="https://... или #" />
 
       <label>Размер / мета-информация</label>
-      <input type="text" id="resMeta" placeholder="Например: PDF, 24 МБ">
+      <input type="text" id="resMeta" placeholder="Например: PDF, 24 МБ" />
 
       <div class="modal-buttons">
         <button type="submit" class="save-btn">Сохранить</button>
@@ -111,50 +123,75 @@
 </div>
 
 <script type="module">
+  // ============================================================
+  //  ИМПОРТЫ
+  // ============================================================
   import { dataManager } from './dataManager.js';
 
-  // --- МОДЕЛЬ ---
+  // ============================================================
+  //  СОСТОЯНИЕ
+  // ============================================================
   let resourcesData = { folders: [] };
   let currentFolderId = null;
   let editFolderId = null;
   let editResourceId = null;
 
-  // --- ЗАГРУЗКА ---
+  // DOM-ссылки
+  const folderListEl = document.getElementById('folderList');
+  const resourcesGrid = document.getElementById('resourcesGrid');
+  const currentFolderTitle = document.getElementById('currentFolderTitle');
+  const addResourceBtn = document.getElementById('addResourceBtn');
+
+  // ============================================================
+  //  ЗАГРУЗКА / СОХРАНЕНИЕ
+  // ============================================================
   async function loadData() {
-    const saved = await dataManager.load('resources');
-    if (saved && saved.folders) {
-      resourcesData = saved;
-    } else {
+    try {
+      const saved = await dataManager.load('resources');
+      if (saved && saved.folders) {
+        resourcesData = saved;
+      } else {
+        // Демо-данные
+        resourcesData = {
+          folders: [
+            {
+              id: 'f1',
+              name: 'Учебники',
+              resources: [
+                { id: 'r1', title: 'Лесоводство. Полный курс', desc: 'Учебник с иллюстрациями и заданиями.', icon: 'fa-file-pdf', link: '#', meta: 'PDF, 24 МБ' },
+                { id: 'r2', title: 'Атлас древесных пород', desc: 'Определитель с фотографиями.', icon: 'fa-file-image', link: '#', meta: 'PDF, 45 МБ' }
+              ]
+            },
+            {
+              id: 'f2',
+              name: 'Видеолекции',
+              resources: [
+                { id: 'r3', title: 'Таксация леса: видеокурс', desc: '8 лекций от профессора Громова.', icon: 'fa-video', link: '#', meta: 'Плейлист' }
+              ]
+            },
+            {
+              id: 'f3',
+              name: 'Тесты',
+              resources: [
+                { id: 'r4', title: 'Экология леса: тренажёр', desc: '200+ вопросов с пояснениями.', icon: 'fa-check-double', link: '#', meta: 'Онлайн' }
+              ]
+            }
+          ]
+        };
+        await dataManager.save('resources', resourcesData);
+      }
+    } catch (e) {
+      console.warn('Ошибка загрузки ресурсов, используем демо:', e);
       resourcesData = {
         folders: [
-          {
-            id: 'f1',
-            name: 'Учебники',
-            resources: [
-              { id: 'r1', title: 'Лесоводство. Полный курс', desc: 'Учебник с иллюстрациями и заданиями.', icon: 'fa-file-pdf', link: '#', meta: 'PDF, 24 МБ' },
-              { id: 'r2', title: 'Атлас древесных пород', desc: 'Определитель с фотографиями.', icon: 'fa-file-image', link: '#', meta: 'PDF, 45 МБ' }
-            ]
-          },
-          {
-            id: 'f2',
-            name: 'Видеолекции',
-            resources: [
-              { id: 'r3', title: 'Таксация леса: видеокурс', desc: '8 лекций от профессора Громова.', icon: 'fa-video', link: '#', meta: 'Плейлист' }
-            ]
-          },
-          {
-            id: 'f3',
-            name: 'Тесты',
-            resources: [
-              { id: 'r4', title: 'Экология леса: тренажёр', desc: '200+ вопросов с пояснениями.', icon: 'fa-check-double', link: '#', meta: 'Онлайн' }
-            ]
-          }
+          { id: 'f1', name: 'Учебники', resources: [] },
+          { id: 'f2', name: 'Видеолекции', resources: [] },
+          { id: 'f3', name: 'Тесты', resources: [] }
         ]
       };
-      await dataManager.save('resources', resourcesData);
     }
     renderFolders();
-    // Восстановить активную папку
+    // Восстановить активную папку из sessionStorage
     const activeId = sessionStorage.getItem('activeFolderId');
     if (activeId && resourcesData.folders.find(f => f.id === activeId)) {
       selectFolder(activeId);
@@ -166,13 +203,18 @@
   }
 
   async function saveData() {
-    await dataManager.save('resources', resourcesData);
+    try {
+      await dataManager.save('resources', resourcesData);
+    } catch (e) {
+      console.warn('Ошибка сохранения ресурсов:', e);
+    }
   }
 
-  // --- ОТРИСОВКА ПАПОК ---
+  // ============================================================
+  //  ОТРИСОВКА ПАПОК
+  // ============================================================
   function renderFolders() {
-    const container = document.getElementById('folderList');
-    container.innerHTML = '';
+    folderListEl.innerHTML = '';
     resourcesData.folders.forEach(folder => {
       const div = document.createElement('div');
       div.className = `folder-item ${currentFolderId === folder.id ? 'active' : ''}`;
@@ -193,19 +235,21 @@
         if (!confirm(`Удалить папку "${folder.name}" и все ресурсы внутри?`)) return;
         await deleteFolder(folder.id);
       });
-      container.appendChild(div);
+      folderListEl.appendChild(div);
     });
-    document.getElementById('addResourceBtn').disabled = !currentFolderId;
+    addResourceBtn.disabled = !currentFolderId;
   }
 
-  // --- ВЫБОР ПАПКИ ---
+  // ============================================================
+  //  ВЫБОР ПАПКИ
+  // ============================================================
   function selectFolder(folderId) {
     currentFolderId = folderId;
     sessionStorage.setItem('activeFolderId', folderId);
     renderFolders();
     const folder = resourcesData.folders.find(f => f.id === folderId);
     if (folder) {
-      document.getElementById('currentFolderTitle').innerHTML = `<i class="fas fa-folder-open"></i> ${escapeHtml(folder.name)}`;
+      currentFolderTitle.innerHTML = `<i class="fas fa-folder-open"></i> ${escapeHtml(folder.name)}`;
       renderResources(folder.resources);
     } else {
       clearResourcesView();
@@ -213,34 +257,38 @@
   }
 
   function clearResourcesView() {
-    document.getElementById('currentFolderTitle').innerHTML = '<i class="fas fa-folder"></i> Выберите папку';
-    document.getElementById('resourcesGrid').innerHTML = `
-      <div class="empty-state"><i class="fas fa-hand-point-left"></i><p>Выберите папку слева</p></div>
+    currentFolderTitle.innerHTML = '<i class="fas fa-folder"></i> Выберите папку';
+    resourcesGrid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1; text-align:center; padding:40px; background:var(--bg-hover); border-radius:28px; color:var(--text-muted);">
+        <i class="fas fa-hand-point-left" style="font-size:3rem; display:block; margin-bottom:16px;"></i>
+        <p>Выберите папку слева</p>
+      </div>
     `;
-    document.getElementById('addResourceBtn').disabled = true;
+    addResourceBtn.disabled = true;
   }
 
-  // --- ОТРИСОВКА РЕСУРСОВ ---
+  // ============================================================
+  //  ОТРИСОВКА РЕСУРСОВ
+  // ============================================================
   function renderResources(resources) {
-    const grid = document.getElementById('resourcesGrid');
     if (!resources || resources.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-folder">
-          <i class="fas fa-folder-open"></i>
+      resourcesGrid.innerHTML = `
+        <div class="empty-folder" style="grid-column:1/-1; text-align:center; padding:40px; background:var(--bg-hover); border-radius:28px; color:var(--text-muted);">
+          <i class="fas fa-folder-open" style="font-size:3rem; display:block; margin-bottom:12px;"></i>
           <p>В этой папке пока нет ресурсов. Нажмите «Добавить ресурс».</p>
         </div>
       `;
       return;
     }
-    grid.innerHTML = '';
+    resourcesGrid.innerHTML = '';
     resources.forEach((res, index) => {
       const card = document.createElement('div');
       card.className = 'resource-card';
       card.style.animationDelay = `${index * 0.08}s`;
       card.innerHTML = `
         <div class="resource-actions">
-          <button class="edit-resource" data-id="${res.id}"><i class="fas fa-pen"></i></button>
-          <button class="delete-resource" data-id="${res.id}"><i class="fas fa-trash-alt"></i></button>
+          <button class="edit-resource action-btn edit" data-id="${res.id}"><i class="fas fa-pen"></i></button>
+          <button class="delete-resource action-btn delete" data-id="${res.id}"><i class="fas fa-trash-alt"></i></button>
         </div>
         <div class="card-icon"><i class="fas ${res.icon || 'fa-file'}"></i></div>
         <div class="card-content">
@@ -264,11 +312,13 @@
           await deleteResource(res.id);
         }, 300);
       });
-      grid.appendChild(card);
+      resourcesGrid.appendChild(card);
     });
   }
 
-  // --- ОПЕРАЦИИ С ПАПКАМИ ---
+  // ============================================================
+  //  ОПЕРАЦИИ С ПАПКАМИ (CRUD)
+  // ============================================================
   async function addFolder(name) {
     if (!name.trim()) return;
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
@@ -285,7 +335,7 @@
       await saveData();
       renderFolders();
       if (currentFolderId === folderId) {
-        document.getElementById('currentFolderTitle').innerHTML = `<i class="fas fa-folder-open"></i> ${escapeHtml(folder.name)}`;
+        currentFolderTitle.innerHTML = `<i class="fas fa-folder-open"></i> ${escapeHtml(folder.name)}`;
       }
     }
   }
@@ -303,7 +353,9 @@
     renderFolders();
   }
 
-  // --- ОПЕРАЦИИ С РЕСУРСАМИ ---
+  // ============================================================
+  //  ОПЕРАЦИИ С РЕСУРСАМИ (CRUD)
+  // ============================================================
   async function addResource(folderId, resData) {
     const folder = resourcesData.folders.find(f => f.id === folderId);
     if (!folder) return;
@@ -335,7 +387,9 @@
     renderResources(folder.resources);
   }
 
-  // --- МОДАЛКА ПАПКИ ---
+  // ============================================================
+  //  МОДАЛКА ДЛЯ ПАПКИ
+  // ============================================================
   const folderModal = document.getElementById('folderModal');
   const folderNameInput = document.getElementById('folderNameInput');
   const folderModalTitle = document.getElementById('folderModalTitle');
@@ -371,7 +425,9 @@
     closeFolderModal();
   }
 
-  // --- МОДАЛКА РЕСУРСА ---
+  // ============================================================
+  //  МОДАЛКА ДЛЯ РЕСУРСА
+  // ============================================================
   const resourceModal = document.getElementById('resourceModal');
   const resourceModalTitle = document.getElementById('resourceModalTitle');
   const resTitle = document.getElementById('resTitle');
@@ -435,7 +491,27 @@
     closeResourceModal();
   }
 
-  // --- ОБРАБОТЧИКИ ---
+  // ============================================================
+  //  ВСПОМОГАТЕЛЬНЫЕ
+  // ============================================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); color:var(--text-primary); padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid var(--border-color); transition: opacity 0.4s;';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+  }
+
+  // ============================================================
+  //  ОБРАБОТЧИКИ
+  // ============================================================
   document.getElementById('addFolderBtn').addEventListener('click', () => openFolderModal());
   document.getElementById('addResourceBtn').addEventListener('click', () => openResourceModal());
 
@@ -455,27 +531,16 @@
     if (e.target === resourceModal) closeResourceModal();
   });
 
-  // Кнопки сайдбара (быстрые переходы)
-  function showToast(msg) {
-    const t = document.createElement('div');
-    t.innerText = msg;
-    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
-  }
+  // Кнопки сайдбара
   document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
+  // ============================================================
+  //  ЗАПУСК
+  // ============================================================
   loadData();
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
 </script>
 </body>
 </html>
