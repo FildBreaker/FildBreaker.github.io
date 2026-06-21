@@ -1347,3 +1347,111 @@ body::before {
   pointer-events: none;
   border-radius: 24px;
 }
+/* ===== УНИВЕРСАЛЬНЫЕ КНОПКИ ДЕЙСТВИЙ В КАРТОЧКАХ ===== */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  background: #161b22;
+}
+.action-btn:hover {
+  background: #2d333b;
+  border-color: #ffb347;
+  color: #f0e6d0;
+  transform: scale(1.12);
+  box-shadow: 0 0 20px rgba(255, 180, 70, 0.15);
+}
+.action-btn.delete:hover {
+  background: #3d1a1a;
+  border-color: #d9534f;
+  color: #d9534f;
+  box-shadow: 0 0 20px rgba(217, 83, 79, 0.15);
+}
+.action-btn.edit:hover {
+  background: #1a2a3a;
+  border-color: #ffb347;
+  color: #ffb347;
+  box-shadow: 0 0 20px rgba(255, 180, 70, 0.15);
+}
+
+/* Группа кнопок в карточках — единый отступ между ними */
+.card-actions,
+.event-actions,
+.exam-actions,
+.resource-actions,
+.task-actions,
+.poll-actions,
+.test-actions,
+.folder-actions,
+.subject-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Дополнительно: если кнопки в абсолютном позиционировании, задаём фон */
+.exam-actions button,
+.resource-actions button,
+.teacher-card .card-actions button {
+  background: rgba(22, 27, 34, 0.92);
+  backdrop-filter: blur(4px);
+  border: 1px solid #30363d;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #c9d1d9;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.exam-actions button:hover,
+.resource-actions button:hover,
+.teacher-card .card-actions button:hover {
+  background: #2d333b;
+  border-color: #ffb347;
+  color: #f0e6d0;
+  transform: scale(1.12);
+}
+.exam-actions .delete-exam:hover,
+.resource-actions .delete-resource:hover,
+.teacher-card .card-actions .delete-teacher:hover {
+  background: #3d1a1a;
+  border-color: #d9534f;
+  color: #d9534f;
+}
+
+/* ===== ДЛЯ МОБИЛЬНЫХ — чуть меньше ===== */
+@media (max-width: 650px) {
+  .action-btn,
+  .exam-actions button,
+  .resource-actions button,
+  .teacher-card .card-actions button {
+    width: 30px;
+    height: 30px;
+    font-size: 0.7rem;
+  }
+  .card-actions,
+  .event-actions,
+  .exam-actions,
+  .resource-actions,
+  .task-actions,
+  .poll-actions,
+  .test-actions,
+  .folder-actions,
+  .subject-actions {
+    gap: 6px;
+  }
+}
