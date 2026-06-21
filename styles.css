@@ -1182,3 +1182,314 @@ body::before {
   font-size: 3rem;
   margin-bottom: 12px;
 }
+
+/* ===== СТРАНИЦА ВНЕУРОЧНОЙ ДЕЯТЕЛЬНОСТИ ===== */
+.section-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  background: #4a4e69;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  color: #e2c9c3;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+.tab-btn.active,
+.tab-btn:hover {
+  background: #ffb347;
+  color: #1e293b;
+  transform: translateY(-2px);
+}
+.tab-btn i {
+  font-size: 1.1rem;
+}
+
+.extracurricular-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.extracurricular-header h2 {
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, #ffe6b3, #ffc857);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.add-item-btn {
+  background: #f0a500;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1e293b;
+}
+.add-item-btn:hover {
+  background: #ffb347;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* Карточки мероприятий */
+.event-card {
+  background: #fef9ef;
+  border-radius: 28px;
+  padding: 20px 24px;
+  transition: all 0.4s cubic-bezier(0.2,0,0,1);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  animation: fadeUp 0.5s ease forwards;
+  opacity: 0;
+  border: 1px solid transparent;
+  position: relative;
+}
+.event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 24px rgba(0,0,0,0.15);
+  border-color: #ffb347;
+}
+.event-card.removing {
+  animation: fadeOut 0.3s ease forwards;
+}
+.card-header-event {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.event-date {
+  font-size: 0.85rem;
+  background: #e9e0cd;
+  padding: 4px 12px;
+  border-radius: 40px;
+}
+.event-actions {
+  display: flex;
+  gap: 10px;
+}
+.event-actions button {
+  background: #e9e0cd;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c3e4e;
+}
+.event-actions button:hover {
+  background: #ffb347;
+  transform: scale(1.1);
+}
+.event-actions .delete-event:hover {
+  background: #d9534f;
+  color: white;
+}
+.event-card h3 {
+  font-size: 1.3rem;
+  color: #2c3e4e;
+  margin-bottom: 8px;
+}
+.event-card p {
+  color: #4f5f6e;
+}
+.event-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #c46d0b;
+  text-decoration: none;
+}
+.event-link:hover {
+  text-decoration: underline;
+}
+
+/* Опросы */
+.poll-card {
+  background: #fef9ef;
+  border-radius: 28px;
+  padding: 20px 24px;
+  transition: all 0.4s cubic-bezier(0.2,0,0,1);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  animation: fadeUp 0.5s ease forwards;
+  opacity: 0;
+  border: 1px solid transparent;
+  position: relative;
+}
+.poll-card:hover {
+  transform: translateY(-4px);
+  border-color: #ffb347;
+}
+.poll-card.removing {
+  animation: fadeOut 0.3s ease forwards;
+}
+.poll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.poll-header h3 {
+  font-size: 1.2rem;
+  color: #2c3e4e;
+}
+.poll-header .poll-actions {
+  display: flex;
+  gap: 10px;
+}
+.poll-option {
+  margin: 12px 0;
+}
+.option-text {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.option-bar {
+  background: #e2dccd;
+  border-radius: 30px;
+  height: 12px;
+  width: 100%;
+  overflow: hidden;
+  margin: 6px 0;
+}
+.bar-fill {
+  background: #ffb347;
+  height: 100%;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+.vote-btn {
+  background: #f0a500;
+  border: none;
+  padding: 5px 18px;
+  border-radius: 40px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.vote-btn:hover {
+  background: #ffb347;
+  transform: scale(1.05);
+}
+.poll-footer {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: #7d6b42;
+}
+
+/* Тесты */
+.test-card {
+  background: #fef9ef;
+  border-radius: 28px;
+  padding: 20px 24px;
+  transition: all 0.4s cubic-bezier(0.2,0,0,1);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  animation: fadeUp 0.5s ease forwards;
+  opacity: 0;
+  border: 1px solid transparent;
+  position: relative;
+}
+.test-card:hover {
+  transform: translateY(-4px);
+  border-color: #ffb347;
+}
+.test-card.removing {
+  animation: fadeOut 0.3s ease forwards;
+}
+.test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.test-header h3 {
+  font-size: 1.2rem;
+  color: #2c3e4e;
+}
+.test-actions {
+  display: flex;
+  gap: 10px;
+}
+.test-actions button {
+  background: #e9e0cd;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.test-actions button:hover {
+  background: #ffb347;
+  transform: scale(1.05);
+}
+.test-actions .delete-test:hover {
+  background: #d9534f;
+  color: white;
+}
+.test-question {
+  margin-bottom: 24px;
+  border-bottom: 1px dashed #bba87a;
+  padding-bottom: 12px;
+}
+.test-options label {
+  display: block;
+  margin: 6px 0;
+}
+.test-result {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #2d6a4f;
+}
+
+/* Модалка для теста (прохождение) */
+.test-modal-content {
+  max-width: 700px;
+}
+#testQuestionsContainer .test-question:last-child {
+  border-bottom: none;
+}
+
+/* Адаптив */
+@media (max-width: 650px) {
+  .section-tabs {
+    justify-content: center;
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+  .extracurricular-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .add-item-btn {
+    justify-content: center;
+  }
+}
