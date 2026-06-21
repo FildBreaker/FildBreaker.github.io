@@ -88,6 +88,22 @@ body::before {
   gap: 6px;
   padding: 6px 14px;
   border-radius: 40px;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #ffb347;
+  transition: 0.3s;
+  transform: translateX(-50%);
+}
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 60%;
 }
 .nav-links a:hover,
 .nav-links a.active {
@@ -152,7 +168,8 @@ body::before {
 .add-link-btn,
 .save-btn,
 .cancel-btn,
-.edit-date-btn {
+.edit-date-btn,
+.action-btn {
   font-family: inherit;
   border: none;
   cursor: pointer;
@@ -163,6 +180,62 @@ body::before {
   gap: 8px;
   font-weight: 600;
   border-radius: 40px;
+  position: relative;
+  overflow: hidden;
+}
+/* Эффект "волны" при нажатии (ripple) – добавим через псевдоэлемент */
+.nav-btn::after,
+.filter-btn::after,
+.section-btn::after,
+.add-subject-btn::after,
+.add-global-btn::after,
+.add-folder-btn::after,
+.add-teacher-btn::after,
+.add-exam-btn::after,
+.add-task-btn::after,
+.add-item-btn::after,
+.reset-btn::after,
+.vote-btn::after,
+.tab-btn::after,
+.card-link::after,
+.res-link::after,
+.event-link::after,
+.add-link-btn::after,
+.save-btn::after,
+.cancel-btn::after,
+.edit-date-btn::after,
+.action-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.2), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.nav-btn:active::after,
+.filter-btn:active::after,
+.section-btn:active::after,
+.add-subject-btn:active::after,
+.add-global-btn:active::after,
+.add-folder-btn:active::after,
+.add-teacher-btn:active::after,
+.add-exam-btn:active::after,
+.add-task-btn:active::after,
+.add-item-btn:active::after,
+.reset-btn:active::after,
+.vote-btn:active::after,
+.tab-btn:active::after,
+.card-link:active::after,
+.res-link:active::after,
+.event-link:active::after,
+.add-link-btn:active::after,
+.save-btn:active::after,
+.cancel-btn:active::after,
+.edit-date-btn:active::after,
+.action-btn:active::after {
+  opacity: 1;
+  transition: 0s;
 }
 
 .nav-btn,
@@ -182,6 +255,12 @@ body::before {
   background: #2d333b;
   transform: translateX(6px);
   border-color: #ffb347;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+.nav-btn:active,
+.filter-btn:active,
+.section-btn:active {
+  transform: scale(0.98) translateX(4px);
 }
 .section-btn.active {
   background: #ffb347;
@@ -189,7 +268,7 @@ body::before {
   border-color: #ffb347;
 }
 
-/* Все кнопки "Добавить" – единый стиль */
+/* Все кнопки "Добавить" – единый стиль с градиентом */
 .add-subject-btn,
 .add-global-btn,
 .add-folder-btn,
@@ -212,12 +291,86 @@ body::before {
 .add-task-btn:hover,
 .add-item-btn:hover {
   transform: scale(1.03);
-  box-shadow: 0 6px 20px rgba(255, 180, 70, 0.3);
+  box-shadow: 0 6px 20px rgba(255, 180, 70, 0.4);
+}
+.add-subject-btn:active,
+.add-global-btn:active,
+.add-folder-btn:active,
+.add-teacher-btn:active,
+.add-exam-btn:active,
+.add-task-btn:active,
+.add-item-btn:active {
+  transform: scale(0.95);
 }
 
-/* Отступ для кнопки "Добавить предмет" в домашке */
-.add-subject-btn {
+/* Отступ для кнопки "Добавить предмет" в домашке и "Создать папку" в ресурсах */
+.add-subject-btn,
+.add-folder-btn {
   margin-top: 12px !important;
+}
+
+/* ===== ЭЛЕМЕНТЫ СПИСКОВ (ПРЕДМЕТЫ И ПАПКИ) – единый стиль ===== */
+.subject-item,
+.folder-item {
+  background: #21262d;
+  border-radius: 20px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #30363d;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.subject-item.active,
+.folder-item.active {
+  border-color: #ffb347;
+  background: #2d333b;
+}
+.subject-item:hover,
+.folder-item:hover {
+  transform: translateX(4px);
+  border-color: #ffb347;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.subject-item:active,
+.folder-item:active {
+  transform: scale(0.98) translateX(3px);
+}
+.subject-name,
+.folder-name {
+  font-weight: 600;
+  color: #f0e6d0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.subject-actions,
+.folder-actions {
+  display: flex;
+  gap: 8px;
+}
+.subject-actions button,
+.folder-actions button {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+  padding: 4px;
+  border-radius: 20px;
+}
+.subject-actions button:hover,
+.folder-actions button:hover {
+  color: #ffb347;
+  background: #2d333b;
+  transform: scale(1.2);
+}
+.subject-actions button:active,
+.folder-actions button:active {
+  transform: scale(0.9);
 }
 
 /* ===== УНИВЕРСАЛЬНЫЕ КНОПКИ ДЕЙСТВИЙ (редактировать/удалить) ===== */
@@ -242,6 +395,9 @@ body::before {
   color: #f0e6d0;
   transform: scale(1.12);
   box-shadow: 0 0 20px rgba(255, 180, 70, 0.15);
+}
+.action-btn:active {
+  transform: scale(0.9);
 }
 .action-btn.delete:hover {
   background: #3d1a1a;
@@ -342,7 +498,7 @@ body::before {
 .site-header,
 .modal-content {
   box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 60px rgba(255, 180, 70, 0.03);
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .schedule-section:hover,
 .exams-hero:hover,
@@ -464,6 +620,10 @@ body::before {
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid #30363d;
+  transition: transform 0.3s;
+}
+.teacher-card:hover .card-photo img {
+  transform: scale(1.05);
 }
 .teacher-info {
   padding: 20px 22px;
@@ -559,6 +719,10 @@ body::before {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 6px;
   background: linear-gradient(90deg, #f7971e, #ffd200);
+  transition: height 0.3s;
+}
+.exam-card:hover::before {
+  height: 8px;
 }
 .exam-card:hover {
   transform: translateY(-8px);
@@ -581,6 +745,11 @@ body::before {
   color: #ffb347;
   font-size: 1.9rem;
   flex-shrink: 0;
+  transition: 0.3s;
+}
+.exam-card:hover .exam-icon {
+  background: #ffb347;
+  color: #0d1117;
 }
 .exam-title h3 {
   font-size: 1.3rem;
@@ -614,7 +783,6 @@ body::before {
   width: 24px;
   color: #ffb347;
 }
-/* Стили для списков внутри деталей (если используются ul) */
 .detail-row ul,
 .detail-row .info-list {
   list-style: none;
@@ -670,6 +838,7 @@ body::before {
   background: #ffb347;
   color: #0d1117;
   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 180, 70, 0.2);
 }
 .card-footer-note {
   padding: 14px 24px 20px;
@@ -713,6 +882,9 @@ body::before {
   border-color: #ffb347;
   color: #f0e6d0;
   transform: scale(1.12);
+}
+.exam-actions button:active {
+  transform: scale(0.9);
 }
 .exam-actions .delete-exam:hover {
   background: #3d1a1a;
@@ -765,6 +937,12 @@ body::before {
   justify-content: center;
   color: #ffb347;
   flex-shrink: 0;
+  transition: 0.3s;
+}
+.resource-card:hover .card-icon {
+  background: #ffb347;
+  color: #0d1117;
+  transform: rotate(3deg);
 }
 .card-content h3 {
   font-size: 1.2rem;
@@ -825,6 +1003,9 @@ body::before {
   border-color: #ffb347;
   color: #f0e6d0;
   transform: scale(1.12);
+}
+.resource-actions button:active {
+  transform: scale(0.9);
 }
 .resource-actions .delete-resource:hover {
   background: #3d1a1a;
@@ -920,49 +1101,18 @@ body::before {
   border-radius: 50%;
   cursor: pointer;
   color: #c9d1d9;
+  transition: 0.3s;
 }
 .task-actions button:hover {
   background: #ffb347;
   color: #0d1117;
 }
+.task-actions button:active {
+  transform: scale(0.9);
+}
 .task-actions .delete-task:hover {
   background: #d9534f;
   color: white;
-}
-.subject-item {
-  background: #21262d;
-  border-radius: 20px;
-  padding: 10px 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #30363d;
-  transition: 0.3s;
-  cursor: pointer;
-}
-.subject-item.active {
-  border-color: #ffb347;
-  background: #2d333b;
-}
-.subject-item:hover {
-  transform: translateX(4px);
-}
-.subject-name {
-  font-weight: 600;
-  color: #f0e6d0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-.subject-actions button {
-  background: transparent;
-  border: none;
-  color: #8b949e;
-  cursor: pointer;
-}
-.subject-actions button:hover {
-  color: #ffb347;
 }
 
 /* ===== ВНЕУРОЧКА ===== */
@@ -983,6 +1133,9 @@ body::before {
   background: #ffb347;
   color: #0d1117;
   border-color: #ffb347;
+}
+.tab-btn:active {
+  transform: scale(0.95);
 }
 .extracurricular-header {
   display: flex;
@@ -1042,6 +1195,9 @@ body::before {
   background: #ffb347;
   color: #0d1117;
 }
+.vote-btn:active {
+  transform: scale(0.95);
+}
 .poll-footer {
   margin-top: 12px;
   font-size: 0.8rem;
@@ -1058,6 +1214,9 @@ body::before {
   background: #ffb347;
   color: #0d1117;
 }
+.test-actions button:active {
+  transform: scale(0.95);
+}
 .test-actions .delete-test:hover {
   background: #d9534f;
   color: white;
@@ -1067,7 +1226,6 @@ body::before {
 .extracurricular-header + .tasks-container .event-card h3:first-child {
   display: none;
 }
-/* Если есть двойной заголовок "Мероприятия" внутри блока, скрываем первый */
 .event-card .card-header-event + h3 {
   margin-top: 0;
 }
@@ -1107,6 +1265,10 @@ body::before {
   padding: 12px 16px;
   min-width: 70px;
   border: 1px solid #30363d;
+  transition: 0.3s;
+}
+.countdown-card:hover .time-block {
+  border-color: #ffb347;
 }
 .time-block .number {
   font-size: 2.2rem;
@@ -1131,6 +1293,9 @@ body::before {
 .edit-date-btn:hover {
   background: #ffb347;
   color: #0d1117;
+}
+.edit-date-btn:active {
+  transform: scale(0.95);
 }
 
 /* ===== РАСПИСАНИЕ ===== */
@@ -1162,6 +1327,9 @@ body::before {
 .reset-btn:hover {
   background: #ffb347;
   color: #0d1117;
+}
+.reset-btn:active {
+  transform: scale(0.95);
 }
 .sync-hint {
   font-size: 0.75rem;
@@ -1260,6 +1428,11 @@ body::before {
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(6px);
+  animation: modalFadeIn 0.3s ease;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 .modal-content {
   background: #161b22;
@@ -1270,7 +1443,11 @@ body::before {
   max-height: 85vh;
   overflow-y: auto;
   border: 1px solid #30363d;
-  animation: fadeUp 0.3s ease;
+  animation: modalContentFade 0.3s ease;
+}
+@keyframes modalContentFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .modal-content h3 {
   color: #f0e6d0;
@@ -1295,11 +1472,13 @@ body::before {
   background: #0d1117;
   color: #f0e6d0;
   font-family: inherit;
+  transition: 0.3s;
 }
 .modal-content input:focus,
 .modal-content textarea:focus {
   outline: none;
   border-color: #ffb347;
+  box-shadow: 0 0 20px rgba(255, 180, 70, 0.1);
 }
 .close-modal {
   float: right;
@@ -1328,6 +1507,9 @@ body::before {
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(45, 106, 79, 0.3);
 }
+.save-btn:active {
+  transform: scale(0.95);
+}
 .cancel-btn {
   background: #21262d;
   color: #8b949e;
@@ -1337,6 +1519,9 @@ body::before {
 }
 .cancel-btn:hover {
   background: #30363d;
+}
+.cancel-btn:active {
+  transform: scale(0.95);
 }
 
 /* ===== ФУТЕР ===== */
@@ -1352,7 +1537,7 @@ body::before {
   font-size: 0.9rem;
 }
 
-/* ===== АНИМАЦИИ ===== */
+/* ===== АНИМАЦИИ ПОЯВЛЕНИЯ/УДАЛЕНИЯ ===== */
 @keyframes slideDown {
   from { transform: translateY(-30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
@@ -1369,10 +1554,25 @@ body::before {
   from { opacity: 1; transform: scale(1); }
   to { opacity: 0; transform: scale(0.9); }
 }
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+/* Элементы с классом .removing будут исчезать */
+.removing {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+/* ===== ПУЛЬСАЦИЯ ДЛЯ КНОПОК "ДОБАВИТЬ" ===== */
+.add-subject-btn,
+.add-global-btn,
+.add-folder-btn,
+.add-teacher-btn,
+.add-exam-btn,
+.add-task-btn,
+.add-item-btn,
+.edit-date-btn {
+  animation: pulse-glow 2s infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 180, 70, 0); }
+  50% { box-shadow: 0 0 20px 6px rgba(255, 180, 70, 0.15); }
 }
 
 /* ===== АДАПТИВ ===== */
