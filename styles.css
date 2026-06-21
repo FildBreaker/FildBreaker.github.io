@@ -1,4 +1,6 @@
-/* ===== ПЕРЕМЕННЫЕ ТЕМ (по умолчанию Dark Gold) ===== */
+/* ============================================================
+   ПЕРЕМЕННЫЕ ТЕМ (по умолчанию — Dark Gold)
+   ============================================================ */
 :root {
   --bg-primary: #0d1117;
   --bg-secondary: #161b22;
@@ -18,6 +20,9 @@
   --shadow-color: rgba(255, 180, 70, 0.06);
   --danger: #d9534f;
   --success: #2d6a4f;
+  --radius: 28px;
+  --radius-sm: 20px;
+  --transition: 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
 
 /* ===== ТЕМА: Dark Blue ===== */
@@ -65,15 +70,16 @@ body.theme-light {
   --accent-gradient: linear-gradient(135deg, #f0a500, #ffb347);
   --accent-glow: rgba(240, 165, 0, 0.2);
   --shadow-color: rgba(0, 0, 0, 0.05);
-  --danger: #d9534f;
-  --success: #2d6a4f;
-}
-/* Для светлой темы фон body заменяем */
-body.theme-light::before {
-  background: linear-gradient(135deg, rgba(240, 242, 245, 0.95), rgba(255, 255, 255, 0.95)), url("data/1.jpg") center/cover no-repeat !important;
 }
 
-/* ===== ГЛОБАЛЬНЫЕ СТИЛИ (используют переменные) ===== */
+/* Светлая тема — фоновая картинка с прозрачностью */
+body.theme-light::before {
+  background: linear-gradient(135deg, rgba(240, 242, 245, 0.92), rgba(255, 255, 255, 0.92)), url("data/1.jpg") center/cover no-repeat !important;
+}
+
+/* ============================================================
+   ГЛОБАЛЬНЫЕ СТИЛИ
+   ============================================================ */
 * {
   margin: 0;
   padding: 0;
@@ -124,11 +130,13 @@ body::before {
   }
 }
 
-/* ===== ШАПКА ===== */
+/* ============================================================
+   ШАПКА
+   ============================================================ */
 .site-header {
   grid-area: header;
   background: var(--bg-secondary);
-  border-radius: 28px;
+  border-radius: var(--radius);
   padding: 16px 32px;
   display: flex;
   flex-wrap: wrap;
@@ -137,7 +145,7 @@ body::before {
   border: 1px solid var(--border-color);
   box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 40px var(--shadow-color);
   animation: slideDown 0.6s ease;
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 .logo h1 {
   font-size: 1.7rem;
@@ -152,7 +160,7 @@ body::before {
 }
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   list-style: none;
   flex-wrap: wrap;
   align-items: center;
@@ -161,7 +169,7 @@ body::before {
   text-decoration: none;
   font-weight: 500;
   color: var(--text-muted);
-  transition: 0.3s;
+  transition: var(--transition);
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -177,7 +185,7 @@ body::before {
   width: 0;
   height: 2px;
   background: var(--accent);
-  transition: 0.3s;
+  transition: var(--transition);
   transform: translateX(-50%);
 }
 .nav-links a:hover::after,
@@ -196,14 +204,16 @@ body::before {
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
   border-radius: 40px;
-  padding: 6px 14px;
+  padding: 6px 16px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: 0.3s;
+  transition: var(--transition);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
 }
 .theme-toggle-btn:hover {
   background: var(--accent);
@@ -214,11 +224,13 @@ body::before {
   font-size: 1.1rem;
 }
 
-/* ===== САЙДБАР ===== */
+/* ============================================================
+   САЙДБАР
+   ============================================================ */
 .sidebar {
   grid-area: sidebar;
   background: var(--bg-secondary);
-  border-radius: 28px;
+  border-radius: var(--radius);
   padding: 24px 18px;
   border: 1px solid var(--border-color);
   height: fit-content;
@@ -226,7 +238,7 @@ body::before {
   top: 20px;
   animation: fadeIn 0.8s ease;
   box-shadow: 0 0 40px var(--shadow-color);
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 .sidebar h3 {
   font-size: 1.3rem;
@@ -273,7 +285,7 @@ body::before {
   font-family: inherit;
   border: none;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  transition: all var(--transition);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -283,6 +295,7 @@ body::before {
   position: relative;
   overflow: hidden;
 }
+/* ripple-эффект при нажатии */
 .nav-btn::after,
 .filter-btn::after,
 .section-btn::after,
@@ -367,6 +380,7 @@ body::before {
   border-color: var(--accent);
 }
 
+/* Кнопки "Добавить" — градиент */
 .add-subject-btn,
 .add-global-btn,
 .add-folder-btn,
@@ -406,17 +420,17 @@ body::before {
   margin-top: 12px !important;
 }
 
-/* ===== ЭЛЕМЕНТЫ СПИСКОВ ===== */
+/* ===== ЭЛЕМЕНТЫ СПИСКОВ (предметы, папки) ===== */
 .subject-item,
 .folder-item {
   background: var(--bg-hover);
-  border-radius: 20px;
+  border-radius: var(--radius-sm);
   padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border: 1px solid var(--border-color);
-  transition: 0.3s;
+  transition: var(--transition);
   cursor: pointer;
 }
 .subject-item.active,
@@ -450,9 +464,9 @@ body::before {
   color: var(--text-muted);
   cursor: pointer;
   font-size: 0.9rem;
-  transition: 0.2s;
+  transition: var(--transition);
   padding: 4px;
-  border-radius: 20px;
+  border-radius: var(--radius-sm);
 }
 .subject-actions button:hover,
 .folder-actions button:hover {
@@ -465,7 +479,7 @@ body::before {
   transform: scale(0.9);
 }
 
-/* ===== КНОПКИ ДЕЙСТВИЙ ===== */
+/* ===== КНОПКИ ДЕЙСТВИЙ (редактировать/удалить) ===== */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -524,7 +538,7 @@ body::before {
 .info-block {
   background: var(--bg-hover);
   border: 2px solid var(--accent);
-  border-radius: 28px;
+  border-radius: var(--radius);
   padding: 20px 28px;
   display: flex;
   align-items: center;
@@ -533,7 +547,7 @@ body::before {
   margin: 10px 0;
   color: var(--text-secondary);
   box-shadow: 0 0 30px var(--accent-glow);
-  transition: 0.3s;
+  transition: var(--transition);
 }
 .info-block:hover {
   box-shadow: 0 0 50px var(--accent-glow);
@@ -554,7 +568,9 @@ body::before {
   color: var(--accent);
 }
 
-/* ===== КАРТОЧКИ ===== */
+/* ============================================================
+   КАРТОЧКИ И ОСНОВНЫЕ БЛОКИ
+   ============================================================ */
 .teachers-section,
 .schedule-section,
 .exams-hero,
@@ -573,11 +589,11 @@ body::before {
 .test-card,
 .modal-content {
   background: var(--bg-card);
-  border-radius: 28px;
+  border-radius: var(--radius);
   border: 1px solid var(--border-color);
   animation: fadeUp 0.6s ease;
   box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 60px var(--shadow-color);
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 .teachers-section:hover,
 .schedule-section:hover,
@@ -598,9 +614,1034 @@ body::before {
   box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 80px var(--shadow-color);
 }
 
-/* Остальные стили (без изменений, но используют переменные) — все блоки уже адаптированы выше */
+/* ===== ПРИВЕТСТВЕННАЯ ПОЛОСКА ===== */
+.welcome-strip {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding: 24px 28px;
+}
+.strip-image {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 0 30px var(--accent-glow), 0 8px 24px rgba(0,0,0,0.5);
+  border: 2px solid var(--accent);
+  transition: var(--transition);
+}
+.strip-image:hover {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 50px var(--accent-glow), 0 12px 32px rgba(0,0,0,0.6);
+  transform: scale(1.02);
+}
+.strip-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.75) saturate(1.2) contrast(1.1);
+  transition: filter var(--transition), transform var(--transition);
+}
+.strip-image:hover img {
+  filter: brightness(0.9) saturate(1.3) contrast(1.1);
+  transform: scale(1.05);
+}
+.strip-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.5), rgba(22, 27, 34, 0.2), rgba(255, 180, 70, 0.05));
+  pointer-events: none;
+  border-radius: 24px;
+}
+.strip-text h2 {
+  font-size: 1.9rem;
+  background: linear-gradient(135deg, #ffe6b3, #ffc857);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.strip-text p {
+  color: var(--text-muted);
+}
 
-/* ===== АДАПТИВ ===== */
+/* ===== ПРЕПОДАВАТЕЛИ ===== */
+.teachers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+  margin-top: 20px;
+}
+.teacher-card {
+  overflow: hidden;
+}
+.teacher-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent);
+}
+.card-photo {
+  background: var(--bg-hover);
+  padding: 20px 0 16px;
+  text-align: center;
+}
+.card-photo img {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--border-color);
+  transition: transform var(--transition);
+}
+.teacher-card:hover .card-photo img {
+  transform: scale(1.05);
+}
+.teacher-info {
+  padding: 20px 22px;
+}
+.teacher-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.teacher-position,
+.teacher-degree {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 6px 0;
+}
+.contact-details-card {
+  margin-top: 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+}
+.contact-details-card p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  margin: 6px 0;
+  color: var(--text-primary);
+}
+.contact-details-card i {
+  width: 20px;
+  color: var(--accent);
+}
+.contact-details-card a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.contact-details-card a:hover {
+  text-decoration: underline;
+}
+
+/* ===== ЭКЗАМЕНЫ ===== */
+.exams-hero {
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.hero-text h2 {
+  font-size: 1.9rem;
+  background: linear-gradient(135deg, #ffe6b3, #ffc857);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.hero-text p {
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+.hero-badge {
+  background: var(--bg-hover);
+  padding: 10px 20px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+}
+.exams-header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.exams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+}
+.exam-card {
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+.exam-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 6px;
+  background: var(--accent-gradient);
+  transition: height 0.3s;
+}
+.exam-card:hover::before {
+  height: 8px;
+}
+.exam-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px 12px 24px;
+}
+.exam-icon {
+  width: 55px;
+  height: 55px;
+  background: var(--bg-hover);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 1.9rem;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.exam-card:hover .exam-icon {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+.exam-title h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.exam-type {
+  font-size: 0.7rem;
+  background: var(--bg-hover);
+  padding: 4px 12px;
+  border-radius: 40px;
+  font-weight: 600;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-details {
+  padding: 0 24px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  padding: 4px 0;
+  color: var(--text-primary);
+}
+.detail-row i {
+  width: 24px;
+  color: var(--accent);
+}
+.detail-row ul,
+.detail-row .info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.detail-row ul li::before,
+.detail-row .info-list li::before {
+  content: "• ";
+  color: var(--accent);
+}
+.exam-resources {
+  padding: 16px 24px;
+  background: var(--bg-hover);
+  margin: 8px 12px;
+  border-radius: 24px;
+}
+.resources-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.resource-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.res-link {
+  background: var(--bg-card);
+  padding: 6px 14px;
+  border-radius: 60px;
+  font-size: 0.75rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+}
+.res-link i {
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+.res-link:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px var(--accent-glow);
+}
+.card-footer-note {
+  padding: 14px 24px 20px;
+  font-size: 0.8rem;
+  border-top: 1px dashed var(--border-color);
+  margin-top: auto;
+  color: var(--text-muted);
+}
+.card-footer-note a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.card-footer-note a:hover {
+  text-decoration: underline;
+}
+.exam-actions {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+.exam-actions button {
+  background: var(--bg-card);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.exam-actions button:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--text-secondary);
+  transform: scale(1.12);
+}
+.exam-actions button:active {
+  transform: scale(0.9);
+}
+.exam-actions .delete-exam:hover {
+  background: #3d1a1a;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ===== РЕСУРСЫ ===== */
+.resources-hero {
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.resources-hero h2 {
+  font-size: 1.9rem;
+  background: linear-gradient(135deg, #ffe6b3, #ffc857);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.resources-hero p {
+  color: var(--text-muted);
+}
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+.resource-card {
+  padding: 20px;
+  display: flex;
+  gap: 18px;
+  position: relative;
+}
+.resource-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+}
+.card-icon {
+  font-size: 2.4rem;
+  background: var(--bg-hover);
+  width: 65px;
+  height: 65px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.resource-card:hover .card-icon {
+  background: var(--accent);
+  color: var(--text-inverse);
+  transform: rotate(3deg);
+}
+.card-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.card-content p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.card-meta span i {
+  margin-right: 4px;
+}
+.card-link {
+  background: var(--bg-hover);
+  padding: 6px 14px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+.card-link:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+.resource-actions {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+}
+.resource-actions button {
+  background: var(--bg-card);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.resource-actions button:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--text-secondary);
+  transform: scale(1.12);
+}
+.resource-actions button:active {
+  transform: scale(0.9);
+}
+.resource-actions .delete-resource:hover {
+  background: #3d1a1a;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ===== ДОМАШКА ===== */
+.homework-header {
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.homework-header h2 {
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, #ffe6b3, #ffc857);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.add-task-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.add-task-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+.tasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.task-card {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+.task-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+.task-content {
+  flex: 1;
+}
+.task-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.task-links {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  background: var(--bg-hover);
+  padding: 6px 14px;
+  border-radius: 30px;
+  display: inline-block;
+}
+.task-links a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-right: 12px;
+}
+.task-links a:hover {
+  text-decoration: underline;
+}
+.task-tags {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 50px;
+}
+.task-actions {
+  display: flex;
+  gap: 12px;
+}
+.task-actions button {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+.task-actions button:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+.task-actions button:active {
+  transform: scale(0.9);
+}
+.task-actions .delete-task:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* ===== ВНЕУРОЧКА ===== */
+.section-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  background: var(--bg-hover);
+  padding: 10px 24px;
+  border-radius: 40px;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+.tab-btn.active,
+.tab-btn:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+}
+.tab-btn:active {
+  transform: scale(0.95);
+}
+.extracurricular-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.extracurricular-header h2 {
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, #ffe6b3, #ffc857);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.add-item-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.event-card,
+.poll-card,
+.test-card {
+  padding: 20px 24px;
+}
+.event-card:hover,
+.poll-card:hover,
+.test-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+.poll-option {
+  margin: 12px 0;
+}
+.option-bar {
+  background: var(--bg-hover);
+  border-radius: 30px;
+  height: 12px;
+  overflow: hidden;
+}
+.bar-fill {
+  background: var(--accent-gradient);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+.vote-btn {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  padding: 5px 18px;
+  border-radius: 40px;
+  border: 1px solid var(--border-color);
+}
+.vote-btn:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+.vote-btn:active {
+  transform: scale(0.95);
+}
+.poll-footer {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.test-actions button {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  padding: 6px 14px;
+  border-radius: 40px;
+  color: var(--text-primary);
+}
+.test-actions button:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+.test-actions button:active {
+  transform: scale(0.95);
+}
+.test-actions .delete-test:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Скрываем дублирующийся заголовок "Мероприятия" */
+.extracurricular-header + .tasks-container .event-card h3:first-child {
+  display: none;
+}
+.event-card .card-header-event + h3 {
+  margin-top: 0;
+}
+
+/* ===== ТАЙМЕРЫ ===== */
+.countdown-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.countdown-card {
+  padding: 24px 28px;
+  text-align: center;
+  cursor: pointer;
+}
+.countdown-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+.countdown-card h3 {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.countdown-card h3 i {
+  color: var(--accent);
+}
+.countdown-display {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.time-block {
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  min-width: 70px;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+.countdown-card:hover .time-block {
+  border-color: var(--accent);
+}
+.time-block .number {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  line-height: 1.2;
+}
+.time-block .label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.edit-date-btn {
+  margin-top: 14px;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  padding: 6px 16px;
+  border-radius: 40px;
+  border: 1px solid var(--border-color);
+}
+.edit-date-btn:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+.edit-date-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   РАСПИСАНИЕ
+   ============================================================ */
+.schedule-section {
+  padding: 24px 28px;
+}
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.schedule-header h2 {
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, #ffe6b3, #ffc857);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.reset-btn {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  padding: 8px 20px;
+  border-radius: 40px;
+  border: 1px solid var(--border-color);
+}
+.reset-btn:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+.reset-btn:active {
+  transform: scale(0.95);
+}
+.sync-hint {
+  font-size: 0.75rem;
+  background: var(--bg-hover);
+  padding: 5px 14px;
+  border-radius: 60px;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 24px;
+  background: var(--bg-primary);
+  padding: 4px;
+}
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 800px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.schedule-table th {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-weight: 700;
+  padding: 16px 10px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+.schedule-table td {
+  padding: 12px 10px;
+  vertical-align: middle;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+.schedule-table .pair-time {
+  background: var(--bg-primary);
+  color: var(--accent);
+  font-weight: 700;
+  text-align: center;
+  width: 130px;
+}
+.schedule-cell {
+  cursor: pointer;
+  transition: var(--transition);
+}
+.schedule-cell:hover {
+  background: var(--bg-hover);
+  transform: scale(1.02);
+  border-color: var(--accent);
+}
+.cell-content .subject {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.cell-content .subject .room {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.cell-content .end-date {
+  font-size: 0.7rem;
+  color: #b5d6b0;
+  background: #1c2a24;
+  padding: 2px 12px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.cell-content .edit-icon {
+  opacity: 0.2;
+  transition: var(--transition);
+}
+.schedule-cell:hover .edit-icon {
+  opacity: 1;
+  color: var(--accent);
+}
+.break-row td {
+  background: var(--bg-primary) !important;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 0.75rem;
+  padding: 6px;
+  border-color: var(--border-color);
+}
+
+/* ============================================================
+   МОДАЛЬНЫЕ ОКНА
+   ============================================================ */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+  animation: modalFadeIn 0.3s ease;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modal-content {
+  background: var(--bg-card);
+  padding: 28px 32px;
+  border-radius: 40px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  animation: modalContentFade 0.3s ease;
+}
+@keyframes modalContentFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-content h3 {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.modal-content label {
+  display: block;
+  margin: 16px 0 6px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 28px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: var(--transition);
+}
+.modal-content input:focus,
+.modal-content textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.close-modal {
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+.close-modal:hover {
+  color: var(--accent);
+  transform: rotate(90deg);
+}
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 28px;
+}
+.save-btn {
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: white;
+  padding: 8px 22px;
+  border-radius: 40px;
+}
+.save-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(45, 106, 79, 0.3);
+}
+.save-btn:active {
+  transform: scale(0.95);
+}
+.cancel-btn {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  padding: 8px 22px;
+  border-radius: 40px;
+  border: 1px solid var(--border-color);
+}
+.cancel-btn:hover {
+  background: var(--bg-active);
+}
+.cancel-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   ФУТЕР
+   ============================================================ */
+.site-footer {
+  grid-area: footer;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   АНИМАЦИИ
+   ============================================================ */
+@keyframes slideDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+.removing {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+/* Пульсация для важных кнопок */
+.add-subject-btn,
+.add-global-btn,
+.add-folder-btn,
+.add-teacher-btn,
+.add-exam-btn,
+.add-task-btn,
+.add-item-btn,
+.edit-date-btn {
+  animation: pulse-glow 2s infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50% { box-shadow: 0 0 20px 6px var(--accent-glow); }
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ
+   ============================================================ */
 @media (max-width: 850px) {
   .app-grid {
     grid-template-columns: 1fr;
@@ -686,6 +1727,9 @@ body::before {
   .info-block i {
     font-size: 2rem;
   }
+  .info-text {
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -713,11 +1757,3 @@ body::before {
     justify-content: center;
   }
 }
-
-/* ===== АНИМАЦИИ (без изменений) ===== */
-@keyframes slideDown { ... }
-@keyframes fadeIn { ... }
-@keyframes fadeUp { ... }
-@keyframes fadeOut { ... }
-@keyframes pulse { ... }
-/* (оставлены для краткости, но должны быть в реальном файле) */
