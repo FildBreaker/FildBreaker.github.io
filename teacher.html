@@ -12,6 +12,7 @@
 </head>
 <body>
 <div class="app-grid">
+  <!-- ШАПКА -->
   <header class="site-header">
     <div class="logo"><h1><i class="fas fa-chalkboard-teacher"></i> Б-21ЛЕС</h1></div>
     <ul class="nav-links">
@@ -25,6 +26,7 @@
     </ul>
   </header>
 
+  <!-- БОКОВАЯ ПАНЕЛЬ -->
   <aside class="sidebar">
     <h3><i class="fas fa-compass"></i> Основное</h3>
     <div class="nav-buttons">
@@ -33,54 +35,266 @@
       <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
       <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
     </div>
-    <div class="sidebar-note"><i class="fas fa-users"></i><p>Преподавательский состав кафедры</p></div>
+    <div class="sidebar-note">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <p>Данные синхронизируются через Firebase – доступны всем.</p>
+    </div>
   </aside>
 
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
   <main class="main-content">
     <div class="teachers-section">
-      <h2><i class="fas fa-leaf"></i> Выбери своего бойца</h2>
-      <div class="teachers-grid" id="teachersGridContainer"></div>
+      <div class="teachers-header">
+        <h2><i class="fas fa-leaf"></i> Профессорско-преподавательский состав</h2>
+        <button class="add-teacher-btn" id="addTeacherBtn"><i class="fas fa-plus"></i> Добавить преподавателя</button>
+      </div>
+      <div class="teachers-grid" id="teachersGrid"></div>
     </div>
   </main>
 
   <footer class="site-footer">
     <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
+    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Данные хранятся в Firebase</p>
   </footer>
 </div>
 
-<script type="module">
-  // Данные преподавателей (как в оригинале)
-  const teachersData = [
-    { name: "Гайвас Алексей Алексеевич", position: "кафедра садоводства, лесного хозяйства и защиты растений", degree: "Кандидат сельскохозяйственных наук, доцент", degree2: "Предмет: Энтомология", phone: "(3812) 65-27-63, 13-42", email: "aa.gayvas@omgau.org", photo: "data/Teachers/Gaivas.jpg" },
-    // ... остальные
-  ];
+<!-- МОДАЛКА ДЛЯ ПРЕПОДАВАТЕЛЯ -->
+<div id="teacherModal" class="modal teacher-modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeTeacherModal">&times;</span>
+    <h3 id="teacherModalTitle"><i class="fas fa-user-plus"></i> Добавить преподавателя</h3>
+    <form id="teacherForm">
+      <label>ФИО</label>
+      <input type="text" id="tName" placeholder="Иванов Иван Иванович" required>
 
-  const container = document.getElementById('teachersGridContainer');
-  teachersData.forEach(teacher => {
-    const card = document.createElement('div');
-    card.className = 'teacher-card';
-    card.innerHTML = `
-      <div class="card-photo"><img src="${teacher.photo}" alt="${teacher.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/130x130?text=Нет+фото'"></div>
-      <div class="teacher-info">
-        <div class="teacher-name"><i class="fas fa-user-tie"></i> ${teacher.name}</div>
-        <div class="teacher-position"><i class="fas fa-briefcase"></i> ${teacher.position}</div>
-        <div class="teacher-degree"><i class="fas fa-graduation-cap"></i> ${teacher.degree}</div>
-        <div class="teacher-degree2"><i class="fas fa-graduation-cap"></i> ${teacher.degree2}</div>
-        <div class="contact-details-card">
-          <p><i class="fas fa-phone-alt"></i> ${teacher.phone}</p>
-          <p><i class="fas fa-envelope"></i> <a href="mailto:${teacher.email}">${teacher.email}</a></p>
-        </div>
+      <label>Должность / подразделение</label>
+      <input type="text" id="tPosition" placeholder="кафедра садоводства, лесного хозяйства и защиты растений" required>
+
+      <label>Учёная степень</label>
+      <input type="text" id="tDegree" placeholder="Кандидат сельскохозяйственных наук, доцент" required>
+
+      <label>Предметы</label>
+      <input type="text" id="tSubject" placeholder="Энтомология, Таксация" required>
+
+      <label>Телефон</label>
+      <input type="text" id="tPhone" placeholder="(3812) 65-27-63, 13-42" required>
+
+      <label>Email</label>
+      <input type="email" id="tEmail" placeholder="aa.gayvas@omgau.org" required>
+
+      <label>Ссылка на фото (URL)</label>
+      <input type="url" id="tPhoto" placeholder="data/Teachers/Gaivas.jpg">
+
+      <div class="modal-buttons">
+        <button type="submit" class="save-btn">Сохранить</button>
+        <button type="button" class="cancel-btn" id="cancelTeacherBtn">Отмена</button>
       </div>
-    `;
-    container.appendChild(card);
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import { dataManager } from './dataManager.js';
+
+  let teachersData = [];
+  let editTeacherId = null;
+  const grid = document.getElementById('teachersGrid');
+
+  // --- Загрузка ---
+  async function loadTeachers() {
+    const saved = await dataManager.load('teachers');
+    if (saved && Array.isArray(saved)) {
+      teachersData = saved;
+    } else {
+      // Демо-данные (как на картинке)
+      teachersData = [
+        {
+          id: 't1',
+          name: 'Гайвас Алексей Алексеевич',
+          position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
+          degree: 'Кандидат сельскохозяйственных наук, доцент',
+          subject: 'Предмет: Энтомология',
+          phone: '(3812) 65-27-63, 13-42',
+          email: 'aa.gayvas@omgau.org',
+          photo: 'data/Teachers/Gaivas.jpg'
+        },
+        {
+          id: 't2',
+          name: 'Ненашев Николай Сергеевич',
+          position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
+          degree: 'Кандидат сельскохозяйственных наук, доцент',
+          subject: 'Предмет: Таксация',
+          phone: '(3812) 65-14-55, (3812) 65-17-45, 13-15',
+          email: 'ns.nenashev@omgau.org',
+          photo: 'data/Teachers/Nenashev.jpg'
+        },
+        {
+          id: 't3',
+          name: 'Коцюбинская Ольга Андреевна',
+          position: 'Подразделение: кафедра садоводства, лесного хозяйства и защиты растений агротехнологического факультета',
+          degree: 'Кандидат сельскохозяйственных наук, доцент',
+          subject: 'Предмет: Основы лесопаркового хозяйства (практика), основы проектной деятельности, селекция растений (практика)',
+          phone: '(3812) 66-17-45',
+          email: 'oa.kotsyubinskaya@omgau.org',
+          photo: 'data/Teachers/Kotsyubinskaya.jpg'
+        }
+      ];
+      await dataManager.save('teachers', teachersData);
+    }
+    renderTeachers();
+  }
+
+  async function saveTeachers() {
+    await dataManager.save('teachers', teachersData);
+  }
+
+  // --- Отрисовка ---
+  function renderTeachers() {
+    if (teachersData.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:40px; background:rgba(79,98,122,0.5); border-radius:32px; color:#e0d6b0;">
+          <i class="fas fa-users" style="font-size:3rem; display:block; margin-bottom:16px;"></i>
+          <p>Пока нет преподавателей. Нажмите «Добавить преподавателя».</p>
+        </div>
+      `;
+      return;
+    }
+    grid.innerHTML = '';
+    teachersData.forEach((teacher, index) => {
+      const card = document.createElement('div');
+      card.className = 'teacher-card';
+      card.style.animationDelay = `${index * 0.08}s`;
+      const photoUrl = teacher.photo || 'https://via.placeholder.com/130x130?text=Нет+фото';
+      card.innerHTML = `
+        <div class="card-actions">
+          <button class="edit-teacher" data-id="${teacher.id}"><i class="fas fa-pen"></i></button>
+          <button class="delete-teacher" data-id="${teacher.id}"><i class="fas fa-trash-alt"></i></button>
+        </div>
+        <div class="card-photo">
+          <img src="${photoUrl}" alt="Фото ${teacher.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/130x130?text=Нет+фото'">
+        </div>
+        <div class="teacher-info">
+          <div class="teacher-name"><i class="fas fa-user-tie"></i> ${escapeHtml(teacher.name)}</div>
+          <div class="teacher-position"><i class="fas fa-briefcase"></i> ${escapeHtml(teacher.position)}</div>
+          <div class="teacher-degree"><i class="fas fa-graduation-cap"></i> ${escapeHtml(teacher.degree)}</div>
+          <div class="teacher-degree"><i class="fas fa-chalkboard"></i> ${escapeHtml(teacher.subject)}</div>
+          <div class="contact-details-card">
+            <p><i class="fas fa-phone-alt"></i> ${escapeHtml(teacher.phone)}</p>
+            <p><i class="fas fa-envelope"></i> <a href="mailto:${escapeHtml(teacher.email)}">${escapeHtml(teacher.email)}</a></p>
+          </div>
+        </div>
+      `;
+      // Обработчики
+      card.querySelector('.edit-teacher').addEventListener('click', () => openTeacherModal(teacher.id));
+      card.querySelector('.delete-teacher').addEventListener('click', async () => {
+        if (!confirm(`Удалить преподавателя "${teacher.name}"?`)) return;
+        card.classList.add('removing');
+        setTimeout(async () => {
+          await deleteTeacher(teacher.id);
+        }, 300);
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  // --- CRUD ---
+  async function deleteTeacher(id) {
+    teachersData = teachersData.filter(t => t.id !== id);
+    await saveTeachers();
+    renderTeachers();
+  }
+
+  async function saveTeacherFromModal() {
+    const name = document.getElementById('tName').value.trim();
+    const position = document.getElementById('tPosition').value.trim();
+    const degree = document.getElementById('tDegree').value.trim();
+    const subject = document.getElementById('tSubject').value.trim();
+    const phone = document.getElementById('tPhone').value.trim();
+    const email = document.getElementById('tEmail').value.trim();
+    const photo = document.getElementById('tPhoto').value.trim();
+
+    if (!name || !position || !degree || !subject || !phone || !email) {
+      alert('Заполните все обязательные поля');
+      return;
+    }
+
+    const teacherData = { name, position, degree, subject, phone, email, photo: photo || '' };
+
+    if (editTeacherId) {
+      const idx = teachersData.findIndex(t => t.id === editTeacherId);
+      if (idx !== -1) {
+        teachersData[idx] = { ...teachersData[idx], ...teacherData };
+      }
+    } else {
+      const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
+      teachersData.push({ id: newId, ...teacherData });
+    }
+    await saveTeachers();
+    renderTeachers();
+    closeTeacherModal();
+  }
+
+  // --- Модалка ---
+  const modal = document.getElementById('teacherModal');
+  const modalTitle = document.getElementById('teacherModalTitle');
+
+  function openTeacherModal(id = null) {
+    editTeacherId = id;
+    if (id) {
+      const teacher = teachersData.find(t => t.id === id);
+      if (!teacher) return;
+      modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать преподавателя';
+      document.getElementById('tName').value = teacher.name;
+      document.getElementById('tPosition').value = teacher.position;
+      document.getElementById('tDegree').value = teacher.degree;
+      document.getElementById('tSubject').value = teacher.subject;
+      document.getElementById('tPhone').value = teacher.phone;
+      document.getElementById('tEmail').value = teacher.email;
+      document.getElementById('tPhoto').value = teacher.photo || '';
+    } else {
+      modalTitle.innerHTML = '<i class="fas fa-user-plus"></i> Добавить преподавателя';
+      document.getElementById('teacherForm').reset();
+    }
+    modal.style.display = 'flex';
+  }
+
+  function closeTeacherModal() {
+    modal.style.display = 'none';
+    editTeacherId = null;
+  }
+
+  // --- Обработчики ---
+  document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
+  document.getElementById('closeTeacherModal').addEventListener('click', closeTeacherModal);
+  document.getElementById('cancelTeacherBtn').addEventListener('click', closeTeacherModal);
+  window.addEventListener('click', (e) => { if (e.target === modal) closeTeacherModal(); });
+  document.getElementById('teacherForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveTeacherFromModal();
   });
 
   // Кнопки сайдбара
-  const showToast = (msg) => { /* ... */ };
-  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: ...'));
-  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
-  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
-  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+  }
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
+
+  // Загрузка
+  loadTeachers();
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 </script>
 </body>
 </html>
