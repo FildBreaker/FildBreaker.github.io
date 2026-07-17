@@ -1,8 +1,8 @@
 // firebase-config.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check.js";
 
-// Конфигурация вашего проекта (взята из ваших скриншотов)
 const firebaseConfig = {
   apiKey: "AIzaSyAwMQhg9UAMo8wVzakwGWpdHSrINQjQJw",
   authDomain: "ibd2026-31a00.firebaseapp.com",
@@ -14,6 +14,12 @@ const firebaseConfig = {
   measurementId: "G-TP5LTG9Q9D"
 };
 
-// Инициализация
 const app = initializeApp(firebaseConfig);
+
+// 👇 Добавьте инициализацию App Check
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('ВАШ_SITE_KEY_ЗДЕСЬ'), // 👈 вставьте site key, а не secret key
+  isTokenAutoRefreshEnabled: true
+});
+
 export const db = getDatabase(app);
