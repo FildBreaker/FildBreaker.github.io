@@ -9,16 +9,11 @@
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
-  <script type="module" src="theme.js"></script>
 </head>
 <body>
 <div class="app-grid">
-
-  <!-- ===== ШАПКА ===== -->
   <header class="site-header">
-    <div class="logo">
-      <h1><i class="fas fa-calendar-alt"></i> Б-21ЛЕС</h1>
-    </div>
+    <div class="logo"><h1><i class="fas fa-calendar-alt"></i> Б-21ЛЕС</h1></div>
     <ul class="nav-links">
       <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html" class="active"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -28,13 +23,8 @@
       <li><a href="extracurricular.html"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
       <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
-    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="openThemeModal()">
-      <i class="fas fa-moon"></i>
-      <span>Тема</span>
-    </button>
   </header>
 
-  <!-- ===== САЙДБАР ===== -->
   <aside class="sidebar">
     <h3><i class="fas fa-compass"></i> Основное</h3>
     <div class="nav-buttons">
@@ -43,20 +33,16 @@
       <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
       <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
     </div>
-    <div class="sidebar-note">
-      <i class="fas fa-cloud-upload-alt"></i>
-      <p>Все изменения сохраняются в облаке.</p>
-    </div>
+    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Все изменения сохраняются в облаке и видны всем.</p></div>
   </aside>
 
-  <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
   <main class="main-content">
     <div class="schedule-section">
       <div class="schedule-header">
         <h2><i class="fas fa-table-list"></i> Расписание занятий</h2>
         <div class="schedule-actions">
           <button id="resetScheduleBtn" class="reset-btn"><i class="fas fa-undo-alt"></i> Сбросить</button>
-          <span class="sync-hint"><i class="fas fa-sync-alt fa-fw"></i> автосинхронизация</span>
+          <span class="sync-hint"><i class="fas fa-sync-alt"></i> автосинхронизация</span>
         </div>
       </div>
       <div class="table-wrapper">
@@ -72,41 +58,32 @@
     </div>
   </main>
 
-  <!-- ===== ФУТЕР ===== -->
   <footer class="site-footer">
-    <p>© 2026 Б-21ЛЕС · Нормально оформленное расписание (неужели)</p>
-    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-database"></i> Данные хранятся в Firebase</p>
+    <p>© 2025 Б-21ЛЕС · Данные синхронизируются в реальном времени</p>
   </footer>
-
 </div>
 
-<!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТИРОВАНИЯ ЯЧЕЙКИ ===== -->
+<!-- Модалка редактирования -->
 <div id="editModal" class="modal">
   <div class="modal-content">
-    <span class="close-modal" id="closeModalBtn">&times;</span>
-    <h3 id="modalTitle"><i class="fas fa-edit"></i> Редактировать пару</h3>
+    <span class="close-modal">&times;</span>
+    <h3><i class="fas fa-edit"></i> Редактировать пару</h3>
     <form id="editForm">
-      <label>Предмет</label>
-      <input type="text" id="editSubject" placeholder="Название предмета" required>
-      <label>Аудитория</label>
-      <input type="text" id="editRoom" placeholder="Номер аудитории" required>
-      <label>Дата окончания (ДД.ММ.ГГГГ)</label>
-      <input type="text" id="editEndDate" placeholder="31.05.2026" required>
+      <label>Предмет:</label><input type="text" id="editSubject" required>
+      <label>Аудитория:</label><input type="text" id="editRoom" required>
+      <label>Дата окончания (ДД.ММ.ГГГГ):</label><input type="text" id="editEndDate" placeholder="31.05.2026" required>
       <div class="modal-buttons">
         <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
-        <button type="button" class="cancel-btn" id="cancelModalBtn">Отмена</button>
+        <button type="button" class="cancel-btn">Отмена</button>
       </div>
     </form>
   </div>
 </div>
 
 <script type="module">
-  // Импорты
   import { dataManager } from './dataManager.js';
 
-  // ============================================================
-  //  ИСХОДНОЕ РАСПИСАНИЕ (6 пар + перерывы)
-  // ============================================================
+  // --- Исходное расписание (6 пар, как на картинке) ---
   const defaultSchedule = {
     0: { // ПН
       1: { subject: "Проектная деятельность (П)", room: "1-210", endDate: "31.05.2026" },
@@ -166,7 +143,7 @@
     }
   };
 
-  // Времена пар и перерывы
+  // --- Времена пар и перерывы ---
   const pairTimes = {
     1: "1 пара (9:00 – 10:30)",
     2: "2 пара (10:45 – 12:15)",
@@ -182,45 +159,28 @@
     4: "Перерыв: 10 минут",
     5: "Перерыв: 10 минут"
   };
+  const dayNames = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
   const MAX_PAIR = 6;
-  const DAYS = 7;
 
-  // ============================================================
-  //  СОСТОЯНИЕ
-  // ============================================================
   let scheduleData = {};
-  let currentEditDay = null, currentEditPair = null;
 
-  // ============================================================
-  //  ЗАГРУЗКА / СОХРАНЕНИЕ
-  // ============================================================
+  // --- Загрузка / сохранение ---
   async function loadSchedule() {
-    try {
-      const saved = await dataManager.load('schedule');
-      if (saved) {
-        scheduleData = saved;
-      } else {
-        scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
-        await dataManager.save('schedule', scheduleData);
-      }
-    } catch (e) {
-      console.warn('Ошибка загрузки расписания, используем дефолтное:', e);
+    const saved = await dataManager.load('schedule');
+    if (saved) {
+      scheduleData = saved;
+    } else {
       scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
+      await dataManager.save('schedule', scheduleData);
     }
     renderSchedule();
   }
 
   async function saveSchedule() {
-    try {
-      await dataManager.save('schedule', scheduleData);
-    } catch (e) {
-      console.warn('Ошибка сохранения расписания:', e);
-    }
+    await dataManager.save('schedule', scheduleData);
   }
 
-  // ============================================================
-  //  ОТРИСОВКА ТАБЛИЦЫ
-  // ============================================================
+  // --- Рендер таблицы с перерывами ---
   function renderSchedule() {
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
@@ -233,18 +193,14 @@
       tdTime.innerHTML = `<strong>${pairTimes[pair]}</strong>`;
       tr.appendChild(tdTime);
 
-      for (let day = 0; day < DAYS; day++) {
+      for (let day = 0; day < 7; day++) {
         const td = document.createElement('td');
         td.className = 'schedule-cell';
         const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', endDate: '' };
-        const subjectHtml = lesson.subject
-          ? `<span class="subject">${escapeHtml(lesson.subject)}${lesson.room ? ` <span class="room">(${escapeHtml(lesson.room)})</span>` : ''}</span>`
-          : `<span class="subject">—</span>`;
-        const endDateHtml = lesson.endDate ? `<span class="end-date"><i class="far fa-calendar-alt"></i> до ${escapeHtml(lesson.endDate)}</span>` : '';
         td.innerHTML = `
           <div class="cell-content">
-            ${subjectHtml}
-            ${endDateHtml}
+            <div class="subject">${lesson.subject || '—'}${lesson.room ? ` (${lesson.room})` : ''}</div>
+            ${lesson.endDate ? `<div class="end-date"><i class="far fa-calendar-alt"></i> до ${lesson.endDate}</div>` : ''}
             <div class="edit-icon"><i class="fas fa-pen"></i></div>
           </div>
         `;
@@ -255,12 +211,13 @@
       }
       tbody.appendChild(tr);
 
-      // Строка перерыва (кроме последней пары)
+      // Если не последняя пара – добавляем строку с перерывом
       if (pair < MAX_PAIR) {
         const breakTr = document.createElement('tr');
         breakTr.className = 'break-row';
         const breakTd = document.createElement('td');
-        breakTd.colSpan = DAYS + 1; // +1 для столбца "Пара"
+        breakTd.colSpan = 8; // 7 дней + столбец "Пара"
+        breakTd.style.cssText = 'background: #2c3e4e; color: #f9e79f; text-align: center; font-size: 0.8rem; padding: 4px;';
         breakTd.textContent = breaks[pair] || '';
         breakTr.appendChild(breakTd);
         tbody.appendChild(breakTr);
@@ -268,11 +225,9 @@
     }
   }
 
-  // ============================================================
-  //  МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ
-  // ============================================================
+  // --- Модалка редактирования ---
+  let currentEditDay = null, currentEditPair = null;
   const modal = document.getElementById('editModal');
-  const modalTitle = document.getElementById('modalTitle');
   const editSubject = document.getElementById('editSubject');
   const editRoom = document.getElementById('editRoom');
   const editEndDate = document.getElementById('editEndDate');
@@ -281,7 +236,6 @@
     currentEditDay = day;
     currentEditPair = pair;
     const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', endDate: '' };
-    modalTitle.innerHTML = `<i class="fas fa-edit"></i> Редактировать: ${dayNames[day]}, ${pairTimes[pair]}`;
     editSubject.value = lesson.subject || '';
     editRoom.value = lesson.room || '';
     editEndDate.value = lesson.endDate || '';
@@ -314,9 +268,6 @@
     closeModal();
   }
 
-  // ============================================================
-  //  СБРОС К ДЕФОЛТУ
-  // ============================================================
   async function resetToDefault() {
     if (!confirm('Сбросить расписание к исходному? Все изменения будут потеряны.')) return;
     scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
@@ -324,47 +275,32 @@
     renderSchedule();
   }
 
-  // ============================================================
-  //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-  // ============================================================
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  const dayNames = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
-
-  // ============================================================
-  //  ОБРАБОТЧИКИ СОБЫТИЙ
-  // ============================================================
-  document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-  document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+  // --- Обработчики событий ---
+  document.querySelector('.close-modal')?.addEventListener('click', closeModal);
+  document.querySelector('.cancel-btn')?.addEventListener('click', closeModal);
   window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-  document.getElementById('editForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    saveEdit();
-  });
-  document.getElementById('resetScheduleBtn').addEventListener('click', resetToDefault);
+  document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
+  document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
 
-  // Кнопки сайдбара
+  // Кнопки сайдбара (быстрые переходы)
   function showToast(msg) {
     const t = document.createElement('div');
     t.innerText = msg;
-    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); color:var(--text-primary); padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid var(--border-color); transition: opacity 0.4s;';
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
   }
-  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса, 20 июня – Конференция'));
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
-  // ============================================================
-  //  ЗАПУСК
-  // ============================================================
+  // Старт
   loadSchedule();
 </script>
+<script type="module" src="firebase-config.js"></script>
+<script type="module" src="dataManager.js"></script>
+<script type="module" src="theme.js"></script>
+<script type="module" src="app-settings.js"></script>
 </body>
 </html>

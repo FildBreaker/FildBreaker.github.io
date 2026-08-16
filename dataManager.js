@@ -2,67 +2,73 @@
 import { db } from './firebase-config.js';
 import { ref, set, get, child, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-// Корневой путь для всех данных в базе
-const ROOT = 'B21LES';
+const ROOT = 'IBD2026';
+const CACHE_PREFIX = 'cache_';
 
 export const dataManager = {
-  /**
-   * Загрузить данные по ключу
-   * @param {string} key - ключ в базе (например, 'schedule', 'homework')
-   * @returns {Promise<any>} данные или null
-   */
   async load(key) {
+    const dbRef = ref(db);
     try {
-      const dbRef = ref(db);
       const snapshot = await get(child(dbRef, `${ROOT}/${key}`));
-      return snapshot.exists() ? snapshot.val() : null;
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(data));
+        return data;
+      } else {
+        const cached = localStorage.getItem(CACHE_PREFIX + key);
+        return cached ? JSON.parse(cached) : null;
+      }
     } catch (error) {
-      console.error(`Ошибка загрузки данных "${key}":`, error);
-      return null;
+      console.warn('⚠️ Ошибка загрузки из Firebase, используем кэш:', error);
+      const cached = localStorage.getItem(CACHE_PREFIX + key);
+      return cached ? JSON.parse(cached) : null;
     }
   },
-
-  /**
-   * Сохранить данные по ключу (полная замена)
-   * @param {string} key - ключ в базе
-   * @param {any} data - данные для сохранения
-   */
   async save(key, data) {
+    const pathRef = ref(db, `${ROOT}/${key}`);
     try {
-      const pathRef = ref(db, `${ROOT}/${key}`);
       await set(pathRef, data);
+      localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(data));
     } catch (error) {
-      console.error(`Ошибка сохранения данных "${key}":`, error);
-      throw error;
+      console.warn('⚠️ Ошибка сохранения в Firebase, сохраняем локально:', error);
+      localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(data));
     }
   },
-
-  /**
-   * Обновить часть данных по ключу
-   * @param {string} key - ключ в базе
-   * @param {object} updates - объект с обновлениями
-   */
   async update(key, updates) {
+    const pathRef = ref(db, `${ROOT}/${key}`);
     try {
-      const pathRef = ref(db, `${ROOT}/${key}`);
       await update(pathRef, updates);
+      const current = await this.load(key);
+      if (current) {
+        const newData = { ...current, ...updates };
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(newData));
+      }
     } catch (error) {
-      console.error(`Ошибка обновления данных "${key}":`, error);
-      throw error;
+      console.warn('⚠️ Ошибка обновления в Firebase, обновляем локально:', error);
+      const cached = localStorage.getItem(CACHE_PREFIX + key);
+      if (cached) {
+        const current = JSON.parse(cached);
+        const newData = { ...current, ...updates };
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(newData));
+      }
+    }
+  },
+  async remove(key) {
+    const pathRef = ref(db, `${ROOT}/${key}`);
+    try {
+      await remove(pathRef);
+      localStorage.removeItem(CACHE_PREFIX + key);
+    } catch (error) {
+      console.warn('⚠️ Ошибка удаления из Firebase, удаляем локально:', error);
+      localStorage.removeItem(CACHE_PREFIX + key);
     }
   },
 
-  /**
-   * Удалить данные по ключу
-   * @param {string} key - ключ в базе
-   */
-  async remove(key) {
-    try {
-      const pathRef = ref(db, `${ROOT}/${key}`);
-      await remove(pathRef);
-    } catch (error) {
-      console.error(`Ошибка удаления данных "${key}":`, error);
-      throw error;
-    }
+  // Новые методы для темы
+  async loadTheme() {
+    return await this.load('theme');
+  },
+  async saveTheme(themeName) {
+    await this.save('theme', themeName);
   }
 };
