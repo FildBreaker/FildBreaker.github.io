@@ -85,7 +85,6 @@
 <script type="module">
   import { dataManager } from './dataManager.js';
 
-  // --- Исходное расписание ---
   const defaultSchedule = {
     0: { 1: { subject: "Проектная деятельность (П)", room: "1-210", endDate: "31.05.2026" }, 2: { subject: "Основы лесопаркового хозяйства (П)", room: "1-308", endDate: "31.05.2026" }, 3: { subject: "Лесная энтомология (П)", room: "1-203", endDate: "31.05.2026" }, 4: { subject: "", room: "", endDate: "" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
     1: { 1: { subject: "Экономическая теория (П)", room: "1-303", endDate: "31.05.2026" }, 2: { subject: "Экономическая теория (П)", room: "1-408а", endDate: "31.05.2026" }, 3: { subject: "Основы лесопаркового хозяйства (П)", room: "Библиотека 309", endDate: "31.05.2026" }, 4: { subject: "", room: "", endDate: "" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
@@ -111,9 +110,7 @@
     4: "Перерыв: 10 минут",
     5: "Перерыв: 10 минут"
   };
-  const dayNames = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
   const MAX_PAIR = 6;
-
   let scheduleData = {};
 
   async function loadSchedule() {
@@ -134,15 +131,12 @@
   function renderSchedule() {
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
-
     for (let pair = 1; pair <= MAX_PAIR; pair++) {
-      // Строка с парами
       const tr = document.createElement('tr');
       const tdTime = document.createElement('td');
       tdTime.className = 'pair-time';
       tdTime.innerHTML = `<strong>${pairTimes[pair]}</strong>`;
       tr.appendChild(tdTime);
-
       for (let day = 0; day < 7; day++) {
         const td = document.createElement('td');
         td.className = 'schedule-cell';
@@ -160,8 +154,6 @@
         tr.appendChild(td);
       }
       tbody.appendChild(tr);
-
-      // Если не последняя пара – добавляем строку с перерывом
       if (pair < MAX_PAIR) {
         const breakTr = document.createElement('tr');
         breakTr.className = 'break-row';
@@ -174,7 +166,7 @@
     }
   }
 
-  // --- Модалка ---
+  // Модалка редактирования (без изменений)
   let currentEditDay = null, currentEditPair = null;
   const modal = document.getElementById('editModal');
   const editSubject = document.getElementById('editSubject');
@@ -203,7 +195,7 @@
     const newRoom = editRoom.value.trim();
     let newEndDate = editEndDate.value.trim();
     if (newEndDate && !/^\d{2}\.\d{2}\.\d{4}$/.test(newEndDate)) {
-      alert('Введите дату в формате ДД.ММ.ГГГГ (например, 31.05.2026)');
+      alert('Введите дату в формате ДД.ММ.ГГГГ');
       return;
     }
     if (!scheduleData[currentEditDay]) scheduleData[currentEditDay] = {};
@@ -218,7 +210,7 @@
   }
 
   async function resetToDefault() {
-    if (!confirm('Сбросить расписание к исходному? Все изменения будут потеряны.')) return;
+    if (!confirm('Сбросить расписание к исходному?')) return;
     scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
     await saveSchedule();
     renderSchedule();
