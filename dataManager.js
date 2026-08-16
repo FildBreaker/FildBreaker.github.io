@@ -1,4 +1,3 @@
-// dataManager.js
 import { db } from './firebase-config.js';
 import { ref, set, get, child, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
@@ -63,8 +62,6 @@ export const dataManager = {
       localStorage.removeItem(CACHE_PREFIX + key);
     }
   },
-
-  // Методы для темы
   async loadTheme() {
     return await this.load('theme');
   },
