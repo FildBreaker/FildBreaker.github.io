@@ -1633,3 +1633,167 @@ body::after {
   border-color: var(--input-focus);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
+/* ===== ИСПРАВЛЕНИЕ НАЛОЖЕНИЯ БЛОКОВ НА МОБИЛЬНЫХ ===== */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* Убеждаемся, что все дочерние блоки не накладываются */
+}
+
+.main-content > * {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  /* Явно задаём фон, чтобы перекрытие не создавало прозрачности */
+  background: var(--block-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  /* Для старых браузеров добавляем запасной цвет */
+  background-color: rgba(45, 45, 68, 0.85);
+}
+
+/* Также для элементов, у которых может не быть фона */
+.teachers-section,
+.schedule-section,
+.exams-hero,
+.hero-resources,
+.homework-header,
+.info-block,
+.welcome-strip,
+.section-header,
+.timers-block {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  background: var(--block-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  background-color: rgba(45, 45, 68, 0.85);
+}
+
+/* Для тёмных тем отдельно уточняем фон */
+.theme-dark-blue .teachers-section,
+.theme-dark-blue .schedule-section,
+.theme-dark-blue .exams-hero,
+.theme-dark-blue .hero-resources,
+.theme-dark-blue .homework-header,
+.theme-dark-blue .info-block,
+.theme-dark-blue .welcome-strip,
+.theme-dark-blue .section-header,
+.theme-dark-blue .timers-block {
+  background-color: rgba(26, 45, 66, 0.85);
+}
+
+.theme-dark-green .teachers-section,
+.theme-dark-green .schedule-section,
+.theme-dark-green .exams-hero,
+.theme-dark-green .hero-resources,
+.theme-dark-green .homework-header,
+.theme-dark-green .info-block,
+.theme-dark-green .welcome-strip,
+.theme-dark-green .section-header,
+.theme-dark-green .timers-block {
+  background-color: rgba(20, 48, 34, 0.85);
+}
+
+.theme-dark-purple .teachers-section,
+.theme-dark-purple .schedule-section,
+.theme-dark-purple .exams-hero,
+.theme-dark-purple .hero-resources,
+.theme-dark-purple .homework-header,
+.theme-dark-purple .info-block,
+.theme-dark-purple .welcome-strip,
+.theme-dark-purple .section-header,
+.theme-dark-purple .timers-block {
+  background-color: rgba(42, 26, 64, 0.85);
+}
+
+.theme-dark-red .teachers-section,
+.theme-dark-red .schedule-section,
+.theme-dark-red .exams-hero,
+.theme-dark-red .hero-resources,
+.theme-dark-red .homework-header,
+.theme-dark-red .info-block,
+.theme-dark-red .welcome-strip,
+.theme-dark-red .section-header,
+.theme-dark-red .timers-block {
+  background-color: rgba(64, 26, 26, 0.85);
+}
+
+/* Светлые темы */
+.theme-light-gold .teachers-section,
+.theme-light-gold .schedule-section,
+.theme-light-gold .exams-hero,
+.theme-light-gold .hero-resources,
+.theme-light-gold .homework-header,
+.theme-light-gold .info-block,
+.theme-light-gold .welcome-strip,
+.theme-light-gold .section-header,
+.theme-light-gold .timers-block {
+  background-color: rgba(240, 232, 216, 0.85);
+}
+
+.theme-light-blue .teachers-section,
+.theme-light-blue .schedule-section,
+.theme-light-blue .exams-hero,
+.theme-light-blue .hero-resources,
+.theme-light-blue .homework-header,
+.theme-light-blue .info-block,
+.theme-light-blue .welcome-strip,
+.theme-light-blue .section-header,
+.theme-light-blue .timers-block {
+  background-color: rgba(220, 232, 245, 0.85);
+}
+
+.theme-light-green .teachers-section,
+.theme-light-green .schedule-section,
+.theme-light-green .exams-hero,
+.theme-light-green .hero-resources,
+.theme-light-green .homework-header,
+.theme-light-green .info-block,
+.theme-light-green .welcome-strip,
+.theme-light-green .section-header,
+.theme-light-green .timers-block {
+  background-color: rgba(220, 238, 224, 0.85);
+}
+
+.theme-light-purple .teachers-section,
+.theme-light-purple .schedule-section,
+.theme-light-purple .exams-hero,
+.theme-light-purple .hero-resources,
+.theme-light-purple .homework-header,
+.theme-light-purple .info-block,
+.theme-light-purple .welcome-strip,
+.theme-light-purple .section-header,
+.theme-light-purple .timers-block {
+  background-color: rgba(232, 224, 245, 0.85);
+}
+
+.theme-light-red .teachers-section,
+.theme-light-red .schedule-section,
+.theme-light-red .exams-hero,
+.theme-light-red .hero-resources,
+.theme-light-red .homework-header,
+.theme-light-red .info-block,
+.theme-light-red .welcome-strip,
+.theme-light-red .section-header,
+.theme-light-red .timers-block {
+  background-color: rgba(245, 224, 224, 0.85);
+}
+
+/* Дополнительно для мобильных: убираем backdrop-filter, если он мешает */
+@media (max-width: 650px) {
+  .teachers-section,
+  .schedule-section,
+  .exams-hero,
+  .hero-resources,
+  .homework-header,
+  .info-block,
+  .welcome-strip,
+  .section-header,
+  .timers-block {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
