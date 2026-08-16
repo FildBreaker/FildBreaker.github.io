@@ -1,7 +1,6 @@
 // app-settings.js
 import { dataManager } from './dataManager.js';
 
-// ===== ЭКСПОРТ ДАННЫХ =====
 export function exportData() {
   Promise.all([
     dataManager.load('schedule'),
@@ -23,7 +22,6 @@ export function exportData() {
   }).catch(console.error);
 }
 
-// ===== ИМПОРТ ДАННЫХ =====
 export function importData(file) {
   const reader = new FileReader();
   reader.onload = async (e) => {
@@ -43,16 +41,17 @@ export function importData(file) {
   reader.readAsText(file);
 }
 
-// ===== РЕГИСТРАЦИЯ SERVICE WORKER =====
 export function registerSW() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
-      .then(() => console.log('✅ Service Worker зарегистрирован'))
+      .then(() => {
+        // Убираем лог, чтобы не засорять консоль (можно оставить, но я убираю)
+        // console.log('✅ Service Worker зарегистрирован');
+      })
       .catch(err => console.error('❌ SW регистрация не удалась:', err));
   }
 }
 
-// ===== ДОБАВЛЕНИЕ КНОПОК В САЙДБАР =====
 export function initSidebarButtons() {
   const sidebar = document.querySelector('.sidebar');
   if (!sidebar) return;
@@ -61,7 +60,6 @@ export function initSidebarButtons() {
   const container = document.createElement('div');
   container.id = 'settingsContainer';
 
-  // Кнопка "Тема"
   const themeBtn = document.createElement('button');
   themeBtn.className = 'nav-btn';
   themeBtn.innerHTML = '<i class="fas fa-palette"></i> Тема оформления';
@@ -74,14 +72,12 @@ export function initSidebarButtons() {
   });
   container.appendChild(themeBtn);
 
-  // Кнопка экспорта
   const exportBtn = document.createElement('button');
   exportBtn.className = 'nav-btn';
   exportBtn.innerHTML = '<i class="fas fa-file-export"></i> Экспорт данных';
   exportBtn.addEventListener('click', exportData);
   container.appendChild(exportBtn);
 
-  // Кнопка импорта (скрытый input)
   const importBtn = document.createElement('button');
   importBtn.className = 'nav-btn';
   importBtn.innerHTML = '<i class="fas fa-file-import"></i> Импорт данных';
@@ -99,7 +95,6 @@ export function initSidebarButtons() {
   sidebar.appendChild(container);
 }
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', () => {
   initSidebarButtons();
   registerSW();
