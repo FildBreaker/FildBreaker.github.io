@@ -1708,3 +1708,178 @@ body {
     padding: 14px 16px;
   }
 }
+/* ============================================================
+   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ДОМАШНЕГО ЗАДАНИЯ
+   ============================================================ */
+
+/* Кнопка "Добавить задание" */
+.add-task-btn {
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.add-task-btn:hover {
+  background: var(--btn-primary-hover);
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.add-task-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Кнопки в карточках заданий (редактировать / удалить) */
+.task-card .task-actions button {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  padding: 6px 14px;
+  border-radius: 40px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.task-card .task-actions button:hover {
+  background: var(--bg-active);
+  color: var(--text-color);
+  border-color: var(--accent);
+}
+
+.task-card .task-actions .edit-task {
+  color: var(--accent);
+}
+
+.task-card .task-actions .edit-task:hover {
+  background: rgba(255, 179, 71, 0.15);
+}
+
+.task-card .task-actions .delete-task {
+  color: #e74c3c;
+}
+
+.task-card .task-actions .delete-task:hover {
+  background: rgba(231, 76, 60, 0.15);
+}
+
+/* Кнопка "Добавить предмет" в сайдбаре */
+.add-subject-btn {
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
+  border: none;
+  padding: 12px 16px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.add-subject-btn:hover {
+  background: var(--btn-primary-hover);
+  transform: scale(1.02);
+}
+
+/* Элементы списка предметов в сайдбаре */
+.subject-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 40px;
+  background: var(--bg-hover);
+  border: 1px solid transparent;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.subject-item:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+}
+
+.subject-item.active {
+  background: var(--bg-active);
+  border-color: var(--accent);
+}
+
+.subject-item .subject-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: 0.3s;
+}
+
+.subject-item.active .subject-name {
+  color: var(--text-color);
+}
+
+.subject-item .subject-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.subject-item .subject-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: 0.3s;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.subject-item .subject-actions button:hover {
+  color: var(--text-color);
+  background: var(--bg-hover);
+}
+
+.subject-item .subject-actions .edit-subject:hover {
+  color: var(--accent);
+}
+
+.subject-item .subject-actions .delete-subject:hover {
+  color: #e74c3c;
+}
+
+/* ============================================================
+   ИСПРАВЛЕНИЕ ФОНОВОГО ИЗОБРАЖЕНИЯ (ГАРАНТИРОВАННО)
+   ============================================================ */
+.bg-layer {
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  filter: blur(14px) brightness(0.7);
+  transform: scale(1.05);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Убедимся, что изображение применяется */
+.bg-layer {
+  background-image: var(--bg-image) !important;
+}
