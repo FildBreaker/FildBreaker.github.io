@@ -11,6 +11,7 @@ const urlsToCache = [
   '/styles.css',
   '/firebase-config.js',
   '/dataManager.js',
+  '/theme.js',
   '/app-settings.js',
   '/data/icon.ico',
   '/data/forest.gif',

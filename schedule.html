@@ -2,13 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Расписание | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
+  <script type="module" src="app-settings.js"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -83,67 +85,17 @@
 <script type="module">
   import { dataManager } from './dataManager.js';
 
-  // --- Исходное расписание (6 пар, как на картинке) ---
+  // --- Исходное расписание ---
   const defaultSchedule = {
-    0: { // ПН
-      1: { subject: "Проектная деятельность (П)", room: "1-210", endDate: "31.05.2026" },
-      2: { subject: "Основы лесопаркового хозяйства (П)", room: "1-308", endDate: "31.05.2026" },
-      3: { subject: "Лесная энтомология (П)", room: "1-203", endDate: "31.05.2026" },
-      4: { subject: "", room: "", endDate: "" },
-      5: { subject: "", room: "", endDate: "" },
-      6: { subject: "", room: "", endDate: "" }
-    },
-    1: { // ВТ
-      1: { subject: "Экономическая теория (П)", room: "1-303", endDate: "31.05.2026" },
-      2: { subject: "Экономическая теория (П)", room: "1-408а", endDate: "31.05.2026" },
-      3: { subject: "Основы лесопаркового хозяйства (П)", room: "Библиотека 309", endDate: "31.05.2026" },
-      4: { subject: "", room: "", endDate: "" },
-      5: { subject: "", room: "", endDate: "" },
-      6: { subject: "", room: "", endDate: "" }
-    },
-    2: { // СР
-      1: { subject: "Цифровые технологии (П)", room: "4-222", endDate: "31.05.2026" },
-      2: { subject: "Технология лесозащиты (П)", room: "1-308", endDate: "31.05.2026" },
-      3: { subject: "Физ-ра", room: "Спорткомплекс", endDate: "31.05.2026" },
-      4: { subject: "Цифровые технологии (П)", room: "Библиотека 3116", endDate: "31.05.2026" },
-      5: { subject: "", room: "", endDate: "" },
-      6: { subject: "", room: "", endDate: "" }
-    },
-    3: { // ЧТ
-      1: { subject: "Лесная селекция (П)", room: "1-305", endDate: "31.05.2026" },
-      2: { subject: "Лесная селекция (П)", room: "1-210", endDate: "31.05.2026" },
-      3: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" },
-      4: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" },
-      5: { subject: "", room: "", endDate: "" },
-      6: { subject: "", room: "", endDate: "" }
-    },
-    4: { // ПТ
-      1: { subject: "Начертательная геометрия (П)", room: "3-23", endDate: "31.05.2026" },
-      2: { subject: "Начертательная геометрия (П)", room: "3-24", endDate: "31.05.2026" },
-      3: { subject: "Лесная энтомология (П)", room: "1-202", endDate: "31.05.2026" },
-      4: { subject: "", room: "", endDate: "" },
-      5: { subject: "", room: "", endDate: "" },
-      6: { subject: "", room: "", endDate: "" }
-    },
-    5: { // СБ
-      1: { subject: "", room: "", endDate: "" },
-      2: { subject: "", room: "", endDate: "" },
-      3: { subject: "", room: "", endDate: "" },
-      4: { subject: "", room: "", endDate: "" },
-      5: { subject: "", room: "", endDate: "" },
-      6: { subject: "", room: "", endDate: "" }
-    },
-    6: { // ВС
-      1: { subject: "", room: "", endDate: "" },
-      2: { subject: "", room: "", endDate: "" },
-      3: { subject: "", room: "", endDate: "" },
-      4: { subject: "", room: "", endDate: "" },
-      5: { subject: "", room: "", endDate: "" },
-      6: { subject: "", room: "", endDate: "" }
-    }
+    0: { 1: { subject: "Проектная деятельность (П)", room: "1-210", endDate: "31.05.2026" }, 2: { subject: "Основы лесопаркового хозяйства (П)", room: "1-308", endDate: "31.05.2026" }, 3: { subject: "Лесная энтомология (П)", room: "1-203", endDate: "31.05.2026" }, 4: { subject: "", room: "", endDate: "" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
+    1: { 1: { subject: "Экономическая теория (П)", room: "1-303", endDate: "31.05.2026" }, 2: { subject: "Экономическая теория (П)", room: "1-408а", endDate: "31.05.2026" }, 3: { subject: "Основы лесопаркового хозяйства (П)", room: "Библиотека 309", endDate: "31.05.2026" }, 4: { subject: "", room: "", endDate: "" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
+    2: { 1: { subject: "Цифровые технологии (П)", room: "4-222", endDate: "31.05.2026" }, 2: { subject: "Технология лесозащиты (П)", room: "1-308", endDate: "31.05.2026" }, 3: { subject: "Физ-ра", room: "Спорткомплекс", endDate: "31.05.2026" }, 4: { subject: "Цифровые технологии (П)", room: "Библиотека 3116", endDate: "31.05.2026" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
+    3: { 1: { subject: "Лесная селекция (П)", room: "1-305", endDate: "31.05.2026" }, 2: { subject: "Лесная селекция (П)", room: "1-210", endDate: "31.05.2026" }, 3: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" }, 4: { subject: "Таксация леса (П)", room: "1-202", endDate: "31.05.2026" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
+    4: { 1: { subject: "Начертательная геометрия (П)", room: "3-23", endDate: "31.05.2026" }, 2: { subject: "Начертательная геометрия (П)", room: "3-24", endDate: "31.05.2026" }, 3: { subject: "Лесная энтомология (П)", room: "1-202", endDate: "31.05.2026" }, 4: { subject: "", room: "", endDate: "" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
+    5: { 1: { subject: "", room: "", endDate: "" }, 2: { subject: "", room: "", endDate: "" }, 3: { subject: "", room: "", endDate: "" }, 4: { subject: "", room: "", endDate: "" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } },
+    6: { 1: { subject: "", room: "", endDate: "" }, 2: { subject: "", room: "", endDate: "" }, 3: { subject: "", room: "", endDate: "" }, 4: { subject: "", room: "", endDate: "" }, 5: { subject: "", room: "", endDate: "" }, 6: { subject: "", room: "", endDate: "" } }
   };
 
-  // --- Времена пар и перерывы ---
   const pairTimes = {
     1: "1 пара (9:00 – 10:30)",
     2: "2 пара (10:45 – 12:15)",
@@ -164,7 +116,6 @@
 
   let scheduleData = {};
 
-  // --- Загрузка / сохранение ---
   async function loadSchedule() {
     const saved = await dataManager.load('schedule');
     if (saved) {
@@ -180,7 +131,6 @@
     await dataManager.save('schedule', scheduleData);
   }
 
-  // --- Рендер таблицы с перерывами ---
   function renderSchedule() {
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
@@ -216,8 +166,7 @@
         const breakTr = document.createElement('tr');
         breakTr.className = 'break-row';
         const breakTd = document.createElement('td');
-        breakTd.colSpan = 8; // 7 дней + столбец "Пара"
-        breakTd.style.cssText = 'background: #2c3e4e; color: #f9e79f; text-align: center; font-size: 0.8rem; padding: 4px;';
+        breakTd.colSpan = 8;
         breakTd.textContent = breaks[pair] || '';
         breakTr.appendChild(breakTd);
         tbody.appendChild(breakTr);
@@ -225,7 +174,7 @@
     }
   }
 
-  // --- Модалка редактирования ---
+  // --- Модалка ---
   let currentEditDay = null, currentEditPair = null;
   const modal = document.getElementById('editModal');
   const editSubject = document.getElementById('editSubject');
@@ -275,32 +224,26 @@
     renderSchedule();
   }
 
-  // --- Обработчики событий ---
   document.querySelector('.close-modal')?.addEventListener('click', closeModal);
   document.querySelector('.cancel-btn')?.addEventListener('click', closeModal);
   window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
   document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
 
-  // Кнопки сайдбара (быстрые переходы)
-  function showToast(msg) {
+  // Кнопки сайдбара
+  const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
     t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
-  }
+  };
   document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса, 20 июня – Конференция'));
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
-  // Старт
   loadSchedule();
 </script>
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="dataManager.js"></script>
-<script type="module" src="theme.js"></script>
-<script type="module" src="app-settings.js"></script>
 </body>
 </html>

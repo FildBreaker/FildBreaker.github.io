@@ -2,13 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Главная | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
+  <script type="module" src="app-settings.js"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -57,7 +59,6 @@
 </div>
 
 <script type="module">
-  // Простые уведомления для кнопок сайдбара (можно убрать или оставить)
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
@@ -70,9 +71,5 @@
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
 </script>
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="dataManager.js"></script>
-<script type="module" src="theme.js"></script>
-<script type="module" src="app-settings.js"></script>
 </body>
 </html>

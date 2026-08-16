@@ -64,7 +64,7 @@ export const dataManager = {
     }
   },
 
-  // Новые методы для темы
+  // Методы для темы
   async loadTheme() {
     return await this.load('theme');
   },

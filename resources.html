@@ -2,13 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Ресурсы | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
+  <script type="module" src="app-settings.js"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -43,12 +45,20 @@
       <div class="hero-search"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск..."></div></div>
     </div>
     <div class="resources-grid" id="resourcesGrid">
-      <!-- Карточки (как в оригинале) -->
+      <!-- Карточки ресурсов -->
       <div class="resource-card" data-category="study">
         <div class="card-icon"><i class="fas fa-book-open"></i></div>
         <div class="card-content"><h3>Лесоводство. Полный курс</h3><p>Учебник PDF, 320 стр.</p><div class="card-meta"><span><i class="fas fa-file-pdf"></i> PDF, 24 МБ</span><a href="#" class="card-link">Скачать <i class="fas fa-arrow-right"></i></a></div></div>
       </div>
-      <!-- Остальные карточки (повторить) -->
+      <div class="resource-card" data-category="video">
+        <div class="card-icon"><i class="fas fa-video"></i></div>
+        <div class="card-content"><h3>Лекции по таксации</h3><p>Плейлист из 12 видео</p><div class="card-meta"><span><i class="fas fa-youtube"></i> YouTube</span><a href="#" class="card-link">Смотреть <i class="fas fa-arrow-right"></i></a></div></div>
+      </div>
+      <div class="resource-card" data-category="soft">
+        <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
+        <div class="card-content"><h3>QGIS для лесоустройства</h3><p>Установочный пакет + плагины</p><div class="card-meta"><span><i class="fas fa-download"></i> 450 МБ</span><a href="#" class="card-link">Скачать <i class="fas fa-arrow-right"></i></a></div></div>
+      </div>
+      <!-- Добавьте остальные по необходимости -->
     </div>
     <div class="pagination"><span class="page active">1</span><span class="page">2</span><span class="page">3</span></div>
   </main>
@@ -57,19 +67,47 @@
     <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
   </footer>
 </div>
+
 <script type="module">
-  // фильтрация и поиск (как в оригинале)
-  // ...
-  // Кнопки сайдбара
-  const showToast = (msg) => { /* ... */ };
+  // Фильтрация и поиск (простая демка)
+  const searchInput = document.getElementById('searchInput');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.resource-card');
+
+  function filterCards() {
+    const search = searchInput.value.toLowerCase();
+    const activeCat = document.querySelector('.filter-btn.active-filter')?.dataset.category || 'all';
+    cards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      const cat = card.dataset.category;
+      const matchSearch = text.includes(search);
+      const matchCat = activeCat === 'all' || cat === activeCat;
+      card.style.display = (matchSearch && matchCat) ? 'flex' : 'none';
+    });
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active-filter'));
+      btn.classList.add('active-filter');
+      filterCards();
+    });
+  });
+
+  searchInput.addEventListener('input', filterCards);
+
+  // Уведомления
+  const showToast = (msg) => {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+  };
   document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: ...'));
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
 </script>
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="dataManager.js"></script>
-<script type="module" src="theme.js"></script>
-<script type="module" src="app-settings.js"></script>
 </body>
 </html>

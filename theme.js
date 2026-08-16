@@ -1,13 +1,32 @@
 // theme.js
 import { dataManager } from './dataManager.js';
 
-// Доступные темы
-const THEMES = {
-  'dark-gold': '🌙 Тёмная (золотая)',
-  'dark-blue': '🌙 Тёмная (синяя)',
-  'dark-green': '🌙 Тёмная (зелёная)',
-  'dark-purple': '🌙 Тёмная (фиолетовая)',
-  'light': '☀️ Светлая'
+// Список тем: ключ → название для отображения
+export const THEMES = {
+  'dark-gold':   '🌙 Тёмная золотая',
+  'dark-blue':   '🌙 Тёмная синяя',
+  'dark-green':  '🌙 Тёмная зеленая',
+  'dark-purple': '🌙 Тёмная фиолетовая',
+  'dark-red':    '🌙 Тёмная красная',
+  'light-gold':  '☀️ Светлая золотая',
+  'light-blue':  '☀️ Светлая синяя',
+  'light-green': '☀️ Светлая зеленая',
+  'light-purple':'☀️ Светлая фиолетовая',
+  'light-red':   '☀️ Светлая красная'
+};
+
+// Соответствие темы → цвет превью (для модалки)
+const themePreviewColors = {
+  'dark-gold':   '#ffb347',
+  'dark-blue':   '#4a8cff',
+  'dark-green':  '#4caf50',
+  'dark-purple': '#ab47bc',
+  'dark-red':    '#e74c3c',
+  'light-gold':  '#b8860b',
+  'light-blue':  '#1a6b8a',
+  'light-green': '#1a7a3a',
+  'light-purple':'#6a1a8a',
+  'light-red':   '#8a1a1a'
 };
 
 let currentTheme = 'dark-gold';
@@ -19,7 +38,7 @@ export function applyTheme(themeName) {
     themeName = 'dark-gold';
   }
 
-  // Удаляем все предыдущие классы тем
+  // Удаляем все предыдущие классы тем (начинаются с "theme-")
   document.body.className = document.body.className
     .split(' ')
     .filter(c => !c.startsWith('theme-'))
@@ -32,34 +51,17 @@ export function applyTheme(themeName) {
   // Сохраняем в localStorage
   try {
     localStorage.setItem('b21-theme', themeName);
-  } catch (e) {
-    // ignore
-  }
+  } catch (e) { /* ignore */ }
 
-  // Обновляем иконку на кнопке
-  const btn = document.getElementById('themeToggleBtn');
-  if (btn) {
-    const icon = btn.querySelector('i');
-    if (icon) {
-      if (themeName === 'light') {
-        icon.className = 'fas fa-sun';
-      } else {
-        icon.className = 'fas fa-moon';
-      }
-    }
-  }
-
-  // Обновляем активный класс в модалке (если открыта)
+  // Обновляем модалку, если открыта
   if (themeModal && themeModal.style.display === 'flex') {
-    document.querySelectorAll('.theme-option').forEach(el => {
-      el.classList.toggle('active', el.dataset.theme === themeName);
-    });
+    renderThemeOptions();
   }
 }
 
 // ===== ЗАГРУЗКА ТЕМЫ =====
 export async function loadTheme() {
-  // 1. Сначала пробуем из localStorage (быстро)
+  // Сначала из localStorage (быстро)
   const localTheme = localStorage.getItem('b21-theme');
   if (localTheme && THEMES[localTheme]) {
     applyTheme(localTheme);
@@ -67,7 +69,7 @@ export async function loadTheme() {
     applyTheme('dark-gold');
   }
 
-  // 2. Потом из Firebase (глобальная)
+  // Затем из Firebase (глобальная)
   try {
     const globalTheme = await dataManager.loadTheme();
     if (globalTheme && THEMES[globalTheme] && globalTheme !== currentTheme) {
@@ -90,7 +92,7 @@ export async function saveTheme(themeName) {
   }
 }
 
-// ===== СОЗДАНИЕ МОДАЛКИ =====
+// ===== СОЗДАНИЕ МОДАЛКИ С ТЕМАМИ =====
 function createThemeModal() {
   if (document.getElementById('themeModal')) return;
 
@@ -102,11 +104,11 @@ function createThemeModal() {
       <span class="close-modal" onclick="window.closeThemeModal()">&times;</span>
       <h3 style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
         <i class="fas fa-palette" style="color:var(--accent);"></i>
-        Выберите тему
+        Выберите тему оформления
       </h3>
       <div id="themeOptions" style="display:flex; flex-direction:column; gap:10px;"></div>
       <div style="margin-top:20px; text-align:center; font-size:0.8rem; color:var(--text-muted);">
-        Тема сохраняется для всех пользователей
+        Тема сохраняется для всех пользователей (через Firebase)
       </div>
     </div>
   `;
@@ -119,7 +121,6 @@ function createThemeModal() {
     if (e.target === modal) closeThemeModal();
   });
 
-  // Заполняем список тем
   renderThemeOptions();
 }
 
@@ -132,21 +133,23 @@ function renderThemeOptions() {
     const btn = document.createElement('button');
     btn.className = `theme-option ${currentTheme === key ? 'active' : ''}`;
     btn.dataset.theme = key;
+    // Цвет превью
+    const color = themePreviewColors[key] || '#888';
     btn.innerHTML = `
-      <span class="theme-preview"></span>
+      <span class="theme-preview" style="border-color: ${color};"></span>
       <span>${label}</span>
       ${currentTheme === key ? '<i class="fas fa-check" style="color:var(--accent); margin-left:auto;"></i>' : ''}
     `;
     btn.addEventListener('click', async () => {
       await saveTheme(key);
-      renderThemeOptions(); // обновляем галочки
+      renderThemeOptions();
       setTimeout(closeThemeModal, 500);
     });
     container.appendChild(btn);
   });
 }
 
-// ===== ОТКРЫТИЕ / ЗАКРЫТИЕ МОДАЛКИ =====
+// ===== ОТКРЫТИЕ / ЗАКРЫТИЕ =====
 export function openThemeModal() {
   if (!document.getElementById('themeModal')) {
     createThemeModal();
@@ -164,65 +167,10 @@ export function closeThemeModal() {
   }
 }
 
-// ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ КНОПОК ТЕМ =====
-function injectThemeStyles() {
-  const style = document.createElement('style');
-  style.textContent = `
-    .theme-option {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      background: var(--bg-hover);
-      border: 2px solid var(--border-color);
-      border-radius: 40px;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: inherit;
-      font-size: 0.95rem;
-      width: 100%;
-      text-align: left;
-    }
-    .theme-option:hover {
-      border-color: var(--accent);
-      background: var(--bg-active);
-      transform: translateX(4px);
-    }
-    .theme-option.active {
-      border-color: var(--accent);
-      background: var(--bg-active);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .theme-preview {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 2px solid var(--border-color);
-      flex-shrink: 0;
-      transition: 0.3s;
-      background: var(--bg-card);
-    }
-    .theme-option.active .theme-preview {
-      border-color: var(--accent);
-    }
-    /* Цвета для превью каждой темы */
-    .theme-option[data-theme="dark-gold"] .theme-preview { border-color: #ffb347; }
-    .theme-option[data-theme="dark-blue"] .theme-preview { border-color: #4a8cff; }
-    .theme-option[data-theme="dark-green"] .theme-preview { border-color: #4caf50; }
-    .theme-option[data-theme="dark-purple"] .theme-preview { border-color: #ab47bc; }
-    .theme-option[data-theme="light"] .theme-preview { border-color: #f0a500; background: #ffffff; }
-  `;
-  document.head.appendChild(style);
-}
-
-// ===== ИНИЦИАЛИЗАЦИЯ =====
-document.addEventListener('DOMContentLoaded', () => {
-  injectThemeStyles();
-  loadTheme();
-});
-
-// Делаем функции глобальными для вызова из HTML (onclick)
+// Глобальные функции для вызова из HTML (onclick)
 window.openThemeModal = openThemeModal;
 window.closeThemeModal = closeThemeModal;
 window.saveTheme = saveTheme;
+
+// Автозагрузка темы при старте
+document.addEventListener('DOMContentLoaded', loadTheme);

@@ -2,22 +2,20 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Домашние задания | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
+  <script type="module" src="app-settings.js"></script>
 </head>
 <body>
-
 <div class="app-grid">
-  <!-- ШАПКА -->
   <header class="site-header">
-    <div class="logo">
-      <h1><i class="fas fa-tasks"></i> Б-21ЛЕС</h1>
-    </div>
+    <div class="logo"><h1><i class="fas fa-tasks"></i> Б-21ЛЕС</h1></div>
     <ul class="nav-links">
       <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -29,39 +27,29 @@
     </ul>
   </header>
 
-  <!-- БОКОВАЯ ПАНЕЛЬ -->
   <aside class="sidebar">
     <h3><i class="fas fa-book"></i> Предметы</h3>
     <div class="subjects-list" id="subjectsList"></div>
     <button class="add-subject-btn" id="addSubjectBtn"><i class="fas fa-plus-circle"></i> Добавить предмет</button>
-    <div class="sidebar-note">
-      <i class="fas fa-cloud-upload-alt"></i>
-      <p>Все изменения сохраняются в облаке и видны всем участникам группы.</p>
-    </div>
+    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Все изменения сохраняются в облаке и видны всем.</p></div>
   </aside>
 
-  <!-- ОСНОВНОЙ КОНТЕНТ -->
   <main class="main-content">
     <div class="homework-header" id="homeworkHeader">
       <h2 id="currentSubjectTitle"><i class="fas fa-folder"></i> Выберите предмет</h2>
       <button class="add-task-btn" id="addTaskBtn" disabled><i class="fas fa-plus"></i> Добавить задание</button>
     </div>
     <div class="tasks-container" id="tasksContainer">
-      <div class="empty-state">
-        <i class="fas fa-hand-point-left"></i>
-        <p>Выберите предмет из боковой панели или создайте новый.</p>
-      </div>
+      <div class="empty-state"><i class="fas fa-hand-point-left"></i><p>Выберите предмет из боковой панели или создайте новый.</p></div>
     </div>
   </main>
 
-  <!-- ФУТЕР -->
   <footer class="site-footer">
     <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
-    <p style="margin-top:6px; font-size:0.8rem;"><i class="fas fa-heart" style="color:#ef4444;"></i> Домашка всегда под рукой</p>
   </footer>
 </div>
 
-<!-- МОДАЛКА ПРЕДМЕТА -->
+<!-- Модалка предмета -->
 <div id="subjectModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeSubjectModal">&times;</span>
@@ -74,21 +62,18 @@
   </div>
 </div>
 
-<!-- МОДАЛКА ЗАДАНИЯ -->
+<!-- Модалка задания -->
 <div id="taskModal" class="modal">
   <div class="modal-content task-modal">
     <span class="close-modal" id="closeTaskModal">&times;</span>
     <h3 id="taskModalTitle"><i class="fas fa-edit"></i> Задание</h3>
     <label>Описание / текст задания</label>
     <textarea id="taskDesc" rows="3" placeholder="Подробное описание..."></textarea>
-
     <label>Ссылки на ресурсы или файлы</label>
     <div id="linksContainer"></div>
     <button type="button" id="addLinkBtn" class="add-link-btn"><i class="fas fa-plus"></i> Добавить ссылку</button>
-
     <label>Дополнительные метки (опционально)</label>
     <input type="text" id="taskTags" placeholder="Ключевые слова через запятую">
-
     <div class="modal-buttons">
       <button id="saveTaskBtn" class="save-btn">Сохранить задание</button>
       <button id="cancelTaskBtn" class="cancel-btn">Отмена</button>
@@ -96,55 +81,28 @@
   </div>
 </div>
 
-<!-- СКРИПТ -->
 <script type="module">
   import { dataManager } from './dataManager.js';
 
-  // --- МОДЕЛЬ ДАННЫХ ---
   let homeworkData = { subjects: [] };
   let currentSubjectId = null;
   let editSubjectId = null;
   let editTaskId = null;
 
-  // --- ЗАГРУЗКА И СОХРАНЕНИЕ ---
   async function loadData() {
     const saved = await dataManager.load('homework');
     if (saved && saved.subjects) {
       homeworkData = saved;
     } else {
-      // Начальные демо-данные
       homeworkData = {
         subjects: [
-          {
-            id: 'subj1',
-            name: 'Лесоводство',
-            tasks: [
-              {
-                id: 'task1',
-                desc: 'Прочитать главы 3-5 учебника "Лесоводство". Подготовить конспект.',
-                links: [{ url: '#', title: 'Скачать учебник' }, { url: 'https://ru.wikipedia.org/wiki/Лесоводство', title: 'Википедия' }],
-                tags: 'конспект, теория'
-              }
-            ]
-          },
-          {
-            id: 'subj2',
-            name: 'Экология леса',
-            tasks: [
-              {
-                id: 'task2',
-                desc: 'Написать эссе на тему "Влияние климата на лесные экосистемы". Срок: 20.05.2025',
-                links: [{ url: '#', title: 'Методичка' }, { url: 'https://www.ipcc.ch/', title: 'IPCC' }],
-                tags: 'эссе, климат'
-              }
-            ]
-          }
+          { id: 'subj1', name: 'Лесоводство', tasks: [{ id: 'task1', desc: 'Прочитать главы 3-5 учебника "Лесоводство". Подготовить конспект.', links: [{ url: '#', title: 'Скачать учебник' }], tags: 'конспект, теория' }] },
+          { id: 'subj2', name: 'Экология леса', tasks: [{ id: 'task2', desc: 'Написать эссе на тему "Влияние климата на лесные экосистемы". Срок: 20.05.2025', links: [{ url: '#', title: 'Методичка' }], tags: 'эссе, климат' }] }
         ]
       };
       await dataManager.save('homework', homeworkData);
     }
     renderSubjects();
-    // Восстанавливаем активный предмет из sessionStorage
     const activeId = sessionStorage.getItem('activeSubjectId');
     if (activeId && homeworkData.subjects.find(s => s.id === activeId)) {
       selectSubject(activeId);
@@ -159,7 +117,6 @@
     await dataManager.save('homework', homeworkData);
   }
 
-  // --- ОТРИСОВКА ПРЕДМЕТОВ ---
   function renderSubjects() {
     const container = document.getElementById('subjectsList');
     container.innerHTML = '';
@@ -188,7 +145,6 @@
     document.getElementById('addTaskBtn').disabled = !currentSubjectId;
   }
 
-  // --- ВЫБОР ПРЕДМЕТА ---
   function selectSubject(subjectId) {
     currentSubjectId = subjectId;
     sessionStorage.setItem('activeSubjectId', subjectId);
@@ -208,7 +164,6 @@
     document.getElementById('addTaskBtn').disabled = true;
   }
 
-  // --- ОТРИСОВКА ЗАДАНИЙ ---
   function renderTasks(tasks) {
     const container = document.getElementById('tasksContainer');
     if (!tasks || tasks.length === 0) {
@@ -245,7 +200,6 @@
     });
   }
 
-  // --- ОПЕРАЦИИ С ПРЕДМЕТАМИ ---
   async function addSubject(name) {
     if (!name.trim()) return;
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
@@ -280,7 +234,6 @@
     renderSubjects();
   }
 
-  // --- ОПЕРАЦИИ С ЗАДАНИЯМИ ---
   async function addTask(subjectId, taskData) {
     const subject = homeworkData.subjects.find(s => s.id === subjectId);
     if (!subject) return;
@@ -319,7 +272,7 @@
     renderTasks(subject.tasks);
   }
 
-  // --- МОДАЛКА ПРЕДМЕТА ---
+  // --- Модалки ---
   const subjectModal = document.getElementById('subjectModal');
   const subjectNameInput = document.getElementById('subjectNameInput');
   const subjectModalTitle = document.getElementById('subjectModalTitle');
@@ -355,7 +308,6 @@
     closeSubjectModal();
   }
 
-  // --- МОДАЛКА ЗАДАНИЯ ---
   const taskModal = document.getElementById('taskModal');
   const taskDesc = document.getElementById('taskDesc');
   const taskTags = document.getElementById('taskTags');
@@ -436,7 +388,6 @@
     closeTaskModal();
   }
 
-  // --- ВСПОМОГАТЕЛЬНЫЕ ---
   function escapeHtml(str) {
     if (!str) return '';
     const div = document.createElement('div');
@@ -444,57 +395,36 @@
     return div.innerHTML;
   }
 
-  function showToast(msg) {
+  // Обработчики
+  document.getElementById('addSubjectBtn').addEventListener('click', () => openSubjectModal());
+  document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
+  document.getElementById('closeSubjectModal').addEventListener('click', closeSubjectModal);
+  document.getElementById('cancelSubjectBtn').addEventListener('click', closeSubjectModal);
+  document.getElementById('saveSubjectBtn').addEventListener('click', saveSubjectFromModal);
+  document.getElementById('closeTaskModal').addEventListener('click', closeTaskModal);
+  document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
+  document.getElementById('saveTaskBtn').addEventListener('click', saveTaskFromModal);
+  addLinkBtn.addEventListener('click', () => addLinkGroup('', ''));
+
+  window.addEventListener('click', (e) => {
+    if (e.target === subjectModal) closeSubjectModal();
+    if (e.target === taskModal) closeTaskModal();
+  });
+
+  // Уведомления
+  const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
     t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
-  }
+  };
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
+  document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
+  document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
+  document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
 
-  // --- ОБРАБОТЧИКИ ---
-  document.addEventListener('DOMContentLoaded', () => {
-    // Кнопки сайдбара
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        this.style.transform = 'scale(0.98)';
-        setTimeout(() => this.style.transform = '', 120);
-      });
-    });
-    document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
-    document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
-    document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
-    document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
-
-    // Добавление предмета
-    document.getElementById('addSubjectBtn').addEventListener('click', () => openSubjectModal());
-    // Добавление задания
-    document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
-
-    // Модалка предмета
-    document.getElementById('closeSubjectModal').addEventListener('click', closeSubjectModal);
-    document.getElementById('cancelSubjectBtn').addEventListener('click', closeSubjectModal);
-    document.getElementById('saveSubjectBtn').addEventListener('click', saveSubjectFromModal);
-
-    // Модалка задания
-    document.getElementById('closeTaskModal').addEventListener('click', closeTaskModal);
-    document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
-    document.getElementById('saveTaskBtn').addEventListener('click', saveTaskFromModal);
-    addLinkBtn.addEventListener('click', () => addLinkGroup('', ''));
-
-    // Закрытие по клику вне модалки
-    window.addEventListener('click', (e) => {
-      if (e.target === subjectModal) closeSubjectModal();
-      if (e.target === taskModal) closeTaskModal();
-    });
-
-    // Загрузка данных
-    loadData();
-  });
+  loadData();
 </script>
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="dataManager.js"></script>
-<script type="module" src="theme.js"></script>
-<script type="module" src="app-settings.js"></script>
 </body>
 </html>

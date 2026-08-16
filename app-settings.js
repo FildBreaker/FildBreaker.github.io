@@ -56,18 +56,16 @@ export function registerSW() {
 export function initSidebarButtons() {
   const sidebar = document.querySelector('.sidebar');
   if (!sidebar) return;
-  if (document.getElementById('settingsContainer')) return; // уже добавлено
+  if (document.getElementById('settingsContainer')) return;
 
   const container = document.createElement('div');
   container.id = 'settingsContainer';
-  container.style.cssText = 'margin-top: 20px; padding-top: 16px; border-top: 2px solid rgba(255,255,255,0.2);';
 
   // Кнопка "Тема"
   const themeBtn = document.createElement('button');
   themeBtn.className = 'nav-btn';
-  themeBtn.innerHTML = '<i class="fas fa-palette"></i> Тема';
+  themeBtn.innerHTML = '<i class="fas fa-palette"></i> Тема оформления';
   themeBtn.addEventListener('click', () => {
-    // Вызываем глобальную функцию из theme.js
     if (window.openThemeModal) {
       window.openThemeModal();
     } else {

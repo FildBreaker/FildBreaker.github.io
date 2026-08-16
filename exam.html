@@ -2,13 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Экзамены | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data/icon.ico">
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dataManager.js"></script>
+  <script type="module" src="theme.js"></script>
+  <script type="module" src="app-settings.js"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -46,7 +48,7 @@
     </div>
 
     <div class="exams-grid">
-      <!-- Карточки экзаменов (оставляем как в оригинале) -->
+      <!-- Карточка 1 -->
       <div class="exam-card">
         <div class="card-header">
           <div class="exam-icon"><i class="fas fa-tree"></i></div>
@@ -68,7 +70,28 @@
         </div>
         <div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">методичка.pdf</a></div>
       </div>
-      <!-- Остальные карточки (повторить по аналогии) – для экономии места здесь только одна, но в реальном файле их 6 -->
+      <!-- Карточка 2 -->
+      <div class="exam-card">
+        <div class="card-header">
+          <div class="exam-icon"><i class="fas fa-seedling"></i></div>
+          <div class="exam-title"><h3>Лесная селекция</h3><span class="exam-type"><i class="fas fa-check-circle"></i> Экзамен</span></div>
+        </div>
+        <div class="card-details">
+          <div class="detail-row"><i class="fas fa-calendar-day"></i> <strong>Дата:</strong> 19 июня 2025, 10:00</div>
+          <div class="detail-row"><i class="fas fa-location-dot"></i> <strong>Ауд.:</strong> 305 (лесной факультет)</div>
+          <div class="detail-row"><i class="fas fa-user-graduate"></i> <strong>Преподаватель:</strong> профессор Лебедев А.И.</div>
+          <div class="detail-row"><i class="fas fa-clock"></i> <strong>Формат:</strong> тестирование + устно</div>
+        </div>
+        <div class="exam-resources">
+          <p class="resources-title"><i class="fas fa-link"></i> Ресурсы:</p>
+          <div class="resource-buttons">
+            <a href="#" class="res-link"><i class="fas fa-file-pdf"></i> Лекции</a>
+            <a href="#" class="res-link"><i class="fas fa-globe"></i> Статьи</a>
+          </div>
+        </div>
+        <div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">селекция_методичка.pdf</a></div>
+      </div>
+      <!-- Добавьте остальные карточки по аналогии -->
     </div>
   </main>
 
@@ -76,17 +99,20 @@
     <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
   </footer>
 </div>
+
 <script type="module">
   // Уведомления
-  const showToast = (msg) => { /* ... */ };
+  const showToast = (msg) => {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
+  };
   document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: ...'));
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
 </script>
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="dataManager.js"></script>
-<script type="module" src="theme.js"></script>
-<script type="module" src="app-settings.js"></script>
 </body>
 </html>
