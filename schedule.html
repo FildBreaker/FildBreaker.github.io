@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Расписание | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data/icon.ico">
-  <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="dataManager.js"></script>
-  <script type="module" src="theme.js"></script>
-  <script type="module" src="app-settings.js"></script>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="icon" href="data/icon.ico?v=2">
+  <script type="module" src="firebase-config.js?v=2"></script>
+  <script type="module" src="dataManager.js?v=2"></script>
+  <script type="module" src="theme.js?v=2"></script>
+  <script type="module" src="app-settings.js?v=2"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -65,7 +68,6 @@
   </footer>
 </div>
 
-<!-- Модалка редактирования -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <span class="close-modal">&times;</span>
@@ -166,7 +168,6 @@
     }
   }
 
-  // Модалка редактирования (без изменений)
   let currentEditDay = null, currentEditPair = null;
   const modal = document.getElementById('editModal');
   const editSubject = document.getElementById('editSubject');
@@ -222,7 +223,6 @@
   document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
   document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
 
-  // Кнопки сайдбара
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
@@ -230,7 +230,7 @@
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
   };
-  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса, 20 июня – Конференция'));
+  document.getElementById('btnEvents')?.addEventListener('click', () => showToast('🎉 Мероприятия: 10 июня – День леса'));
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');

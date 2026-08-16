@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Ресурсы | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data/icon.ico">
-  <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="dataManager.js"></script>
-  <script type="module" src="theme.js"></script>
-  <script type="module" src="app-settings.js"></script>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="icon" href="data/icon.ico?v=2">
+  <script type="module" src="firebase-config.js?v=2"></script>
+  <script type="module" src="dataManager.js?v=2"></script>
+  <script type="module" src="theme.js?v=2"></script>
+  <script type="module" src="app-settings.js?v=2"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -42,24 +45,12 @@
   <main class="main-content">
     <div class="hero-resources">
       <div class="hero-text"><h2><i class="fas fa-cloud-upload-alt"></i> Ресурсный центр</h2><p>Электронные книги, видео, тесты, ПО</p></div>
-      <div class="hero-search"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск..."></div></div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div class="hero-search"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск..."></div></div>
+        <button id="addResourceBtn" class="reset-btn"><i class="fas fa-plus"></i> Добавить</button>
+      </div>
     </div>
-    <div class="resources-grid" id="resourcesGrid">
-      <!-- Карточки ресурсов -->
-      <div class="resource-card" data-category="study">
-        <div class="card-icon"><i class="fas fa-book-open"></i></div>
-        <div class="card-content"><h3>Лесоводство. Полный курс</h3><p>Учебник PDF, 320 стр.</p><div class="card-meta"><span><i class="fas fa-file-pdf"></i> PDF, 24 МБ</span><a href="#" class="card-link">Скачать <i class="fas fa-arrow-right"></i></a></div></div>
-      </div>
-      <div class="resource-card" data-category="video">
-        <div class="card-icon"><i class="fas fa-video"></i></div>
-        <div class="card-content"><h3>Лекции по таксации</h3><p>Плейлист из 12 видео</p><div class="card-meta"><span><i class="fas fa-youtube"></i> YouTube</span><a href="#" class="card-link">Смотреть <i class="fas fa-arrow-right"></i></a></div></div>
-      </div>
-      <div class="resource-card" data-category="soft">
-        <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
-        <div class="card-content"><h3>QGIS для лесоустройства</h3><p>Установочный пакет + плагины</p><div class="card-meta"><span><i class="fas fa-download"></i> 450 МБ</span><a href="#" class="card-link">Скачать <i class="fas fa-arrow-right"></i></a></div></div>
-      </div>
-      <!-- Добавьте остальные по необходимости -->
-    </div>
+    <div class="resources-grid" id="resourcesGrid"></div>
     <div class="pagination"><span class="page active">1</span><span class="page">2</span><span class="page">3</span></div>
   </main>
 
@@ -68,16 +59,108 @@
   </footer>
 </div>
 
-<script type="module">
-  // Фильтрация и поиск (простая демка)
-  const searchInput = document.getElementById('searchInput');
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const cards = document.querySelectorAll('.resource-card');
+<!-- Модалка ресурса -->
+<div id="resourceModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeResourceModal">&times;</span>
+    <h3 id="resourceModalTitle"><i class="fas fa-edit"></i> Ресурс</h3>
+    <form id="resourceForm">
+      <label>Название</label><input type="text" id="resourceTitle" required>
+      <label>Описание</label><input type="text" id="resourceDesc" required>
+      <label>Категория</label>
+      <select id="resourceCategory" required>
+        <option value="study">Учебники</option>
+        <option value="video">Видео</option>
+        <option value="test">Тесты</option>
+        <option value="soft">ПО</option>
+      </select>
+      <label>Иконка (Font Awesome класс)</label>
+      <input type="text" id="resourceIcon" placeholder="fa-book-open">
+      <label>Мета-информация (например, PDF, 24 МБ)</label>
+      <input type="text" id="resourceMeta" placeholder="PDF, 24 МБ">
+      <label>Ссылка скачать</label>
+      <input type="text" id="resourceLink" placeholder="https://...">
+      <div class="modal-buttons">
+        <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
+        <button type="button" id="cancelResourceBtn" class="cancel-btn">Отмена</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-  function filterCards() {
-    const search = searchInput.value.toLowerCase();
+<script type="module">
+  import { dataManager } from './dataManager.js';
+
+  let resources = [];
+  let editResourceId = null;
+
+  async function loadResources() {
+    const saved = await dataManager.load('resources');
+    if (saved && Array.isArray(saved)) {
+      resources = saved;
+    } else {
+      resources = [
+        { id: '1', title: 'Лесоводство. Полный курс', desc: 'Учебник PDF, 320 стр.', category: 'study', icon: 'fa-book-open', meta: 'PDF, 24 МБ', link: '#' },
+        { id: '2', title: 'Лекции по таксации', desc: 'Плейлист из 12 видео', category: 'video', icon: 'fa-video', meta: 'YouTube', link: '#' },
+        { id: '3', title: 'QGIS для лесоустройства', desc: 'Установочный пакет + плагины', category: 'soft', icon: 'fa-laptop-code', meta: '450 МБ', link: '#' }
+      ];
+      await dataManager.save('resources', resources);
+    }
+    renderResources();
+  }
+
+  async function saveResources() {
+    await dataManager.save('resources', resources);
+  }
+
+  function renderResources() {
+    const grid = document.getElementById('resourcesGrid');
+    if (!resources.length) {
+      grid.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><p>Нет ресурсов. Нажмите "Добавить".</p></div>`;
+      return;
+    }
+    grid.innerHTML = '';
+    resources.forEach(res => {
+      const card = document.createElement('div');
+      card.className = 'resource-card';
+      card.dataset.category = res.category;
+      const icon = res.icon || 'fa-file';
+      card.innerHTML = `
+        <div class="card-icon"><i class="fas ${icon}"></i></div>
+        <div class="card-content">
+          <h3>${escapeHtml(res.title)}</h3>
+          <p>${escapeHtml(res.desc)}</p>
+          <div class="card-meta">
+            <span><i class="fas fa-tag"></i> ${escapeHtml(res.meta || '')}</span>
+            <div style="display:flex; gap:8px;">
+              <a href="${escapeHtml(res.link || '#')}" class="card-link">Скачать <i class="fas fa-arrow-right"></i></a>
+              <button class="edit-resource" data-id="${res.id}" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fas fa-edit"></i></button>
+              <button class="delete-resource" data-id="${res.id}" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+        </div>
+      `;
+      card.querySelector('.edit-resource').addEventListener('click', () => openResourceModal(res.id));
+      card.querySelector('.delete-resource').addEventListener('click', () => deleteResource(res.id));
+      grid.appendChild(card);
+    });
+
+    // Фильтрация
+    applyFilters();
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // --- Фильтрация ---
+  function applyFilters() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
     const activeCat = document.querySelector('.filter-btn.active-filter')?.dataset.category || 'all';
-    cards.forEach(card => {
+    document.querySelectorAll('.resource-card').forEach(card => {
       const text = card.textContent.toLowerCase();
       const cat = card.dataset.category;
       const matchSearch = text.includes(search);
@@ -86,17 +169,94 @@
     });
   }
 
-  filterBtns.forEach(btn => {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active-filter'));
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
       btn.classList.add('active-filter');
-      filterCards();
+      applyFilters();
     });
   });
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
 
-  searchInput.addEventListener('input', filterCards);
+  // --- Модалка ---
+  const modal = document.getElementById('resourceModal');
+  const modalTitle = document.getElementById('resourceModalTitle');
+  const form = document.getElementById('resourceForm');
+  const titleInput = document.getElementById('resourceTitle');
+  const descInput = document.getElementById('resourceDesc');
+  const catSelect = document.getElementById('resourceCategory');
+  const iconInput = document.getElementById('resourceIcon');
+  const metaInput = document.getElementById('resourceMeta');
+  const linkInput = document.getElementById('resourceLink');
 
-  // Уведомления
+  function openResourceModal(id = null) {
+    editResourceId = id;
+    if (id) {
+      const res = resources.find(r => r.id === id);
+      if (!res) return;
+      modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать ресурс';
+      titleInput.value = res.title || '';
+      descInput.value = res.desc || '';
+      catSelect.value = res.category || 'study';
+      iconInput.value = res.icon || '';
+      metaInput.value = res.meta || '';
+      linkInput.value = res.link || '';
+    } else {
+      modalTitle.innerHTML = '<i class="fas fa-plus"></i> Добавить ресурс';
+      titleInput.value = '';
+      descInput.value = '';
+      catSelect.value = 'study';
+      iconInput.value = '';
+      metaInput.value = '';
+      linkInput.value = '';
+    }
+    modal.style.display = 'flex';
+  }
+
+  function closeResourceModal() {
+    modal.style.display = 'none';
+    editResourceId = null;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = titleInput.value.trim();
+    const desc = descInput.value.trim();
+    const category = catSelect.value;
+    const icon = iconInput.value.trim() || 'fa-file';
+    const meta = metaInput.value.trim();
+    const link = linkInput.value.trim() || '#';
+    if (!title || !desc) {
+      alert('Заполните название и описание');
+      return;
+    }
+    const resData = { title, desc, category, icon, meta, link };
+    if (editResourceId) {
+      const idx = resources.findIndex(r => r.id === editResourceId);
+      if (idx !== -1) {
+        resources[idx] = { ...resources[idx], ...resData };
+      }
+    } else {
+      resources.push({ id: Date.now().toString(), ...resData });
+    }
+    await saveResources();
+    renderResources();
+    closeResourceModal();
+  });
+
+  async function deleteResource(id) {
+    if (!confirm('Удалить ресурс?')) return;
+    resources = resources.filter(r => r.id !== id);
+    await saveResources();
+    renderResources();
+  }
+
+  document.getElementById('closeResourceModal').addEventListener('click', closeResourceModal);
+  document.getElementById('cancelResourceBtn').addEventListener('click', closeResourceModal);
+  window.addEventListener('click', (e) => { if (e.target === modal) closeResourceModal(); });
+  document.getElementById('addResourceBtn').addEventListener('click', () => openResourceModal());
+
+  // --- Кнопки сайдбара ---
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
@@ -108,6 +268,8 @@
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+
+  loadResources();
 </script>
 </body>
 </html>

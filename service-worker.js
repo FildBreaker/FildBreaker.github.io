@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ibd2026-cache-v1';
+const CACHE_NAME = 'ibd2026-cache-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -8,12 +8,12 @@ const urlsToCache = [
   '/homework.html',
   '/extracurricular.html',
   '/teacher.html',
-  '/styles.css',
-  '/firebase-config.js',
-  '/dataManager.js',
-  '/theme.js',
-  '/app-settings.js',
-  '/data/icon.ico',
+  '/styles.css?v=2',
+  '/firebase-config.js?v=2',
+  '/dataManager.js?v=2',
+  '/theme.js?v=2',
+  '/app-settings.js?v=2',
+  '/data/icon.ico?v=2',
   '/data/forest.gif',
   '/data/1.jpg',
   '/data/Teachers/Gaivas.jpg'

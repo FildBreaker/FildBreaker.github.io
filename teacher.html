@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Преподаватели | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data/icon.ico">
-  <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="dataManager.js"></script>
-  <script type="module" src="theme.js"></script>
-  <script type="module" src="app-settings.js"></script>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="icon" href="data/icon.ico?v=2">
+  <script type="module" src="firebase-config.js?v=2"></script>
+  <script type="module" src="dataManager.js?v=2"></script>
+  <script type="module" src="theme.js?v=2"></script>
+  <script type="module" src="app-settings.js?v=2"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -40,7 +43,10 @@
 
   <main class="main-content">
     <div class="teachers-section">
-      <h2><i class="fas fa-leaf"></i> Профессорско-преподавательский состав</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <h2><i class="fas fa-leaf"></i> Профессорско-преподавательский состав</h2>
+        <button id="addTeacherBtn" class="reset-btn"><i class="fas fa-plus"></i> Добавить преподавателя</button>
+      </div>
       <div class="teachers-grid" id="teachersGridContainer"></div>
     </div>
   </main>
@@ -50,51 +56,195 @@
   </footer>
 </div>
 
-<script type="module">
-  // Данные преподавателей
-  const teachersData = [
-    {
-      name: "Гайвас Алексей Алексеевич",
-      position: "кафедра садоводства, лесного хозяйства и защиты растений",
-      degree: "Кандидат сельскохозяйственных наук, доцент",
-      degree2: "Предмет: Энтомология",
-      phone: "(3812) 65-27-63, 13-42",
-      email: "aa.gayvas@omgau.org",
-      photo: "data/Teachers/Gaivas.jpg"
-    },
-    {
-      name: "Иванова Елена Васильевна",
-      position: "кафедра лесоводства и лесопаркового хозяйства",
-      degree: "Доктор биологических наук, профессор",
-      degree2: "Предмет: Лесоводство",
-      phone: "(3812) 65-27-64",
-      email: "ev.ivanova@omgau.org",
-      photo: "data/Teachers/Ivanova.jpg"
-    },
-    // Добавьте остальных по необходимости
-  ];
-
-  const container = document.getElementById('teachersGridContainer');
-  teachersData.forEach(teacher => {
-    const card = document.createElement('div');
-    card.className = 'teacher-card';
-    card.innerHTML = `
-      <div class="card-photo"><img src="${teacher.photo}" alt="${teacher.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/130x130?text=Нет+фото'"></div>
-      <div class="teacher-info">
-        <div class="teacher-name"><i class="fas fa-user-tie"></i> ${teacher.name}</div>
-        <div class="teacher-position"><i class="fas fa-briefcase"></i> ${teacher.position}</div>
-        <div class="teacher-degree"><i class="fas fa-graduation-cap"></i> ${teacher.degree}</div>
-        <div class="teacher-degree2"><i class="fas fa-graduation-cap"></i> ${teacher.degree2}</div>
-        <div class="contact-details-card">
-          <p><i class="fas fa-phone-alt"></i> ${teacher.phone}</p>
-          <p><i class="fas fa-envelope"></i> <a href="mailto:${teacher.email}">${teacher.email}</a></p>
-        </div>
+<!-- Модалка редактирования преподавателя -->
+<div id="teacherModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeTeacherModal">&times;</span>
+    <h3 id="teacherModalTitle"><i class="fas fa-edit"></i> Преподаватель</h3>
+    <form id="teacherForm">
+      <label>ФИО</label><input type="text" id="teacherName" required>
+      <label>Кафедра / должность</label><input type="text" id="teacherPosition" required>
+      <label>Учёная степень</label><input type="text" id="teacherDegree" required>
+      <label>Предмет</label><input type="text" id="teacherDegree2" required>
+      <label>Телефон</label><input type="text" id="teacherPhone" required>
+      <label>Email</label><input type="email" id="teacherEmail" required>
+      <label>Ссылка на фото (URL)</label><input type="text" id="teacherPhoto" placeholder="data/Teachers/photo.jpg">
+      <div class="modal-buttons">
+        <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
+        <button type="button" id="cancelTeacherBtn" class="cancel-btn">Отмена</button>
       </div>
-    `;
-    container.appendChild(card);
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import { dataManager } from './dataManager.js';
+
+  let teachers = [];
+  let editTeacherId = null;
+
+  async function loadTeachers() {
+    const saved = await dataManager.load('teachers');
+    if (saved && Array.isArray(saved)) {
+      teachers = saved;
+    } else {
+      // Начальные данные
+      teachers = [
+        {
+          id: '1',
+          name: 'Гайвас Алексей Алексеевич',
+          position: 'кафедра садоводства, лесного хозяйства и защиты растений',
+          degree: 'Кандидат сельскохозяйственных наук, доцент',
+          degree2: 'Предмет: Энтомология',
+          phone: '(3812) 65-27-63, 13-42',
+          email: 'aa.gayvas@omgau.org',
+          photo: 'data/Teachers/Gaivas.jpg'
+        },
+        {
+          id: '2',
+          name: 'Иванова Елена Васильевна',
+          position: 'кафедра лесоводства и лесопаркового хозяйства',
+          degree: 'Доктор биологических наук, профессор',
+          degree2: 'Предмет: Лесоводство',
+          phone: '(3812) 65-27-64',
+          email: 'ev.ivanova@omgau.org',
+          photo: 'data/Teachers/Ivanova.jpg'
+        }
+      ];
+      await dataManager.save('teachers', teachers);
+    }
+    renderTeachers();
+  }
+
+  async function saveTeachers() {
+    await dataManager.save('teachers', teachers);
+  }
+
+  function renderTeachers() {
+    const container = document.getElementById('teachersGridContainer');
+    if (!teachers.length) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>Нет преподавателей. Нажмите "Добавить преподавателя".</p></div>`;
+      return;
+    }
+    container.innerHTML = '';
+    teachers.forEach(teacher => {
+      const card = document.createElement('div');
+      card.className = 'teacher-card';
+      card.innerHTML = `
+        <div class="card-photo">
+          <img src="${teacher.photo || 'https://via.placeholder.com/130x130?text=Нет+фото'}" alt="${teacher.name}" loading="lazy">
+        </div>
+        <div class="teacher-info">
+          <div class="teacher-name"><i class="fas fa-user-tie"></i> ${escapeHtml(teacher.name)}</div>
+          <div class="teacher-position"><i class="fas fa-briefcase"></i> ${escapeHtml(teacher.position)}</div>
+          <div class="teacher-degree"><i class="fas fa-graduation-cap"></i> ${escapeHtml(teacher.degree)}</div>
+          <div class="teacher-degree2"><i class="fas fa-graduation-cap"></i> ${escapeHtml(teacher.degree2)}</div>
+          <div class="contact-details-card">
+            <p><i class="fas fa-phone-alt"></i> ${escapeHtml(teacher.phone)}</p>
+            <p><i class="fas fa-envelope"></i> <a href="mailto:${teacher.email}" style="color:var(--accent);">${escapeHtml(teacher.email)}</a></p>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="edit-teacher" data-id="${teacher.id}" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fas fa-edit"></i></button>
+            <button class="delete-teacher" data-id="${teacher.id}" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </div>
+      `;
+      card.querySelector('.edit-teacher').addEventListener('click', () => openTeacherModal(teacher.id));
+      card.querySelector('.delete-teacher').addEventListener('click', () => deleteTeacher(teacher.id));
+      container.appendChild(card);
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // --- Модалка ---
+  const modal = document.getElementById('teacherModal');
+  const modalTitle = document.getElementById('teacherModalTitle');
+  const form = document.getElementById('teacherForm');
+  const nameInput = document.getElementById('teacherName');
+  const posInput = document.getElementById('teacherPosition');
+  const degreeInput = document.getElementById('teacherDegree');
+  const deg2Input = document.getElementById('teacherDegree2');
+  const phoneInput = document.getElementById('teacherPhone');
+  const emailInput = document.getElementById('teacherEmail');
+  const photoInput = document.getElementById('teacherPhoto');
+
+  function openTeacherModal(id = null) {
+    editTeacherId = id;
+    if (id) {
+      const teacher = teachers.find(t => t.id === id);
+      if (!teacher) return;
+      modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать преподавателя';
+      nameInput.value = teacher.name || '';
+      posInput.value = teacher.position || '';
+      degreeInput.value = teacher.degree || '';
+      deg2Input.value = teacher.degree2 || '';
+      phoneInput.value = teacher.phone || '';
+      emailInput.value = teacher.email || '';
+      photoInput.value = teacher.photo || '';
+    } else {
+      modalTitle.innerHTML = '<i class="fas fa-plus"></i> Добавить преподавателя';
+      nameInput.value = '';
+      posInput.value = '';
+      degreeInput.value = '';
+      deg2Input.value = '';
+      phoneInput.value = '';
+      emailInput.value = '';
+      photoInput.value = '';
+    }
+    modal.style.display = 'flex';
+  }
+
+  function closeTeacherModal() {
+    modal.style.display = 'none';
+    editTeacherId = null;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = nameInput.value.trim();
+    const position = posInput.value.trim();
+    const degree = degreeInput.value.trim();
+    const degree2 = deg2Input.value.trim();
+    const phone = phoneInput.value.trim();
+    const email = emailInput.value.trim();
+    const photo = photoInput.value.trim();
+    if (!name || !position || !degree || !degree2 || !phone || !email) {
+      alert('Заполните все обязательные поля');
+      return;
+    }
+    const teacherData = { name, position, degree, degree2, phone, email, photo };
+    if (editTeacherId) {
+      const idx = teachers.findIndex(t => t.id === editTeacherId);
+      if (idx !== -1) {
+        teachers[idx] = { ...teachers[idx], ...teacherData };
+      }
+    } else {
+      teachers.push({ id: Date.now().toString(), ...teacherData });
+    }
+    await saveTeachers();
+    renderTeachers();
+    closeTeacherModal();
   });
 
-  // Уведомления
+  async function deleteTeacher(id) {
+    if (!confirm('Удалить преподавателя?')) return;
+    teachers = teachers.filter(t => t.id !== id);
+    await saveTeachers();
+    renderTeachers();
+  }
+
+  document.getElementById('closeTeacherModal').addEventListener('click', closeTeacherModal);
+  document.getElementById('cancelTeacherBtn').addEventListener('click', closeTeacherModal);
+  window.addEventListener('click', (e) => { if (e.target === modal) closeTeacherModal(); });
+  document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
+
+  // --- Кнопки сайдбара ---
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
@@ -106,6 +256,8 @@
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href='teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href='resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
+
+  loadTeachers();
 </script>
 </body>
 </html>
