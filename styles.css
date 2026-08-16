@@ -2,157 +2,215 @@
    ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ТЕМЫ
    ============================================================ */
 
-/* ---- БАЗОВЫЕ ПЕРЕМЕННЫЕ (по умолчанию – тёмная золотая) ---- */
+/* ---- БАЗОВЫЕ ПЕРЕМЕННЫЕ (тёмная золотая) ---- */
 :root {
-  --bg-image: url("data/1.jpg");
-  --bg-overlay: rgba(0, 0, 0, 0.55);
-  --primary-bg: #22223b;
-  --header-bg: #4a4e69;
-  --sidebar-bg: #4f627a;
-  --card-bg: #fef9ef;
-  --text-color: #ffa343;
-  --text-secondary: #e2c9c3;
-  --text-muted: #b0a0a0;
-  --link-color: #e2c9c3;
+  --bg-image: linear-gradient(145deg, #1a1a2e 0%, #2d2d44 100%);
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+  --primary-bg: #1a1a2e;
+  --header-bg: #2d2d44;
+  --sidebar-bg: #25253a;
+  --card-bg: #2a2a40;
+  --text-color: #f0e6d3;
+  --text-secondary: #d4c9b8;
+  --text-muted: #a89a87;
+  --link-color: #d4c9b8;
   --link-hover: #ffdd99;
-  --border-color: rgba(255, 215, 150, 0.3);
-  --shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  --border-color: rgba(255, 215, 150, 0.2);
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   --accent: #ffb347;
-  --accent-glow: rgba(255, 179, 71, 0.3);
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  --bg-active: rgba(255, 179, 71, 0.15);
-  --table-header-bg: #3a4d66;
-  --table-header-color: #faf0ca;
-  --table-row-hover: rgba(255, 255, 255, 0.08);
-  --input-bg: rgba(255, 255, 255, 0.1);
-  --input-border: var(--border-color);
+  --accent-glow: rgba(255, 179, 71, 0.25);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-active: rgba(255, 179, 71, 0.12);
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 215, 150, 0.2);
   --input-focus: var(--accent);
-  --btn-primary: #2d6a4f;
-  --btn-primary-hover: #1f543d;
-  --btn-secondary: #bdc3c7;
-  --btn-secondary-hover: #a0a8ae;
+  --btn-primary: #b8860b;
+  --btn-primary-hover: #a0750a;
+  --btn-secondary: #4a4a5a;
+  --btn-secondary-hover: #5a5a6a;
   --badge-bg: var(--accent);
-  --badge-color: #1e293b;
+  --badge-color: #1a1a2e;
+  --block-bg: rgba(45, 45, 68, 0.75);
+  --block-border: rgba(255, 215, 150, 0.15);
+  --empty-color: var(--text-muted);
+  --pagination-active-bg: var(--accent);
+  --pagination-active-color: #1a1a2e;
+
+  --table-bg: #2a2a40;
+  --table-text: #f0e6d3;
+  --table-border: rgba(255, 215, 150, 0.15);
+  --table-header-bg: #202035;
+  --table-header-text: #f0e6d3;
+  --table-row-hover: rgba(255, 215, 150, 0.05);
+
+  --btn-sidebar-bg: #3d3d5a;
+  --btn-sidebar-text: #f0e6d3;
+  --btn-sidebar-hover: #5a5a7a;
 }
 
 /* ---- ТЁМНЫЕ ТЕМЫ ---- */
-/* 1. Тёмная золотая (по умолчанию) – уже в :root, ничего не меняем */
 
-/* 2. Тёмная синяя */
+/* 1. Тёмная синяя */
 .theme-dark-blue {
-  --bg-overlay: rgba(26, 42, 58, 0.85);
-  --primary-bg: #1a2a3a;
-  --header-bg: #2c3e50;
-  --sidebar-bg: #34495e;
-  --card-bg: #ecf0f1;
-  --text-color: #ecf0f1;
-  --text-secondary: #bdc3c7;
-  --text-muted: #95a5a6;
-  --link-color: #bdc3c7;
-  --link-hover: #3498db;
-  --border-color: rgba(52, 152, 219, 0.3);
+  --bg-image: linear-gradient(145deg, #0f1a2b 0%, #1a2d42 100%);
+  --primary-bg: #0f1a2b;
+  --header-bg: #1a2d42;
+  --sidebar-bg: #15263a;
+  --card-bg: #1a2a3d;
+  --text-color: #e8f0f8;
+  --text-secondary: #c8d8e8;
+  --text-muted: #8fa8b8;
+  --link-color: #c8d8e8;
+  --link-hover: #6ab0e6;
+  --border-color: rgba(74, 140, 255, 0.2);
   --accent: #4a8cff;
-  --accent-glow: rgba(74, 140, 255, 0.3);
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  --bg-active: rgba(74, 140, 255, 0.15);
-  --table-header-bg: #1f3a4d;
-  --table-header-color: #ecf0f1;
-  --table-row-hover: rgba(52, 152, 219, 0.1);
+  --accent-glow: rgba(74, 140, 255, 0.2);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-active: rgba(74, 140, 255, 0.12);
   --input-bg: rgba(255, 255, 255, 0.05);
-  --btn-primary: #2980b9;
-  --btn-primary-hover: #1f618d;
+  --input-border: rgba(74, 140, 255, 0.2);
+  --btn-primary: #2a6a9a;
+  --btn-primary-hover: #1f5a8a;
+  --btn-secondary: #3a4a5a;
+  --btn-secondary-hover: #4a5a6a;
   --badge-bg: #4a8cff;
-  --badge-color: #fff;
+  --badge-color: #0f1a2b;
+  --block-bg: rgba(26, 45, 66, 0.75);
+  --block-border: rgba(74, 140, 255, 0.15);
+  --table-bg: #1a2a3d;
+  --table-text: #e8f0f8;
+  --table-border: rgba(74, 140, 255, 0.15);
+  --table-header-bg: #122236;
+  --table-header-text: #e8f0f8;
+  --table-row-hover: rgba(74, 140, 255, 0.05);
+  --btn-sidebar-bg: #2a4055;
+  --btn-sidebar-text: #e8f0f8;
+  --btn-sidebar-hover: #3a5a7a;
 }
 
-/* 3. Тёмная зелёная */
+/* 2. Тёмная зелёная */
 .theme-dark-green {
-  --bg-overlay: rgba(26, 58, 42, 0.85);
-  --primary-bg: #1a3a2a;
-  --header-bg: #2d4a3a;
-  --sidebar-bg: #3a5a4a;
-  --card-bg: #f0f7f0;
-  --text-color: #d4edda;
-  --text-secondary: #c3e6cb;
-  --text-muted: #a0c0a0;
-  --link-color: #c3e6cb;
-  --link-hover: #28a745;
-  --border-color: rgba(40, 167, 69, 0.3);
+  --bg-image: linear-gradient(145deg, #0a1f12 0%, #143022 100%);
+  --primary-bg: #0a1f12;
+  --header-bg: #143022;
+  --sidebar-bg: #0f281a;
+  --card-bg: #142a1e;
+  --text-color: #d8f0e0;
+  --text-secondary: #b8d8c8;
+  --text-muted: #80a890;
+  --link-color: #b8d8c8;
+  --link-hover: #5ab87a;
+  --border-color: rgba(40, 167, 69, 0.2);
   --accent: #4caf50;
-  --accent-glow: rgba(76, 175, 80, 0.3);
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  --bg-active: rgba(76, 175, 80, 0.15);
-  --table-header-bg: #1d3d2a;
-  --table-header-color: #d4edda;
-  --table-row-hover: rgba(76, 175, 80, 0.1);
+  --accent-glow: rgba(76, 175, 80, 0.2);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-active: rgba(76, 175, 80, 0.12);
   --input-bg: rgba(255, 255, 255, 0.05);
-  --btn-primary: #27ae60;
-  --btn-primary-hover: #1e8449;
+  --input-border: rgba(40, 167, 69, 0.2);
+  --btn-primary: #2a7a3a;
+  --btn-primary-hover: #1f6a32;
+  --btn-secondary: #2a4a3a;
+  --btn-secondary-hover: #3a5a4a;
   --badge-bg: #4caf50;
-  --badge-color: #fff;
+  --badge-color: #0a1f12;
+  --block-bg: rgba(20, 48, 34, 0.75);
+  --block-border: rgba(40, 167, 69, 0.15);
+  --table-bg: #142a1e;
+  --table-text: #d8f0e0;
+  --table-border: rgba(40, 167, 69, 0.15);
+  --table-header-bg: #0e2218;
+  --table-header-text: #d8f0e0;
+  --table-row-hover: rgba(76, 175, 80, 0.05);
+  --btn-sidebar-bg: #1a3a2a;
+  --btn-sidebar-text: #d8f0e0;
+  --btn-sidebar-hover: #2a5a3a;
 }
 
-/* 4. Тёмная фиолетовая */
+/* 3. Тёмная фиолетовая */
 .theme-dark-purple {
-  --bg-overlay: rgba(42, 26, 58, 0.85);
-  --primary-bg: #2a1a3a;
-  --header-bg: #3d2a4a;
-  --sidebar-bg: #4a3a5a;
-  --card-bg: #f0ecf7;
-  --text-color: #d4c3e6;
-  --text-secondary: #c3b0d4;
-  --text-muted: #a090b0;
-  --link-color: #c3b0d4;
-  --link-hover: #ab47bc;
-  --border-color: rgba(171, 71, 188, 0.3);
+  --bg-image: linear-gradient(145deg, #1a0f2a 0%, #2a1a40 100%);
+  --primary-bg: #1a0f2a;
+  --header-bg: #2a1a40;
+  --sidebar-bg: #221536;
+  --card-bg: #251a3a;
+  --text-color: #e8d8f0;
+  --text-secondary: #d0b8e0;
+  --text-muted: #9888a8;
+  --link-color: #d0b8e0;
+  --link-hover: #b07ad0;
+  --border-color: rgba(171, 71, 188, 0.2);
   --accent: #ab47bc;
-  --accent-glow: rgba(171, 71, 188, 0.3);
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  --bg-active: rgba(171, 71, 188, 0.15);
-  --table-header-bg: #3a2a4d;
-  --table-header-color: #d4c3e6;
-  --table-row-hover: rgba(171, 71, 188, 0.1);
+  --accent-glow: rgba(171, 71, 188, 0.2);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-active: rgba(171, 71, 188, 0.12);
   --input-bg: rgba(255, 255, 255, 0.05);
-  --btn-primary: #8e44ad;
-  --btn-primary-hover: #6c3483;
+  --input-border: rgba(171, 71, 188, 0.2);
+  --btn-primary: #6a2a8a;
+  --btn-primary-hover: #5a1f7a;
+  --btn-secondary: #3a2a4a;
+  --btn-secondary-hover: #4a3a5a;
   --badge-bg: #ab47bc;
-  --badge-color: #fff;
+  --badge-color: #1a0f2a;
+  --block-bg: rgba(42, 26, 64, 0.75);
+  --block-border: rgba(171, 71, 188, 0.15);
+  --table-bg: #251a3a;
+  --table-text: #e8d8f0;
+  --table-border: rgba(171, 71, 188, 0.15);
+  --table-header-bg: #1e1432;
+  --table-header-text: #e8d8f0;
+  --table-row-hover: rgba(171, 71, 188, 0.05);
+  --btn-sidebar-bg: #2a1a3a;
+  --btn-sidebar-text: #e8d8f0;
+  --btn-sidebar-hover: #3a2a5a;
 }
 
-/* 5. Тёмная красная */
+/* 4. Тёмная красная */
 .theme-dark-red {
-  --bg-overlay: rgba(58, 26, 26, 0.85);
-  --primary-bg: #3a1a1a;
-  --header-bg: #4a2a2a;
-  --sidebar-bg: #5a3a3a;
-  --card-bg: #f7ecec;
-  --text-color: #e6c3c3;
-  --text-secondary: #d4b0b0;
-  --text-muted: #b09090;
-  --link-color: #d4b0b0;
-  --link-hover: #e74c3c;
-  --border-color: rgba(231, 76, 60, 0.3);
+  --bg-image: linear-gradient(145deg, #2a0f0f 0%, #401a1a 100%);
+  --primary-bg: #2a0f0f;
+  --header-bg: #401a1a;
+  --sidebar-bg: #361515;
+  --card-bg: #3a1a1a;
+  --text-color: #f0d8d8;
+  --text-secondary: #e0b8b8;
+  --text-muted: #b08888;
+  --link-color: #e0b8b8;
+  --link-hover: #e67070;
+  --border-color: rgba(231, 76, 60, 0.2);
   --accent: #e74c3c;
-  --accent-glow: rgba(231, 76, 60, 0.3);
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  --bg-active: rgba(231, 76, 60, 0.15);
-  --table-header-bg: #4d2a2a;
-  --table-header-color: #e6c3c3;
-  --table-row-hover: rgba(231, 76, 60, 0.1);
+  --accent-glow: rgba(231, 76, 60, 0.2);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-active: rgba(231, 76, 60, 0.12);
   --input-bg: rgba(255, 255, 255, 0.05);
-  --btn-primary: #c0392b;
-  --btn-primary-hover: #a93226;
+  --input-border: rgba(231, 76, 60, 0.2);
+  --btn-primary: #8a2a2a;
+  --btn-primary-hover: #7a1f1f;
+  --btn-secondary: #4a2a2a;
+  --btn-secondary-hover: #5a3a3a;
   --badge-bg: #e74c3c;
-  --badge-color: #fff;
+  --badge-color: #2a0f0f;
+  --block-bg: rgba(64, 26, 26, 0.75);
+  --block-border: rgba(231, 76, 60, 0.15);
+  --table-bg: #3a1a1a;
+  --table-text: #f0d8d8;
+  --table-border: rgba(231, 76, 60, 0.15);
+  --table-header-bg: #321414;
+  --table-header-text: #f0d8d8;
+  --table-row-hover: rgba(231, 76, 60, 0.05);
+  --btn-sidebar-bg: #4a2a2a;
+  --btn-sidebar-text: #f0d8d8;
+  --btn-sidebar-hover: #5a3a3a;
 }
 
 /* ---- СВЕТЛЫЕ ТЕМЫ ---- */
-/* 6. Светлая золотая */
+
+/* 5. Светлая золотая */
 .theme-light-gold {
-  --bg-overlay: rgba(255, 248, 235, 0.85);
-  --primary-bg: #f5f0e8;
+  --bg-image: linear-gradient(145deg, #fdf8f0 0%, #f5ede0 100%);
+  --bg-overlay: rgba(255, 248, 235, 0.3);
+  --primary-bg: #fdf8f0;
   --header-bg: #ffffff;
-  --sidebar-bg: #e8e0d8;
+  --sidebar-bg: #f0e8d8;
   --card-bg: #ffffff;
   --text-color: #332211;
   --text-secondary: #554433;
@@ -162,13 +220,10 @@
   --border-color: #d4c4b0;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   --accent: #b8860b;
-  --accent-glow: rgba(184, 134, 11, 0.2);
+  --accent-glow: rgba(184, 134, 11, 0.15);
   --bg-hover: rgba(0, 0, 0, 0.03);
-  --bg-active: rgba(184, 134, 11, 0.1);
-  --table-header-bg: #d4c4b0;
-  --table-header-color: #332211;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
-  --input-bg: rgba(0, 0, 0, 0.03);
+  --bg-active: rgba(184, 134, 11, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.02);
   --input-border: #d4c4b0;
   --input-focus: #b8860b;
   --btn-primary: #b8860b;
@@ -176,13 +231,25 @@
   --btn-secondary: #d4c4b0;
   --btn-secondary-hover: #c4b4a0;
   --badge-bg: #b8860b;
-  --badge-color: #fff;
+  --badge-color: #ffffff;
+  --block-bg: rgba(240, 232, 216, 0.7);
+  --block-border: #d4c4b0;
+  --table-bg: #ffffff;
+  --table-text: #332211;
+  --table-border: #d4c4b0;
+  --table-header-bg: #d4c4b0;
+  --table-header-text: #332211;
+  --table-row-hover: rgba(184, 134, 11, 0.06);
+  --btn-sidebar-bg: #d4c4b0;
+  --btn-sidebar-text: #332211;
+  --btn-sidebar-hover: #c4b4a0;
 }
 
-/* 7. Светлая синяя */
+/* 6. Светлая синяя */
 .theme-light-blue {
-  --bg-overlay: rgba(235, 245, 255, 0.85);
-  --primary-bg: #f0f5ff;
+  --bg-image: linear-gradient(145deg, #f0f8ff 0%, #e0ecf5 100%);
+  --bg-overlay: rgba(235, 245, 255, 0.3);
+  --primary-bg: #f0f8ff;
   --header-bg: #ffffff;
   --sidebar-bg: #dce8f5;
   --card-bg: #ffffff;
@@ -194,13 +261,10 @@
   --border-color: #b0c8e0;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   --accent: #1a6b8a;
-  --accent-glow: rgba(26, 107, 138, 0.2);
+  --accent-glow: rgba(26, 107, 138, 0.15);
   --bg-hover: rgba(0, 0, 0, 0.03);
-  --bg-active: rgba(26, 107, 138, 0.1);
-  --table-header-bg: #b0c8e0;
-  --table-header-color: #1a2a3a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
-  --input-bg: rgba(0, 0, 0, 0.03);
+  --bg-active: rgba(26, 107, 138, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.02);
   --input-border: #b0c8e0;
   --input-focus: #1a6b8a;
   --btn-primary: #1a6b8a;
@@ -208,13 +272,25 @@
   --btn-secondary: #b0c8e0;
   --btn-secondary-hover: #a0b8d0;
   --badge-bg: #1a6b8a;
-  --badge-color: #fff;
+  --badge-color: #ffffff;
+  --block-bg: rgba(220, 232, 245, 0.7);
+  --block-border: #b0c8e0;
+  --table-bg: #ffffff;
+  --table-text: #1a2a3a;
+  --table-border: #b0c8e0;
+  --table-header-bg: #b0c8e0;
+  --table-header-text: #1a2a3a;
+  --table-row-hover: rgba(26, 107, 138, 0.06);
+  --btn-sidebar-bg: #b0c8e0;
+  --btn-sidebar-text: #1a2a3a;
+  --btn-sidebar-hover: #a0b8d0;
 }
 
-/* 8. Светлая зелёная */
+/* 7. Светлая зелёная */
 .theme-light-green {
-  --bg-overlay: rgba(235, 255, 240, 0.85);
-  --primary-bg: #f0faf2;
+  --bg-image: linear-gradient(145deg, #f0faf5 0%, #e0f0e8 100%);
+  --bg-overlay: rgba(235, 255, 240, 0.3);
+  --primary-bg: #f0faf5;
   --header-bg: #ffffff;
   --sidebar-bg: #dceee0;
   --card-bg: #ffffff;
@@ -226,13 +302,10 @@
   --border-color: #b0d4b8;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   --accent: #1a7a3a;
-  --accent-glow: rgba(26, 122, 58, 0.2);
+  --accent-glow: rgba(26, 122, 58, 0.15);
   --bg-hover: rgba(0, 0, 0, 0.03);
-  --bg-active: rgba(26, 122, 58, 0.1);
-  --table-header-bg: #b0d4b8;
-  --table-header-color: #1a3a2a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
-  --input-bg: rgba(0, 0, 0, 0.03);
+  --bg-active: rgba(26, 122, 58, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.02);
   --input-border: #b0d4b8;
   --input-focus: #1a7a3a;
   --btn-primary: #1a7a3a;
@@ -240,13 +313,25 @@
   --btn-secondary: #b0d4b8;
   --btn-secondary-hover: #a0c4a8;
   --badge-bg: #1a7a3a;
-  --badge-color: #fff;
+  --badge-color: #ffffff;
+  --block-bg: rgba(220, 238, 224, 0.7);
+  --block-border: #b0d4b8;
+  --table-bg: #ffffff;
+  --table-text: #1a3a2a;
+  --table-border: #b0d4b8;
+  --table-header-bg: #b0d4b8;
+  --table-header-text: #1a3a2a;
+  --table-row-hover: rgba(26, 122, 58, 0.06);
+  --btn-sidebar-bg: #b0d4b8;
+  --btn-sidebar-text: #1a3a2a;
+  --btn-sidebar-hover: #a0c4a8;
 }
 
-/* 9. Светлая фиолетовая */
+/* 8. Светлая фиолетовая */
 .theme-light-purple {
-  --bg-overlay: rgba(245, 240, 255, 0.85);
-  --primary-bg: #f5f0ff;
+  --bg-image: linear-gradient(145deg, #f8f0ff 0%, #ede5f5 100%);
+  --bg-overlay: rgba(245, 240, 255, 0.3);
+  --primary-bg: #f8f0ff;
   --header-bg: #ffffff;
   --sidebar-bg: #e8e0f5;
   --card-bg: #ffffff;
@@ -258,13 +343,10 @@
   --border-color: #c8b8d8;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   --accent: #6a1a8a;
-  --accent-glow: rgba(106, 26, 138, 0.2);
+  --accent-glow: rgba(106, 26, 138, 0.15);
   --bg-hover: rgba(0, 0, 0, 0.03);
-  --bg-active: rgba(106, 26, 138, 0.1);
-  --table-header-bg: #c8b8d8;
-  --table-header-color: #2a1a3a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
-  --input-bg: rgba(0, 0, 0, 0.03);
+  --bg-active: rgba(106, 26, 138, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.02);
   --input-border: #c8b8d8;
   --input-focus: #6a1a8a;
   --btn-primary: #6a1a8a;
@@ -272,13 +354,25 @@
   --btn-secondary: #c8b8d8;
   --btn-secondary-hover: #b8a8c8;
   --badge-bg: #6a1a8a;
-  --badge-color: #fff;
+  --badge-color: #ffffff;
+  --block-bg: rgba(232, 224, 245, 0.7);
+  --block-border: #c8b8d8;
+  --table-bg: #ffffff;
+  --table-text: #2a1a3a;
+  --table-border: #c8b8d8;
+  --table-header-bg: #c8b8d8;
+  --table-header-text: #2a1a3a;
+  --table-row-hover: rgba(106, 26, 138, 0.06);
+  --btn-sidebar-bg: #c8b8d8;
+  --btn-sidebar-text: #2a1a3a;
+  --btn-sidebar-hover: #b8a8c8;
 }
 
-/* 10. Светлая красная */
+/* 9. Светлая красная */
 .theme-light-red {
-  --bg-overlay: rgba(255, 240, 240, 0.85);
-  --primary-bg: #faf0f0;
+  --bg-image: linear-gradient(145deg, #fdf5f5 0%, #f5e8e8 100%);
+  --bg-overlay: rgba(255, 240, 240, 0.3);
+  --primary-bg: #fdf5f5;
   --header-bg: #ffffff;
   --sidebar-bg: #f5e0e0;
   --card-bg: #ffffff;
@@ -290,13 +384,10 @@
   --border-color: #d8b8b8;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   --accent: #8a1a1a;
-  --accent-glow: rgba(138, 26, 26, 0.2);
+  --accent-glow: rgba(138, 26, 26, 0.15);
   --bg-hover: rgba(0, 0, 0, 0.03);
-  --bg-active: rgba(138, 26, 26, 0.1);
-  --table-header-bg: #d8b8b8;
-  --table-header-color: #3a1a1a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
-  --input-bg: rgba(0, 0, 0, 0.03);
+  --bg-active: rgba(138, 26, 26, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.02);
   --input-border: #d8b8b8;
   --input-focus: #8a1a1a;
   --btn-primary: #8a1a1a;
@@ -304,7 +395,18 @@
   --btn-secondary: #d8b8b8;
   --btn-secondary-hover: #c8a8a8;
   --badge-bg: #8a1a1a;
-  --badge-color: #fff;
+  --badge-color: #ffffff;
+  --block-bg: rgba(245, 224, 224, 0.7);
+  --block-border: #d8b8b8;
+  --table-bg: #ffffff;
+  --table-text: #3a1a1a;
+  --table-border: #d8b8b8;
+  --table-header-bg: #d8b8b8;
+  --table-header-text: #3a1a1a;
+  --table-row-hover: rgba(138, 26, 26, 0.06);
+  --btn-sidebar-bg: #d8b8b8;
+  --btn-sidebar-text: #3a1a1a;
+  --btn-sidebar-hover: #c8a8a8;
 }
 
 /* ============================================================
@@ -428,16 +530,17 @@ body::before {
   font-weight: 600;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #faf0ca;
+  color: var(--text-secondary);
 }
 
 .nav-buttons,
 .filter-buttons,
-.subjects-list {
+.subjects-list,
+.nav-sections {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -448,7 +551,8 @@ body::before {
 .section-btn,
 .add-subject-btn,
 .add-global-btn {
-  background: #8db5e2;
+  background: var(--btn-sidebar-bg);
+  color: var(--btn-sidebar-text);
   border: none;
   padding: 12px 16px;
   border-radius: 40px;
@@ -460,7 +564,6 @@ body::before {
   gap: 12px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-  color: #1e293b;
   font-family: inherit;
   width: 100%;
 }
@@ -468,31 +571,32 @@ body::before {
 .nav-btn:hover,
 .filter-btn:hover,
 .section-btn:hover {
-  background: #7a98fa;
+  background: var(--btn-sidebar-hover);
   transform: translateX(6px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .section-btn.active {
-  background: #7a98fa;
-  color: white;
+  background: var(--btn-sidebar-hover);
+  color: #fff;
 }
 
 .add-subject-btn,
 .add-global-btn {
-  background: #ffb347;
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
   justify-content: center;
   text-align: center;
 }
 
 .add-subject-btn:hover,
 .add-global-btn:hover {
-  background: #f5a623;
+  background: var(--btn-primary-hover);
   transform: scale(1.02);
 }
 
 .sidebar-note {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 24px;
   padding: 16px;
   margin-top: 28px;
@@ -507,11 +611,10 @@ body::before {
   color: var(--accent);
 }
 
-/* Кнопки в сайдбаре (настройки) */
 #settingsContainer {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 2px solid rgba(255, 255, 255, 0.15);
+  border-top: 2px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -544,12 +647,13 @@ body::before {
 .hero-resources,
 .homework-header,
 .info-block,
-.welcome-strip {
-  background: rgba(79, 98, 122, 0.75);
+.welcome-strip,
+.section-header {
+  background: var(--block-bg);
   backdrop-filter: blur(4px);
   border-radius: 32px;
   padding: 24px 28px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--block-border);
   animation: fadeUp 0.6s ease;
 }
 
@@ -580,19 +684,26 @@ body::before {
   color: var(--text-secondary);
 }
 
-/* ===== КАРТОЧКИ (преподаватели, экзамены, ресурсы, домашка, опросы) ===== */
-.teachers-grid {
+/* ===== КАРТОЧКИ ===== */
+.teachers-grid,
+.exams-grid,
+.resources-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 28px;
   margin-top: 20px;
 }
+
+.teachers-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.exams-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.resources-grid { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
 
 .teacher-card,
 .exam-card,
 .resource-card,
 .task-card,
-.poll-card {
+.poll-card,
+.event-card,
+.test-card {
   background: var(--card-bg);
   color: var(--text-color);
   border-radius: 28px;
@@ -604,9 +715,12 @@ body::before {
 .teacher-card:hover,
 .exam-card:hover,
 .resource-card:hover,
-.task-card:hover {
+.task-card:hover,
+.poll-card:hover,
+.event-card:hover,
+.test-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 24px 36px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 24px 36px rgba(0, 0, 0, 0.3);
 }
 
 /* Преподаватели */
@@ -656,12 +770,6 @@ body::before {
 }
 
 /* Экзамены */
-.exams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 28px;
-}
-
 .exam-card {
   position: relative;
 }
@@ -676,13 +784,78 @@ body::before {
   background: linear-gradient(90deg, var(--accent), #ffd200);
 }
 
-/* Ресурсы */
-.resources-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 24px;
+.exam-card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px 0;
 }
 
+.exam-card .exam-icon {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.exam-card .exam-title h3 {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.exam-card .exam-type {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.exam-card .card-details {
+  padding: 12px 22px;
+}
+
+.exam-card .detail-row {
+  display: flex;
+  gap: 8px;
+  font-size: 0.9rem;
+  margin: 6px 0;
+}
+
+.exam-card .exam-resources {
+  padding: 12px 22px;
+  border-top: 1px solid var(--border-color);
+}
+
+.exam-card .resource-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.exam-card .res-link {
+  background: var(--bg-hover);
+  padding: 4px 12px;
+  border-radius: 40px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: 0.3s;
+}
+
+.exam-card .res-link:hover {
+  background: var(--bg-active);
+  color: var(--text-color);
+}
+
+.exam-card .card-footer-note {
+  padding: 12px 22px 20px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.exam-card .card-footer-note a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Ресурсы */
 .resource-card {
   padding: 20px;
   display: flex;
@@ -690,8 +863,34 @@ body::before {
   cursor: pointer;
 }
 
-.resource-card:hover {
-  transform: translateY(-6px) scale(1.02);
+.resource-card .card-icon {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.resource-card .card-content h3 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.resource-card .card-content p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.resource-card .card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.resource-card .card-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
 }
 
 /* Домашка */
@@ -703,12 +902,157 @@ body::before {
   gap: 20px;
 }
 
-/* Опросы */
-.poll-card {
+.task-card .task-content {
+  flex: 1;
+}
+
+.task-card .task-desc {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.task-card .task-links,
+.task-card .task-tags {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.task-card .task-links a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+.task-card .task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.task-card .task-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.task-card .task-actions button:hover {
+  color: var(--text-color);
+}
+
+/* Опросы и мероприятия (extracurricular) */
+.poll-card,
+.event-card,
+.test-card {
   padding: 20px 24px;
 }
 
-/* ===== РАСПИСАНИЕ – НОВЫЙ КРАСИВЫЙ ДИЗАЙН ===== */
+.poll-card .poll-header,
+.event-card .card-header-event,
+.test-card .test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.poll-card .poll-header h3,
+.event-card h3,
+.test-card .test-header h3 {
+  font-size: 1.1rem;
+}
+
+.poll-card .poll-option {
+  margin: 8px 0;
+}
+
+.poll-card .option-bar {
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.poll-card .bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.poll-card .vote-btn {
+  background: var(--accent);
+  border: none;
+  padding: 4px 16px;
+  border-radius: 40px;
+  color: var(--badge-color, #fff);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.event-card .event-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.event-card .event-actions button,
+.test-card .test-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.event-card .event-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+/* Пустые состояния */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--empty-color);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination .page {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 40px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.pagination .page.active {
+  background: var(--pagination-active-bg);
+  color: var(--pagination-active-color);
+}
+
+.pagination .page:hover:not(.active) {
+  background: var(--bg-active);
+}
+
+/* ===== РАСПИСАНИЕ ===== */
 .schedule-section {
   padding: 28px 32px;
 }
@@ -774,8 +1118,9 @@ body::before {
 .table-wrapper {
   overflow-x: auto;
   border-radius: 24px;
-  background: var(--card-bg);
   box-shadow: var(--shadow);
+  background: var(--table-bg);
+  border: 1px solid var(--table-border);
 }
 
 .schedule-table {
@@ -783,17 +1128,18 @@ body::before {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.9rem;
-  background: transparent;
   min-width: 700px;
+  background: transparent;
 }
 
 .schedule-table th {
   background: var(--table-header-bg);
-  color: var(--table-header-color);
+  color: var(--table-header-text);
   padding: 14px 12px;
   text-align: center;
   font-weight: 600;
   letter-spacing: 0.3px;
+  border-bottom: 2px solid var(--table-border);
 }
 
 .schedule-table th:first-child {
@@ -805,9 +1151,10 @@ body::before {
 
 .schedule-table td {
   padding: 12px 10px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--table-border);
   vertical-align: middle;
-  background: var(--card-bg);
+  background: var(--table-bg);
+  color: var(--table-text);
   transition: background 0.2s;
 }
 
@@ -817,9 +1164,10 @@ body::before {
 
 .schedule-table td:first-child {
   font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-hover);
+  background: var(--table-header-bg);
+  color: var(--table-header-text);
   width: 160px;
+  text-align: center;
 }
 
 .schedule-cell {
@@ -836,6 +1184,7 @@ body::before {
   flex-direction: column;
   gap: 4px;
   position: relative;
+  word-break: break-word;
 }
 
 .cell-content .subject {
@@ -867,11 +1216,12 @@ body::before {
 
 .break-row td {
   background: var(--table-header-bg);
-  color: var(--table-header-color);
+  color: var(--table-header-text);
   text-align: center;
   font-size: 0.8rem;
   padding: 6px;
   letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--table-border);
 }
 
 /* ===== ФУТЕР ===== */
@@ -988,7 +1338,6 @@ body::before {
 }
 .close-modal:hover { color: var(--text-color); }
 
-/* Дополнительные стили для кнопок внутри модалок */
 .add-link-btn {
   background: var(--accent);
   color: var(--badge-color, #1e293b);
@@ -1028,7 +1377,52 @@ body::before {
 }
 .remove-link-btn:hover { background: #c0392b; }
 
-/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ В МОДАЛКЕ (из theme.js) ===== */
+.question-editor {
+  background: var(--bg-hover);
+  border-radius: 20px;
+  padding: 16px;
+  margin-top: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.question-editor .question-text input {
+  width: 100%;
+}
+
+.question-editor .question-options {
+  margin: 8px 0;
+}
+
+.question-editor .opt-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.question-editor .opt-row input {
+  flex: 1;
+}
+
+.question-editor .correct-badge {
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+
+.question-editor .q-correct {
+  margin: 8px 0;
+}
+
+.question-editor .remove-question-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 4px 14px;
+  border-radius: 40px;
+  cursor: pointer;
+}
+
+/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ В МОДАЛКЕ ===== */
 .theme-option {
   display: flex;
   align-items: center;
@@ -1067,7 +1461,6 @@ body::before {
 .theme-option.active .theme-preview {
   border-color: var(--accent);
 }
-/* Цвета для превью каждой темы (задаются в theme.js) */
 
 /* ===== АНИМАЦИИ ===== */
 @keyframes slideDown {
@@ -1117,6 +1510,16 @@ body::before {
     justify-content: space-between;
   }
   .cell-content .edit-icon {
-    opacity: 0.5; /* всегда видно на мобильных */
+    opacity: 0.5;
+  }
+  .modal-content {
+    padding: 20px;
+  }
+  .exam-card .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .resource-card {
+    flex-direction: column;
   }
 }
