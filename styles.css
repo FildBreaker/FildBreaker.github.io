@@ -21,9 +21,6 @@
   --accent-glow: rgba(255, 179, 71, 0.3);
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(255, 179, 71, 0.15);
-  --table-header-bg: #3a4d66;
-  --table-header-color: #faf0ca;
-  --table-row-hover: rgba(255, 255, 255, 0.08);
   --input-bg: rgba(255, 255, 255, 0.1);
   --input-border: var(--border-color);
   --input-focus: var(--accent);
@@ -33,17 +30,24 @@
   --btn-secondary-hover: #a0a8ae;
   --badge-bg: var(--accent);
   --badge-color: #1e293b;
-  --block-bg: rgba(79, 98, 122, 0.75);  /* фон для основных блоков */
+  --block-bg: rgba(79, 98, 122, 0.75);
   --block-border: var(--border-color);
   --empty-color: var(--text-muted);
   --pagination-active-bg: var(--accent);
   --pagination-active-color: #1e293b;
+
+  /* ПЕРЕМЕННЫЕ ДЛЯ ТАБЛИЦЫ РАСПИСАНИЯ */
+  --table-bg: #fef9ef;
+  --table-text: #1e293b;
+  --table-border: rgba(255, 215, 150, 0.3);
+  --table-header-bg: #3a4d66;
+  --table-header-text: #faf0ca;
+  --table-row-hover: rgba(255, 215, 150, 0.15);
 }
 
 /* ---- ТЁМНЫЕ ТЕМЫ ---- */
-/* 1. Тёмная золотая (по умолчанию) – уже в :root */
 
-/* 2. Тёмная синяя */
+/* Тёмная синяя */
 .theme-dark-blue {
   --bg-overlay: rgba(26, 42, 58, 0.85);
   --primary-bg: #1a2a3a;
@@ -60,18 +64,21 @@
   --accent-glow: rgba(74, 140, 255, 0.3);
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(74, 140, 255, 0.15);
-  --table-header-bg: #1f3a4d;
-  --table-header-color: #ecf0f1;
-  --table-row-hover: rgba(52, 152, 219, 0.1);
   --input-bg: rgba(255, 255, 255, 0.05);
   --btn-primary: #2980b9;
   --btn-primary-hover: #1f618d;
   --badge-bg: #4a8cff;
   --badge-color: #fff;
   --block-bg: rgba(44, 62, 80, 0.85);
+  --table-bg: #1f3a4d;
+  --table-text: #ecf0f1;
+  --table-border: rgba(52, 152, 219, 0.4);
+  --table-header-bg: #152a3a;
+  --table-header-text: #ecf0f1;
+  --table-row-hover: rgba(74, 140, 255, 0.2);
 }
 
-/* 3. Тёмная зелёная */
+/* Тёмная зелёная */
 .theme-dark-green {
   --bg-overlay: rgba(26, 58, 42, 0.85);
   --primary-bg: #1a3a2a;
@@ -88,18 +95,21 @@
   --accent-glow: rgba(76, 175, 80, 0.3);
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(76, 175, 80, 0.15);
-  --table-header-bg: #1d3d2a;
-  --table-header-color: #d4edda;
-  --table-row-hover: rgba(76, 175, 80, 0.1);
   --input-bg: rgba(255, 255, 255, 0.05);
   --btn-primary: #27ae60;
   --btn-primary-hover: #1e8449;
   --badge-bg: #4caf50;
   --badge-color: #fff;
   --block-bg: rgba(45, 74, 58, 0.85);
+  --table-bg: #1d3d2a;
+  --table-text: #d4edda;
+  --table-border: rgba(40, 167, 69, 0.4);
+  --table-header-bg: #152a1d;
+  --table-header-text: #d4edda;
+  --table-row-hover: rgba(76, 175, 80, 0.2);
 }
 
-/* 4. Тёмная фиолетовая */
+/* Тёмная фиолетовая */
 .theme-dark-purple {
   --bg-overlay: rgba(42, 26, 58, 0.85);
   --primary-bg: #2a1a3a;
@@ -116,18 +126,21 @@
   --accent-glow: rgba(171, 71, 188, 0.3);
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(171, 71, 188, 0.15);
-  --table-header-bg: #3a2a4d;
-  --table-header-color: #d4c3e6;
-  --table-row-hover: rgba(171, 71, 188, 0.1);
   --input-bg: rgba(255, 255, 255, 0.05);
   --btn-primary: #8e44ad;
   --btn-primary-hover: #6c3483;
   --badge-bg: #ab47bc;
   --badge-color: #fff;
   --block-bg: rgba(61, 42, 74, 0.85);
+  --table-bg: #3a2a4d;
+  --table-text: #d4c3e6;
+  --table-border: rgba(171, 71, 188, 0.4);
+  --table-header-bg: #2a1a3a;
+  --table-header-text: #d4c3e6;
+  --table-row-hover: rgba(171, 71, 188, 0.2);
 }
 
-/* 5. Тёмная красная */
+/* Тёмная красная */
 .theme-dark-red {
   --bg-overlay: rgba(58, 26, 26, 0.85);
   --primary-bg: #3a1a1a;
@@ -144,19 +157,23 @@
   --accent-glow: rgba(231, 76, 60, 0.3);
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(231, 76, 60, 0.15);
-  --table-header-bg: #4d2a2a;
-  --table-header-color: #e6c3c3;
-  --table-row-hover: rgba(231, 76, 60, 0.1);
   --input-bg: rgba(255, 255, 255, 0.05);
   --btn-primary: #c0392b;
   --btn-primary-hover: #a93226;
   --badge-bg: #e74c3c;
   --badge-color: #fff;
   --block-bg: rgba(74, 42, 42, 0.85);
+  --table-bg: #4d2a2a;
+  --table-text: #e6c3c3;
+  --table-border: rgba(231, 76, 60, 0.4);
+  --table-header-bg: #3a1a1a;
+  --table-header-text: #e6c3c3;
+  --table-row-hover: rgba(231, 76, 60, 0.2);
 }
 
 /* ---- СВЕТЛЫЕ ТЕМЫ ---- */
-/* 6. Светлая золотая */
+
+/* Светлая золотая */
 .theme-light-gold {
   --bg-overlay: rgba(255, 248, 235, 0.85);
   --primary-bg: #f5f0e8;
@@ -174,9 +191,6 @@
   --accent-glow: rgba(184, 134, 11, 0.2);
   --bg-hover: rgba(0, 0, 0, 0.03);
   --bg-active: rgba(184, 134, 11, 0.1);
-  --table-header-bg: #d4c4b0;
-  --table-header-color: #332211;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
   --input-bg: rgba(0, 0, 0, 0.03);
   --input-border: #d4c4b0;
   --input-focus: #b8860b;
@@ -187,9 +201,15 @@
   --badge-bg: #b8860b;
   --badge-color: #fff;
   --block-bg: rgba(232, 224, 216, 0.85);
+  --table-bg: #ffffff;
+  --table-text: #332211;
+  --table-border: #d4c4b0;
+  --table-header-bg: #d4c4b0;
+  --table-header-text: #332211;
+  --table-row-hover: rgba(184, 134, 11, 0.1);
 }
 
-/* 7. Светлая синяя */
+/* Светлая синяя */
 .theme-light-blue {
   --bg-overlay: rgba(235, 245, 255, 0.85);
   --primary-bg: #f0f5ff;
@@ -207,9 +227,6 @@
   --accent-glow: rgba(26, 107, 138, 0.2);
   --bg-hover: rgba(0, 0, 0, 0.03);
   --bg-active: rgba(26, 107, 138, 0.1);
-  --table-header-bg: #b0c8e0;
-  --table-header-color: #1a2a3a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
   --input-bg: rgba(0, 0, 0, 0.03);
   --input-border: #b0c8e0;
   --input-focus: #1a6b8a;
@@ -220,9 +237,15 @@
   --badge-bg: #1a6b8a;
   --badge-color: #fff;
   --block-bg: rgba(220, 232, 245, 0.85);
+  --table-bg: #ffffff;
+  --table-text: #1a2a3a;
+  --table-border: #b0c8e0;
+  --table-header-bg: #b0c8e0;
+  --table-header-text: #1a2a3a;
+  --table-row-hover: rgba(26, 107, 138, 0.1);
 }
 
-/* 8. Светлая зелёная */
+/* Светлая зелёная */
 .theme-light-green {
   --bg-overlay: rgba(235, 255, 240, 0.85);
   --primary-bg: #f0faf2;
@@ -240,9 +263,6 @@
   --accent-glow: rgba(26, 122, 58, 0.2);
   --bg-hover: rgba(0, 0, 0, 0.03);
   --bg-active: rgba(26, 122, 58, 0.1);
-  --table-header-bg: #b0d4b8;
-  --table-header-color: #1a3a2a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
   --input-bg: rgba(0, 0, 0, 0.03);
   --input-border: #b0d4b8;
   --input-focus: #1a7a3a;
@@ -253,9 +273,15 @@
   --badge-bg: #1a7a3a;
   --badge-color: #fff;
   --block-bg: rgba(220, 238, 224, 0.85);
+  --table-bg: #ffffff;
+  --table-text: #1a3a2a;
+  --table-border: #b0d4b8;
+  --table-header-bg: #b0d4b8;
+  --table-header-text: #1a3a2a;
+  --table-row-hover: rgba(26, 122, 58, 0.1);
 }
 
-/* 9. Светлая фиолетовая */
+/* Светлая фиолетовая */
 .theme-light-purple {
   --bg-overlay: rgba(245, 240, 255, 0.85);
   --primary-bg: #f5f0ff;
@@ -273,9 +299,6 @@
   --accent-glow: rgba(106, 26, 138, 0.2);
   --bg-hover: rgba(0, 0, 0, 0.03);
   --bg-active: rgba(106, 26, 138, 0.1);
-  --table-header-bg: #c8b8d8;
-  --table-header-color: #2a1a3a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
   --input-bg: rgba(0, 0, 0, 0.03);
   --input-border: #c8b8d8;
   --input-focus: #6a1a8a;
@@ -286,9 +309,15 @@
   --badge-bg: #6a1a8a;
   --badge-color: #fff;
   --block-bg: rgba(232, 224, 245, 0.85);
+  --table-bg: #ffffff;
+  --table-text: #2a1a3a;
+  --table-border: #c8b8d8;
+  --table-header-bg: #c8b8d8;
+  --table-header-text: #2a1a3a;
+  --table-row-hover: rgba(106, 26, 138, 0.1);
 }
 
-/* 10. Светлая красная */
+/* Светлая красная */
 .theme-light-red {
   --bg-overlay: rgba(255, 240, 240, 0.85);
   --primary-bg: #faf0f0;
@@ -306,9 +335,6 @@
   --accent-glow: rgba(138, 26, 26, 0.2);
   --bg-hover: rgba(0, 0, 0, 0.03);
   --bg-active: rgba(138, 26, 26, 0.1);
-  --table-header-bg: #d8b8b8;
-  --table-header-color: #3a1a1a;
-  --table-row-hover: rgba(0, 0, 0, 0.05);
   --input-bg: rgba(0, 0, 0, 0.03);
   --input-border: #d8b8b8;
   --input-focus: #8a1a1a;
@@ -319,6 +345,12 @@
   --badge-bg: #8a1a1a;
   --badge-color: #fff;
   --block-bg: rgba(245, 224, 224, 0.85);
+  --table-bg: #ffffff;
+  --table-text: #3a1a1a;
+  --table-border: #d8b8b8;
+  --table-header-bg: #d8b8b8;
+  --table-header-text: #3a1a1a;
+  --table-row-hover: rgba(138, 26, 26, 0.1);
 }
 
 /* ============================================================
@@ -964,7 +996,7 @@ body::before {
   background: var(--bg-active);
 }
 
-/* ===== РАСПИСАНИЕ ===== */
+/* ===== РАСПИСАНИЕ – НОВЫЙ ДИЗАЙН ===== */
 .schedule-section {
   padding: 28px 32px;
 }
@@ -1030,8 +1062,9 @@ body::before {
 .table-wrapper {
   overflow-x: auto;
   border-radius: 24px;
-  background: var(--card-bg);
   box-shadow: var(--shadow);
+  background: var(--table-bg);
+  border: 1px solid var(--table-border);
 }
 
 .schedule-table {
@@ -1039,17 +1072,18 @@ body::before {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.9rem;
-  background: transparent;
   min-width: 700px;
+  background: transparent;
 }
 
 .schedule-table th {
   background: var(--table-header-bg);
-  color: var(--table-header-color);
+  color: var(--table-header-text);
   padding: 14px 12px;
   text-align: center;
   font-weight: 600;
   letter-spacing: 0.3px;
+  border-bottom: 2px solid var(--table-border);
 }
 
 .schedule-table th:first-child {
@@ -1061,9 +1095,10 @@ body::before {
 
 .schedule-table td {
   padding: 12px 10px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--table-border);
   vertical-align: middle;
-  background: var(--card-bg);
+  background: var(--table-bg);
+  color: var(--table-text);
   transition: background 0.2s;
 }
 
@@ -1073,9 +1108,10 @@ body::before {
 
 .schedule-table td:first-child {
   font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-hover);
+  background: var(--table-header-bg);
+  color: var(--table-header-text);
   width: 160px;
+  text-align: center;
 }
 
 .schedule-cell {
@@ -1092,6 +1128,7 @@ body::before {
   flex-direction: column;
   gap: 4px;
   position: relative;
+  word-break: break-word;
 }
 
 .cell-content .subject {
@@ -1121,13 +1158,15 @@ body::before {
   opacity: 1;
 }
 
+/* Строки с перерывами */
 .break-row td {
   background: var(--table-header-bg);
-  color: var(--table-header-color);
+  color: var(--table-header-text);
   text-align: center;
   font-size: 0.8rem;
   padding: 6px;
   letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--table-border);
 }
 
 /* ===== ФУТЕР ===== */
