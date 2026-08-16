@@ -1,7 +1,7 @@
 /* ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (по умолчанию – тёмная золотая) ===== */
 :root {
   --bg-image: url("data/1.jpg");
-  --bg-overlay: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55));
+  --bg-overlay: rgba(0, 0, 0, 0.55);
   --primary-bg: #22223b;
   --header-bg: #4a4e69;
   --sidebar-bg: #4f627a;
@@ -11,19 +11,24 @@
   --text-muted: #b0a0a0;
   --link-color: #e2c9c3;
   --link-hover: #ffdd99;
-  --border-color: rgba(255,215,150,0.3);
-  --shadow: 0 8px 20px rgba(0,0,0,0.1);
+  --border-color: rgba(255, 215, 150, 0.3);
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   --accent: #ffb347;
-  --accent-glow: rgba(255,179,71,0.3);
-  --bg-hover: rgba(255,255,255,0.05);
-  --bg-active: rgba(255,179,71,0.15);
+  --accent-glow: rgba(255, 179, 71, 0.3);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(255, 179, 71, 0.15);
+  --table-header-bg: #3a4d66;
+  --table-header-color: #faf0ca;
+  --table-row-hover: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --input-border: var(--border-color);
+  --input-focus: var(--accent);
 }
 
-/* ===== ТЕМЫ (классы для <body>) ===== */
+/* ===== ТЕМЫ ===== */
 /* Тёмная синяя */
 .theme-dark-blue {
-  --bg-image: none;
-  --bg-overlay: #1a2a3a;
+  --bg-overlay: rgba(26, 42, 58, 0.85);
   --primary-bg: #1a2a3a;
   --header-bg: #2c3e50;
   --sidebar-bg: #34495e;
@@ -33,17 +38,20 @@
   --text-muted: #95a5a6;
   --link-color: #bdc3c7;
   --link-hover: #3498db;
-  --border-color: rgba(52,152,219,0.3);
+  --border-color: rgba(52, 152, 219, 0.3);
   --accent: #4a8cff;
-  --accent-glow: rgba(74,140,255,0.3);
-  --bg-hover: rgba(255,255,255,0.05);
-  --bg-active: rgba(74,140,255,0.15);
+  --accent-glow: rgba(74, 140, 255, 0.3);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(74, 140, 255, 0.15);
+  --table-header-bg: #1f3a4d;
+  --table-header-color: #ecf0f1;
+  --table-row-hover: rgba(52, 152, 219, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.05);
 }
 
 /* Тёмная зелёная */
 .theme-dark-green {
-  --bg-image: none;
-  --bg-overlay: #1a3a2a;
+  --bg-overlay: rgba(26, 58, 42, 0.85);
   --primary-bg: #1a3a2a;
   --header-bg: #2d4a3a;
   --sidebar-bg: #3a5a4a;
@@ -53,17 +61,20 @@
   --text-muted: #a0c0a0;
   --link-color: #c3e6cb;
   --link-hover: #28a745;
-  --border-color: rgba(40,167,69,0.3);
+  --border-color: rgba(40, 167, 69, 0.3);
   --accent: #4caf50;
-  --accent-glow: rgba(76,175,80,0.3);
-  --bg-hover: rgba(255,255,255,0.05);
-  --bg-active: rgba(76,175,80,0.15);
+  --accent-glow: rgba(76, 175, 80, 0.3);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(76, 175, 80, 0.15);
+  --table-header-bg: #1d3d2a;
+  --table-header-color: #d4edda;
+  --table-row-hover: rgba(76, 175, 80, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.05);
 }
 
 /* Тёмная фиолетовая */
 .theme-dark-purple {
-  --bg-image: none;
-  --bg-overlay: #2a1a3a;
+  --bg-overlay: rgba(42, 26, 58, 0.85);
   --primary-bg: #2a1a3a;
   --header-bg: #3d2a4a;
   --sidebar-bg: #4a3a5a;
@@ -73,17 +84,20 @@
   --text-muted: #a090b0;
   --link-color: #c3b0d4;
   --link-hover: #ab47bc;
-  --border-color: rgba(171,71,188,0.3);
+  --border-color: rgba(171, 71, 188, 0.3);
   --accent: #ab47bc;
-  --accent-glow: rgba(171,71,188,0.3);
-  --bg-hover: rgba(255,255,255,0.05);
-  --bg-active: rgba(171,71,188,0.15);
+  --accent-glow: rgba(171, 71, 188, 0.3);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(171, 71, 188, 0.15);
+  --table-header-bg: #3a2a4d;
+  --table-header-color: #d4c3e6;
+  --table-row-hover: rgba(171, 71, 188, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.05);
 }
 
 /* Светлая */
 .theme-light {
-  --bg-image: none;
-  --bg-overlay: #f5f5f5;
+  --bg-overlay: rgba(245, 245, 245, 0.85);
   --primary-bg: #f5f5f5;
   --header-bg: #ffffff;
   --sidebar-bg: #e8e8e8;
@@ -94,11 +108,17 @@
   --link-color: #333333;
   --link-hover: #0077ff;
   --border-color: #cccccc;
-  --shadow: 0 8px 20px rgba(0,0,0,0.05);
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   --accent: #f0a500;
-  --accent-glow: rgba(240,165,0,0.2);
-  --bg-hover: rgba(0,0,0,0.03);
-  --bg-active: rgba(240,165,0,0.1);
+  --accent-glow: rgba(240, 165, 0, 0.2);
+  --bg-hover: rgba(0, 0, 0, 0.03);
+  --bg-active: rgba(240, 165, 0, 0.1);
+  --table-header-bg: #d5d5d5;
+  --table-header-color: #222222;
+  --table-row-hover: rgba(0, 0, 0, 0.05);
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --input-border: #cccccc;
+  --input-focus: #0077ff;
 }
 
 /* ===== БАЗОВЫЕ СТИЛИ ===== */
@@ -198,7 +218,7 @@ body::before {
 .nav-links a:hover,
 .nav-links a.active {
   color: var(--link-hover);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
   transform: translateY(-2px);
 }
 
@@ -220,7 +240,7 @@ body::before {
   font-weight: 600;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid rgba(255,255,255,0.2);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -262,7 +282,7 @@ body::before {
 .section-btn:hover {
   background: #7a98fa;
   transform: translateX(6px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .section-btn.active {
@@ -284,7 +304,7 @@ body::before {
 }
 
 .sidebar-note {
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 24px;
   padding: 16px;
   margin-top: 28px;
@@ -297,6 +317,29 @@ body::before {
 .sidebar-note i {
   font-size: 1.8rem;
   color: var(--accent);
+}
+
+/* Кнопки настроек (тема, экспорт, импорт) */
+#settingsContainer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#settingsContainer .nav-btn {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s;
+}
+
+#settingsContainer .nav-btn:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  transform: translateX(4px);
 }
 
 /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
@@ -334,7 +377,7 @@ body::before {
   height: 120px;
   object-fit: cover;
   border-radius: 24px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .strip-text h2 {
@@ -349,7 +392,7 @@ body::before {
   color: var(--text-secondary);
 }
 
-/* ===== КАРТОЧКИ ===== */
+/* ===== КАРТОЧКИ (преподаватели, экзамены, ресурсы, домашка, опросы) ===== */
 .teachers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -363,6 +406,7 @@ body::before {
 .task-card,
 .poll-card {
   background: var(--card-bg);
+  color: var(--text-color);
   border-radius: 28px;
   box-shadow: var(--shadow);
   transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
@@ -374,9 +418,10 @@ body::before {
 .resource-card:hover,
 .task-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 24px 36px rgba(0,0,0,0.2);
+  box-shadow: 0 24px 36px rgba(0, 0, 0, 0.2);
 }
 
+/* Преподаватели */
 .teacher-card .card-photo {
   background: var(--sidebar-bg);
   padding: 20px 0 16px;
@@ -429,6 +474,10 @@ body::before {
   gap: 28px;
 }
 
+.exam-card {
+  position: relative;
+}
+
 .exam-card::before {
   content: '';
   position: absolute;
@@ -437,10 +486,6 @@ body::before {
   width: 100%;
   height: 6px;
   background: linear-gradient(90deg, var(--accent), #ffd200);
-}
-
-.exam-card {
-  position: relative;
 }
 
 /* Ресурсы */
@@ -475,26 +520,118 @@ body::before {
   padding: 20px 24px;
 }
 
-/* Расписание */
-.schedule-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-  background: rgba(255, 248, 210, 0.9);
-  border-radius: 24px;
-  overflow: hidden;
+/* ===== РАСПИСАНИЕ – НОВЫЙ КРАСИВЫЙ ДИЗАЙН ===== */
+.schedule-section {
+  padding: 28px 32px;
 }
 
-.schedule-table th,
-.schedule-table td {
-  border: 1px solid #7d96b1;
-  padding: 12px 8px;
-  vertical-align: top;
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.schedule-header h2 {
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-color);
+}
+
+.schedule-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.reset-btn {
+  background: var(--accent);
+  color: #1e293b;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reset-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.sync-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sync-hint i {
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 24px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+  background: transparent;
+  min-width: 700px;
 }
 
 .schedule-table th {
-  background: #3a4d66;
-  color: #faf0ca;
+  background: var(--table-header-bg);
+  color: var(--table-header-color);
+  padding: 14px 12px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.schedule-table th:first-child {
+  border-top-left-radius: 24px;
+}
+.schedule-table th:last-child {
+  border-top-right-radius: 24px;
+}
+
+.schedule-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  background: var(--card-bg);
+  transition: background 0.2s;
+}
+
+.schedule-table tr:last-child td {
+  border-bottom: none;
+}
+
+.schedule-table td:first-child {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  width: 160px;
 }
 
 .schedule-cell {
@@ -503,7 +640,50 @@ body::before {
 }
 
 .schedule-cell:hover {
-  background: #fff2b5;
+  background: var(--table-row-hover);
+}
+
+.cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.cell-content .subject {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.cell-content .end-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cell-content .edit-icon {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.schedule-cell:hover .edit-icon {
+  opacity: 1;
+}
+
+.break-row td {
+  background: var(--table-header-bg);
+  color: var(--table-header-color);
+  text-align: center;
+  font-size: 0.8rem;
+  padding: 6px;
+  letter-spacing: 0.5px;
 }
 
 /* ===== ФУТЕР ===== */
@@ -526,7 +706,7 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.75);
   align-items: center;
   justify-content: center;
   z-index: 1000;
@@ -543,6 +723,41 @@ body::before {
   max-height: 85vh;
   overflow-y: auto;
   animation: fadeUp 0.3s ease;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 6px;
+  border-radius: 40px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border 0.2s;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.modal-content textarea {
+  border-radius: 20px;
+  resize: vertical;
 }
 
 .modal-buttons {
@@ -582,6 +797,46 @@ body::before {
   transition: 0.2s;
 }
 .close-modal:hover { color: var(--text-color); }
+
+/* Дополнительные стили для кнопок внутри модалок */
+.add-link-btn {
+  background: var(--accent);
+  color: #1e293b;
+  border: none;
+  padding: 6px 18px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: 0.3s;
+}
+
+.add-link-btn:hover {
+  transform: scale(1.05);
+}
+
+.link-input-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.link-input-group input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.remove-link-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0 14px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.remove-link-btn:hover { background: #c0392b; }
 
 /* ===== АНИМАЦИИ ===== */
 @keyframes slideDown {
@@ -623,4 +878,60 @@ body::before {
     width: 100%;
     height: auto;
   }
+  .schedule-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .schedule-actions {
+    justify-content: space-between;
+  }
+  .cell-content .edit-icon {
+    opacity: 0.5; /* всегда видно на мобильных */
+  }
 }
+
+/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ В МОДАЛКЕ (из theme.js) ===== */
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-hover);
+  border: 2px solid var(--border-color);
+  border-radius: 40px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
+  font-size: 0.95rem;
+  width: 100%;
+  text-align: left;
+}
+.theme-option:hover {
+  border-color: var(--accent);
+  background: var(--bg-active);
+  transform: translateX(4px);
+}
+.theme-option.active {
+  border-color: var(--accent);
+  background: var(--bg-active);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.theme-preview {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  flex-shrink: 0;
+  transition: 0.3s;
+  background: var(--card-bg);
+}
+.theme-option.active .theme-preview {
+  border-color: var(--accent);
+}
+/* Цвета для превью каждой темы */
+.theme-option[data-theme="dark-gold"] .theme-preview { border-color: #ffb347; }
+.theme-option[data-theme="dark-blue"] .theme-preview { border-color: #4a8cff; }
+.theme-option[data-theme="dark-green"] .theme-preview { border-color: #4caf50; }
+.theme-option[data-theme="dark-purple"] .theme-preview { border-color: #ab47bc; }
+.theme-option[data-theme="light"] .theme-preview { border-color: #f0a500; background: #ffffff; }
