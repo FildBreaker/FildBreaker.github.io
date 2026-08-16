@@ -33,10 +33,15 @@
   --btn-secondary-hover: #a0a8ae;
   --badge-bg: var(--accent);
   --badge-color: #1e293b;
+  --block-bg: rgba(79, 98, 122, 0.75);  /* фон для основных блоков */
+  --block-border: var(--border-color);
+  --empty-color: var(--text-muted);
+  --pagination-active-bg: var(--accent);
+  --pagination-active-color: #1e293b;
 }
 
 /* ---- ТЁМНЫЕ ТЕМЫ ---- */
-/* 1. Тёмная золотая (по умолчанию) – уже в :root, ничего не меняем */
+/* 1. Тёмная золотая (по умолчанию) – уже в :root */
 
 /* 2. Тёмная синяя */
 .theme-dark-blue {
@@ -63,6 +68,7 @@
   --btn-primary-hover: #1f618d;
   --badge-bg: #4a8cff;
   --badge-color: #fff;
+  --block-bg: rgba(44, 62, 80, 0.85);
 }
 
 /* 3. Тёмная зелёная */
@@ -90,6 +96,7 @@
   --btn-primary-hover: #1e8449;
   --badge-bg: #4caf50;
   --badge-color: #fff;
+  --block-bg: rgba(45, 74, 58, 0.85);
 }
 
 /* 4. Тёмная фиолетовая */
@@ -117,6 +124,7 @@
   --btn-primary-hover: #6c3483;
   --badge-bg: #ab47bc;
   --badge-color: #fff;
+  --block-bg: rgba(61, 42, 74, 0.85);
 }
 
 /* 5. Тёмная красная */
@@ -144,6 +152,7 @@
   --btn-primary-hover: #a93226;
   --badge-bg: #e74c3c;
   --badge-color: #fff;
+  --block-bg: rgba(74, 42, 42, 0.85);
 }
 
 /* ---- СВЕТЛЫЕ ТЕМЫ ---- */
@@ -177,6 +186,7 @@
   --btn-secondary-hover: #c4b4a0;
   --badge-bg: #b8860b;
   --badge-color: #fff;
+  --block-bg: rgba(232, 224, 216, 0.85);
 }
 
 /* 7. Светлая синяя */
@@ -209,6 +219,7 @@
   --btn-secondary-hover: #a0b8d0;
   --badge-bg: #1a6b8a;
   --badge-color: #fff;
+  --block-bg: rgba(220, 232, 245, 0.85);
 }
 
 /* 8. Светлая зелёная */
@@ -241,6 +252,7 @@
   --btn-secondary-hover: #a0c4a8;
   --badge-bg: #1a7a3a;
   --badge-color: #fff;
+  --block-bg: rgba(220, 238, 224, 0.85);
 }
 
 /* 9. Светлая фиолетовая */
@@ -273,6 +285,7 @@
   --btn-secondary-hover: #b8a8c8;
   --badge-bg: #6a1a8a;
   --badge-color: #fff;
+  --block-bg: rgba(232, 224, 245, 0.85);
 }
 
 /* 10. Светлая красная */
@@ -305,6 +318,7 @@
   --btn-secondary-hover: #c8a8a8;
   --badge-bg: #8a1a1a;
   --badge-color: #fff;
+  --block-bg: rgba(245, 224, 224, 0.85);
 }
 
 /* ============================================================
@@ -437,7 +451,8 @@ body::before {
 
 .nav-buttons,
 .filter-buttons,
-.subjects-list {
+.subjects-list,
+.nav-sections {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -544,12 +559,13 @@ body::before {
 .hero-resources,
 .homework-header,
 .info-block,
-.welcome-strip {
-  background: rgba(79, 98, 122, 0.75);
+.welcome-strip,
+.section-header {
+  background: var(--block-bg);
   backdrop-filter: blur(4px);
   border-radius: 32px;
   padding: 24px 28px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--block-border);
   animation: fadeUp 0.6s ease;
 }
 
@@ -580,19 +596,26 @@ body::before {
   color: var(--text-secondary);
 }
 
-/* ===== КАРТОЧКИ (преподаватели, экзамены, ресурсы, домашка, опросы) ===== */
-.teachers-grid {
+/* ===== КАРТОЧКИ ===== */
+.teachers-grid,
+.exams-grid,
+.resources-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 28px;
   margin-top: 20px;
 }
+
+.teachers-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.exams-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.resources-grid { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
 
 .teacher-card,
 .exam-card,
 .resource-card,
 .task-card,
-.poll-card {
+.poll-card,
+.event-card,
+.test-card {
   background: var(--card-bg);
   color: var(--text-color);
   border-radius: 28px;
@@ -604,7 +627,10 @@ body::before {
 .teacher-card:hover,
 .exam-card:hover,
 .resource-card:hover,
-.task-card:hover {
+.task-card:hover,
+.poll-card:hover,
+.event-card:hover,
+.test-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 24px 36px rgba(0, 0, 0, 0.2);
 }
@@ -656,12 +682,6 @@ body::before {
 }
 
 /* Экзамены */
-.exams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 28px;
-}
-
 .exam-card {
   position: relative;
 }
@@ -676,13 +696,78 @@ body::before {
   background: linear-gradient(90deg, var(--accent), #ffd200);
 }
 
-/* Ресурсы */
-.resources-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 24px;
+.exam-card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px 0;
 }
 
+.exam-card .exam-icon {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.exam-card .exam-title h3 {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.exam-card .exam-type {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.exam-card .card-details {
+  padding: 12px 22px;
+}
+
+.exam-card .detail-row {
+  display: flex;
+  gap: 8px;
+  font-size: 0.9rem;
+  margin: 6px 0;
+}
+
+.exam-card .exam-resources {
+  padding: 12px 22px;
+  border-top: 1px solid var(--border-color);
+}
+
+.exam-card .resource-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.exam-card .res-link {
+  background: var(--bg-hover);
+  padding: 4px 12px;
+  border-radius: 40px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: 0.3s;
+}
+
+.exam-card .res-link:hover {
+  background: var(--bg-active);
+  color: var(--text-color);
+}
+
+.exam-card .card-footer-note {
+  padding: 12px 22px 20px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.exam-card .card-footer-note a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Ресурсы */
 .resource-card {
   padding: 20px;
   display: flex;
@@ -690,8 +775,34 @@ body::before {
   cursor: pointer;
 }
 
-.resource-card:hover {
-  transform: translateY(-6px) scale(1.02);
+.resource-card .card-icon {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.resource-card .card-content h3 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.resource-card .card-content p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.resource-card .card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.resource-card .card-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
 }
 
 /* Домашка */
@@ -703,12 +814,157 @@ body::before {
   gap: 20px;
 }
 
-/* Опросы */
-.poll-card {
+.task-card .task-content {
+  flex: 1;
+}
+
+.task-card .task-desc {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.task-card .task-links,
+.task-card .task-tags {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.task-card .task-links a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+.task-card .task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.task-card .task-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.task-card .task-actions button:hover {
+  color: var(--text-color);
+}
+
+/* Опросы и мероприятия (extracurricular) */
+.poll-card,
+.event-card,
+.test-card {
   padding: 20px 24px;
 }
 
-/* ===== РАСПИСАНИЕ – НОВЫЙ КРАСИВЫЙ ДИЗАЙН ===== */
+.poll-card .poll-header,
+.event-card .card-header-event,
+.test-card .test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.poll-card .poll-header h3,
+.event-card h3,
+.test-card .test-header h3 {
+  font-size: 1.1rem;
+}
+
+.poll-card .poll-option {
+  margin: 8px 0;
+}
+
+.poll-card .option-bar {
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.poll-card .bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.poll-card .vote-btn {
+  background: var(--accent);
+  border: none;
+  padding: 4px 16px;
+  border-radius: 40px;
+  color: var(--badge-color, #fff);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.event-card .event-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.event-card .event-actions button,
+.test-card .test-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.event-card .event-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+/* Пустые состояния */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--empty-color);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination .page {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 40px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.pagination .page.active {
+  background: var(--pagination-active-bg);
+  color: var(--pagination-active-color);
+}
+
+.pagination .page:hover:not(.active) {
+  background: var(--bg-active);
+}
+
+/* ===== РАСПИСАНИЕ ===== */
 .schedule-section {
   padding: 28px 32px;
 }
@@ -1028,7 +1284,53 @@ body::before {
 }
 .remove-link-btn:hover { background: #c0392b; }
 
-/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ В МОДАЛКЕ (из theme.js) ===== */
+/* Стили для редактора вопросов (тесты) */
+.question-editor {
+  background: var(--bg-hover);
+  border-radius: 20px;
+  padding: 16px;
+  margin-top: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.question-editor .question-text input {
+  width: 100%;
+}
+
+.question-editor .question-options {
+  margin: 8px 0;
+}
+
+.question-editor .opt-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.question-editor .opt-row input {
+  flex: 1;
+}
+
+.question-editor .correct-badge {
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+
+.question-editor .q-correct {
+  margin: 8px 0;
+}
+
+.question-editor .remove-question-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 4px 14px;
+  border-radius: 40px;
+  cursor: pointer;
+}
+
+/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ В МОДАЛКЕ ===== */
 .theme-option {
   display: flex;
   align-items: center;
@@ -1067,7 +1369,6 @@ body::before {
 .theme-option.active .theme-preview {
   border-color: var(--accent);
 }
-/* Цвета для превью каждой темы (задаются в theme.js) */
 
 /* ===== АНИМАЦИИ ===== */
 @keyframes slideDown {
@@ -1117,6 +1418,16 @@ body::before {
     justify-content: space-between;
   }
   .cell-content .edit-icon {
-    opacity: 0.5; /* всегда видно на мобильных */
+    opacity: 0.5;
+  }
+  .modal-content {
+    padding: 20px;
+  }
+  .exam-card .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .resource-card {
+    flex-direction: column;
   }
 }
