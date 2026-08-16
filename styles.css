@@ -1633,27 +1633,85 @@ body::after {
   border-color: var(--input-focus);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
-/* ===== ИСПРАВЛЕНИЕ НАЛОЖЕНИЯ БЛОКОВ НА МОБИЛЬНЫХ ===== */
+/* ============================================================
+   ПОЛНОСТЬЮ ПЕРЕРАБОТАННЫЙ ФОН И БЛОКИ (ФИКС НАЛОЖЕНИЯ)
+   ============================================================ */
+
+/* 1. Фоновое изображение — только на самом body, без псевдоэлементов */
+body {
+  background: var(--primary-bg) !important;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* 2. Создаём единый контейнер для фона поверх body */
+.bg-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background: var(--bg-image) center/cover no-repeat;
+  filter: blur(12px) brightness(0.8);
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+/* 3. Оверлей поверх фона */
+.bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: var(--bg-overlay);
+  pointer-events: none;
+}
+
+/* 4. Все блоки в .main-content — теперь полностью непрозрачные и не накладываются */
 .main-content {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  /* Убеждаемся, что все дочерние блоки не накладываются */
+  position: relative;
+  z-index: 1;
 }
 
 .main-content > * {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  /* Явно задаём фон, чтобы перекрытие не создавало прозрачности */
-  background: var(--block-bg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  /* Для старых браузеров добавляем запасной цвет */
-  background-color: rgba(45, 45, 68, 0.85);
+  width: 100%;
+  background: var(--block-bg-solid, rgba(45, 45, 68, 0.95));
+  border-radius: 32px;
+  padding: 24px 28px;
+  border: 1px solid var(--block-border, rgba(255, 215, 150, 0.15));
+  box-shadow: var(--shadow, 0 8px 20px rgba(0, 0, 0, 0.4));
+  /* Убираем backdrop-filter полностью — он мешает на мобильных */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
+  margin: 0;
 }
 
-/* Также для элементов, у которых может не быть фона */
+/* 5. Для каждой темы — сплошной цвет фона для блоков */
+/* Тёмные темы */
+:root .main-content > * { background: rgba(45, 45, 68, 0.95); }
+.theme-dark-blue .main-content > * { background: rgba(15, 26, 43, 0.95); }
+.theme-dark-green .main-content > * { background: rgba(10, 31, 18, 0.95); }
+.theme-dark-purple .main-content > * { background: rgba(26, 15, 42, 0.95); }
+.theme-dark-red .main-content > * { background: rgba(42, 15, 15, 0.95); }
+
+/* Светлые темы */
+.theme-light-gold .main-content > * { background: rgba(253, 248, 240, 0.95); }
+.theme-light-blue .main-content > * { background: rgba(240, 248, 255, 0.95); }
+.theme-light-green .main-content > * { background: rgba(240, 250, 245, 0.95); }
+.theme-light-purple .main-content > * { background: rgba(248, 240, 255, 0.95); }
+.theme-light-red .main-content > * { background: rgba(253, 245, 245, 0.95); }
+
+/* 6. Отдельные секции — тоже сплошной фон */
 .teachers-section,
 .schedule-section,
 .exams-hero,
@@ -1666,124 +1724,51 @@ body::after {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  background: var(--block-bg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  background-color: rgba(45, 45, 68, 0.85);
+  background: var(--block-bg-solid, rgba(45, 45, 68, 0.95));
+  border-radius: 32px;
+  padding: 24px 28px;
+  border: 1px solid var(--block-border, rgba(255, 215, 150, 0.15));
+  box-shadow: var(--shadow, 0 8px 20px rgba(0, 0, 0, 0.4));
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
 }
 
-/* Для тёмных тем отдельно уточняем фон */
-.theme-dark-blue .teachers-section,
-.theme-dark-blue .schedule-section,
-.theme-dark-blue .exams-hero,
-.theme-dark-blue .hero-resources,
-.theme-dark-blue .homework-header,
-.theme-dark-blue .info-block,
-.theme-dark-blue .welcome-strip,
-.theme-dark-blue .section-header,
-.theme-dark-blue .timers-block {
-  background-color: rgba(26, 45, 66, 0.85);
+/* 7. Карточки внутри блоков — всегда непрозрачные */
+.teacher-card,
+.exam-card,
+.resource-card,
+.task-card,
+.poll-card,
+.event-card,
+.test-card {
+  background: var(--card-bg, #2a2a40) !important;
+  color: var(--text-color, #f0e6d3) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-.theme-dark-green .teachers-section,
-.theme-dark-green .schedule-section,
-.theme-dark-green .exams-hero,
-.theme-dark-green .hero-resources,
-.theme-dark-green .homework-header,
-.theme-dark-green .info-block,
-.theme-dark-green .welcome-strip,
-.theme-dark-green .section-header,
-.theme-dark-green .timers-block {
-  background-color: rgba(20, 48, 34, 0.85);
+/* 8. Специально для экзаменов, чтобы полоска сверху была видна */
+.exam-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, var(--accent, #ffb347), #ffd200);
+  border-radius: 28px 28px 0 0;
+  z-index: 2;
 }
 
-.theme-dark-purple .teachers-section,
-.theme-dark-purple .schedule-section,
-.theme-dark-purple .exams-hero,
-.theme-dark-purple .hero-resources,
-.theme-dark-purple .homework-header,
-.theme-dark-purple .info-block,
-.theme-dark-purple .welcome-strip,
-.theme-dark-purple .section-header,
-.theme-dark-purple .timers-block {
-  background-color: rgba(42, 26, 64, 0.85);
+/* 9. Фотографии преподавателей */
+.teacher-card .card-photo {
+  background: var(--sidebar-bg, #25253a) !important;
 }
 
-.theme-dark-red .teachers-section,
-.theme-dark-red .schedule-section,
-.theme-dark-red .exams-hero,
-.theme-dark-red .hero-resources,
-.theme-dark-red .homework-header,
-.theme-dark-red .info-block,
-.theme-dark-red .welcome-strip,
-.theme-dark-red .section-header,
-.theme-dark-red .timers-block {
-  background-color: rgba(64, 26, 26, 0.85);
-}
-
-/* Светлые темы */
-.theme-light-gold .teachers-section,
-.theme-light-gold .schedule-section,
-.theme-light-gold .exams-hero,
-.theme-light-gold .hero-resources,
-.theme-light-gold .homework-header,
-.theme-light-gold .info-block,
-.theme-light-gold .welcome-strip,
-.theme-light-gold .section-header,
-.theme-light-gold .timers-block {
-  background-color: rgba(240, 232, 216, 0.85);
-}
-
-.theme-light-blue .teachers-section,
-.theme-light-blue .schedule-section,
-.theme-light-blue .exams-hero,
-.theme-light-blue .hero-resources,
-.theme-light-blue .homework-header,
-.theme-light-blue .info-block,
-.theme-light-blue .welcome-strip,
-.theme-light-blue .section-header,
-.theme-light-blue .timers-block {
-  background-color: rgba(220, 232, 245, 0.85);
-}
-
-.theme-light-green .teachers-section,
-.theme-light-green .schedule-section,
-.theme-light-green .exams-hero,
-.theme-light-green .hero-resources,
-.theme-light-green .homework-header,
-.theme-light-green .info-block,
-.theme-light-green .welcome-strip,
-.theme-light-green .section-header,
-.theme-light-green .timers-block {
-  background-color: rgba(220, 238, 224, 0.85);
-}
-
-.theme-light-purple .teachers-section,
-.theme-light-purple .schedule-section,
-.theme-light-purple .exams-hero,
-.theme-light-purple .hero-resources,
-.theme-light-purple .homework-header,
-.theme-light-purple .info-block,
-.theme-light-purple .welcome-strip,
-.theme-light-purple .section-header,
-.theme-light-purple .timers-block {
-  background-color: rgba(232, 224, 245, 0.85);
-}
-
-.theme-light-red .teachers-section,
-.theme-light-red .schedule-section,
-.theme-light-red .exams-hero,
-.theme-light-red .hero-resources,
-.theme-light-red .homework-header,
-.theme-light-red .info-block,
-.theme-light-red .welcome-strip,
-.theme-light-red .section-header,
-.theme-light-red .timers-block {
-  background-color: rgba(245, 224, 224, 0.85);
-}
-
-/* Дополнительно для мобильных: убираем backdrop-filter, если он мешает */
-@media (max-width: 650px) {
+/* 10. Для мобильных — убираем всё лишнее и делаем отступы минимальными */
+@media (max-width: 850px) {
+  .main-content > *,
   .teachers-section,
   .schedule-section,
   .exams-hero,
@@ -1793,59 +1778,27 @@ body::after {
   .welcome-strip,
   .section-header,
   .timers-block {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    padding: 16px 18px;
+    border-radius: 24px;
   }
-}
-/* ===== ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ НАЛОЖЕНИЯ БЛОКОВ ===== */
-.main-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  /* Убеждаемся, что блоки не сжимаются и не перекрываются */
-}
-
-.main-content > * {
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-  width: 100%;
-  /* Фон с хорошей непрозрачностью */
-  background: var(--block-bg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  background-color: rgba(45, 45, 68, 0.85);
-  /* Добавляем отступы, чтобы блоки не слипались */
-  margin-bottom: 0; /* уже есть gap */
-  /* Избегаем трансформаций, которые могут нарушить позиционирование */
-  transform: none !important;
-}
-
-/* Для мобильных отключаем блюр, чтобы не тормозил */
-@media (max-width: 850px) {
-  .main-content > * {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background-color: rgba(45, 45, 68, 0.92);
+  
+  .exams-grid,
+  .teachers-grid,
+  .resources-grid {
+    gap: 16px;
+  }
+  
+  .exam-card,
+  .teacher-card,
+  .resource-card,
+  .task-card,
+  .poll-card,
+  .event-card,
+  .test-card {
+    border-radius: 20px;
   }
 }
 
-/* Дополнительно: для каждой темы свой цвет фона */
-.theme-dark-blue .main-content > * { background-color: rgba(26, 45, 66, 0.92); }
-.theme-dark-green .main-content > * { background-color: rgba(20, 48, 34, 0.92); }
-.theme-dark-purple .main-content > * { background-color: rgba(42, 26, 64, 0.92); }
-.theme-dark-red .main-content > * { background-color: rgba(64, 26, 26, 0.92); }
-.theme-light-gold .main-content > * { background-color: rgba(240, 232, 216, 0.92); }
-.theme-light-blue .main-content > * { background-color: rgba(220, 232, 245, 0.92); }
-.theme-light-green .main-content > * { background-color: rgba(220, 238, 224, 0.92); }
-.theme-light-purple .main-content > * { background-color: rgba(232, 224, 245, 0.92); }
-.theme-light-red .main-content > * { background-color: rgba(245, 224, 224, 0.92); }
-
-/* Для экзаменов и других специфических блоков — наследуют */
-.exam-card, .teacher-card, .resource-card, .task-card, .poll-card, .event-card, .test-card {
-  background: var(--card-bg) !important;
-  color: var(--text-color) !important;
-}
 
 /* Если используются карточки с прозрачностью, делаем их непрозрачными */
 .teacher-card .card-photo {
