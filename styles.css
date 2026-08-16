@@ -935,3 +935,112 @@ body::before {
 .theme-option[data-theme="dark-green"] .theme-preview { border-color: #4caf50; }
 .theme-option[data-theme="dark-purple"] .theme-preview { border-color: #ab47bc; }
 .theme-option[data-theme="light"] .theme-preview { border-color: #f0a500; background: #ffffff; }
+
+/* ===== ФИКС: фоновая картинка всегда ===== */
+body::before {
+  background: var(--bg-overlay), url("data/1.jpg") center/cover no-repeat !important;
+}
+
+/* ===== КРАСИВАЯ ТАБЛИЦА РАСПИСАНИЯ ===== */
+.schedule-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  background: var(--card-bg);
+}
+
+.schedule-table th {
+  background: var(--table-header-bg, #3a4d66);
+  color: var(--table-header-color, #faf0ca);
+  padding: 14px 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.schedule-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border-color, rgba(255,215,150,0.2));
+  vertical-align: middle;
+  background: var(--card-bg, #fef9ef);
+}
+
+.schedule-table td:first-child {
+  font-weight: 600;
+  color: var(--text-secondary, #e2c9c3);
+  background: var(--bg-hover, rgba(255,255,255,0.05));
+  width: 160px;
+}
+
+.schedule-cell {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.schedule-cell:hover {
+  background: var(--table-row-hover, rgba(255,255,255,0.08));
+}
+
+.cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.cell-content .subject {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.cell-content .end-date {
+  font-size: 0.75rem;
+  color: var(--text-muted, #b0a0a0);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cell-content .edit-icon {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.schedule-cell:hover .edit-icon {
+  opacity: 1;
+}
+
+.break-row td {
+  background: var(--table-header-bg, #3a4d66);
+  color: var(--table-header-color, #faf0ca);
+  text-align: center;
+  font-size: 0.8rem;
+  padding: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* Стили для кнопок и полей в модалках – чтобы подхватывали тему */
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  background: var(--input-bg, rgba(255,255,255,0.1));
+  border: 1px solid var(--input-border, var(--border-color));
+  color: var(--text-color);
+  border-radius: 40px;
+  padding: 10px 14px;
+  width: 100%;
+  font-family: inherit;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: var(--input-focus, var(--accent));
+  box-shadow: 0 0 0 3px var(--accent-glow, rgba(255,179,71,0.3));
+  outline: none;
+}
