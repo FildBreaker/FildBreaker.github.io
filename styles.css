@@ -1537,3 +1537,99 @@ body::after {
     flex-direction: column;
   }
 }
+/* ===== ТАЙМЕРЫ НА ГЛАВНОЙ ===== */
+.timers-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 650px) {
+  .timers-block {
+    grid-template-columns: 1fr;
+  }
+}
+
+.timer-card {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 28px;
+  padding: 24px 28px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.timer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+}
+
+.timer-icon {
+  font-size: 2.5rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.timer-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timer-content h3 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+}
+
+.timer-display {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color);
+}
+
+.timer-settings-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px 8px;
+  transition: color 0.2s, transform 0.2s;
+  float: right;
+  margin-top: -4px;
+}
+
+.timer-settings-btn:hover {
+  color: var(--accent);
+  transform: rotate(60deg);
+}
+
+/* В модалке настройки таймеров */
+#timerSettingsForm label {
+  display: block;
+  margin-top: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+#timerSettingsForm input[type="datetime-local"] {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 6px;
+  border-radius: 40px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border 0.2s;
+}
+#timerSettingsForm input[type="datetime-local"]:focus {
+  outline: none;
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
