@@ -1,7 +1,6 @@
 /* ============================================================
-   ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+   ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (ТЁМНАЯ ЗОЛОТАЯ ПО УМОЛЧАНИЮ)
    ============================================================ */
-
 :root {
   --bg-image: url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80");
   --bg-overlay: rgba(0, 0, 0, 0.35);
@@ -61,10 +60,6 @@
   --border-color: rgba(74, 140, 255, 0.15);
   --accent: #4a8cff;
   --accent-glow: rgba(74, 140, 255, 0.15);
-  --bg-hover: rgba(255, 255, 255, 0.04);
-  --bg-active: rgba(74, 140, 255, 0.08);
-  --input-bg: rgba(255, 255, 255, 0.06);
-  --input-border: rgba(74, 140, 255, 0.15);
   --btn-primary: #2a6a9a;
   --btn-primary-hover: #1f5a8a;
   --btn-secondary: rgba(58, 74, 90, 0.7);
@@ -97,10 +92,6 @@
   --border-color: rgba(40, 167, 69, 0.15);
   --accent: #4caf50;
   --accent-glow: rgba(76, 175, 80, 0.15);
-  --bg-hover: rgba(255, 255, 255, 0.04);
-  --bg-active: rgba(76, 175, 80, 0.08);
-  --input-bg: rgba(255, 255, 255, 0.06);
-  --input-border: rgba(40, 167, 69, 0.15);
   --btn-primary: #2a7a3a;
   --btn-primary-hover: #1f6a32;
   --btn-secondary: rgba(42, 74, 58, 0.7);
@@ -133,10 +124,6 @@
   --border-color: rgba(171, 71, 188, 0.15);
   --accent: #ab47bc;
   --accent-glow: rgba(171, 71, 188, 0.15);
-  --bg-hover: rgba(255, 255, 255, 0.04);
-  --bg-active: rgba(171, 71, 188, 0.08);
-  --input-bg: rgba(255, 255, 255, 0.06);
-  --input-border: rgba(171, 71, 188, 0.15);
   --btn-primary: #6a2a8a;
   --btn-primary-hover: #5a1f7a;
   --btn-secondary: rgba(58, 42, 74, 0.7);
@@ -169,10 +156,6 @@
   --border-color: rgba(231, 76, 60, 0.15);
   --accent: #e74c3c;
   --accent-glow: rgba(231, 76, 60, 0.15);
-  --bg-hover: rgba(255, 255, 255, 0.04);
-  --bg-active: rgba(231, 76, 60, 0.08);
-  --input-bg: rgba(255, 255, 255, 0.06);
-  --input-border: rgba(231, 76, 60, 0.15);
   --btn-primary: #8a2a2a;
   --btn-primary-hover: #7a1f1f;
   --btn-secondary: rgba(74, 42, 42, 0.7);
@@ -207,11 +190,6 @@
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   --accent: #b8860b;
   --accent-glow: rgba(184, 134, 11, 0.12);
-  --bg-hover: rgba(0, 0, 0, 0.02);
-  --bg-active: rgba(184, 134, 11, 0.06);
-  --input-bg: rgba(0, 0, 0, 0.03);
-  --input-border: rgba(184, 134, 11, 0.15);
-  --input-focus: #b8860b;
   --btn-primary: #b8860b;
   --btn-primary-hover: #a0750a;
   --btn-secondary: rgba(212, 196, 176, 0.7);
@@ -247,11 +225,6 @@
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   --accent: #1a6b8a;
   --accent-glow: rgba(26, 107, 138, 0.12);
-  --bg-hover: rgba(0, 0, 0, 0.02);
-  --bg-active: rgba(26, 107, 138, 0.06);
-  --input-bg: rgba(0, 0, 0, 0.03);
-  --input-border: rgba(26, 107, 138, 0.15);
-  --input-focus: #1a6b8a;
   --btn-primary: #1a6b8a;
   --btn-primary-hover: #155a75;
   --btn-secondary: rgba(176, 200, 224, 0.7);
@@ -287,11 +260,6 @@
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   --accent: #1a7a3a;
   --accent-glow: rgba(26, 122, 58, 0.12);
-  --bg-hover: rgba(0, 0, 0, 0.02);
-  --bg-active: rgba(26, 122, 58, 0.06);
-  --input-bg: rgba(0, 0, 0, 0.03);
-  --input-border: rgba(26, 122, 58, 0.15);
-  --input-focus: #1a7a3a;
   --btn-primary: #1a7a3a;
   --btn-primary-hover: #156a32;
   --btn-secondary: rgba(176, 212, 184, 0.7);
@@ -327,11 +295,6 @@
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   --accent: #6a1a8a;
   --accent-glow: rgba(106, 26, 138, 0.12);
-  --bg-hover: rgba(0, 0, 0, 0.02);
-  --bg-active: rgba(106, 26, 138, 0.06);
-  --input-bg: rgba(0, 0, 0, 0.03);
-  --input-border: rgba(106, 26, 138, 0.15);
-  --input-focus: #6a1a8a;
   --btn-primary: #6a1a8a;
   --btn-primary-hover: #5a1578;
   --btn-secondary: rgba(200, 184, 216, 0.7);
@@ -367,11 +330,6 @@
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   --accent: #8a1a1a;
   --accent-glow: rgba(138, 26, 26, 0.12);
-  --bg-hover: rgba(0, 0, 0, 0.02);
-  --bg-active: rgba(138, 26, 26, 0.06);
-  --input-bg: rgba(0, 0, 0, 0.03);
-  --input-border: rgba(138, 26, 26, 0.15);
-  --input-focus: #8a1a1a;
   --btn-primary: #8a1a1a;
   --btn-primary-hover: #751515;
   --btn-secondary: rgba(216, 184, 184, 0.7);
@@ -414,7 +372,9 @@ body {
   position: relative;
 }
 
-/* Фоновое изображение */
+/* ============================================================
+   ФОНОВЫЕ СЛОИ (гарантированно работают)
+   ============================================================ */
 .bg-layer {
   position: fixed;
   top: 0;
@@ -426,9 +386,9 @@ body {
   filter: blur(14px) brightness(0.7);
   transform: scale(1.05);
   pointer-events: none;
+  will-change: transform;
 }
 
-/* Оверлей поверх фона */
 .bg-overlay {
   position: fixed;
   top: 0;
@@ -440,6 +400,9 @@ body {
   pointer-events: none;
 }
 
+/* ============================================================
+   СЕТКА
+   ============================================================ */
 .app-grid {
   position: relative;
   z-index: 0;
@@ -464,7 +427,9 @@ body {
   }
 }
 
-/* ===== ШАПКА ===== */
+/* ============================================================
+   ШАПКА
+   ============================================================ */
 .site-header {
   grid-area: header;
   background: var(--header-bg);
@@ -477,8 +442,8 @@ body {
   align-items: center;
   justify-content: space-between;
   box-shadow: var(--shadow);
-  animation: slideDown 0.6s ease;
   border: 1px solid var(--border-color);
+  animation: slideDown 0.6s ease;
 }
 
 .logo h1 {
@@ -519,7 +484,9 @@ body {
   transform: translateY(-2px);
 }
 
-/* ===== САЙДБАР (СТАТИЧНЫЙ) ===== */
+/* ============================================================
+   САЙДБАР (СТАТИЧНЫЙ)
+   ============================================================ */
 .sidebar {
   grid-area: sidebar;
   background: var(--sidebar-bg);
@@ -531,7 +498,7 @@ body {
   height: fit-content;
   border: 1px solid var(--border-color);
   animation: fadeIn 0.8s ease;
-  /* Убираем sticky — теперь статичный */
+  /* статичный — без sticky */
 }
 
 .sidebar h3 {
@@ -645,7 +612,9 @@ body {
   transform: translateX(4px);
 }
 
-/* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+/* ============================================================
+   ОСНОВНОЙ КОНТЕНТ
+   ============================================================ */
 .main-content {
   grid-area: main;
   display: flex;
@@ -655,7 +624,6 @@ body {
   z-index: 1;
 }
 
-/* Все блоки с прозрачным фоном и стеклянным эффектом */
 .teachers-section,
 .schedule-section,
 .exams-hero,
@@ -671,10 +639,10 @@ body {
   border-radius: 32px;
   padding: 24px 28px;
   border: 1px solid var(--block-border);
+  box-shadow: var(--shadow);
   animation: fadeUp 0.6s ease;
   position: relative;
   z-index: 1;
-  box-shadow: var(--shadow);
 }
 
 .welcome-strip {
@@ -704,7 +672,9 @@ body {
   color: var(--text-secondary);
 }
 
-/* ===== КАРТОЧКИ ===== */
+/* ============================================================
+   КАРТОЧКИ
+   ============================================================ */
 .teachers-grid,
 .exams-grid,
 .resources-grid {
@@ -746,7 +716,6 @@ body {
   box-shadow: 0 24px 36px rgba(0, 0, 0, 0.3);
 }
 
-/* Преподаватели */
 .teacher-card .card-photo {
   background: var(--sidebar-bg);
   padding: 20px 0 16px;
@@ -792,7 +761,6 @@ body {
   margin: 6px 0;
 }
 
-/* Экзамены */
 .exam-card {
   position: relative;
 }
@@ -880,7 +848,6 @@ body {
   text-decoration: none;
 }
 
-/* Ресурсы */
 .resource-card {
   padding: 20px;
   display: flex;
@@ -918,7 +885,6 @@ body {
   font-weight: 500;
 }
 
-/* Домашка */
 .task-card {
   padding: 20px 24px;
   display: flex;
@@ -955,19 +921,30 @@ body {
 }
 
 .task-card .task-actions button {
-  background: none;
-  border: none;
-  color: var(--text-muted);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  padding: 6px 14px;
+  border-radius: 40px;
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 1rem;
-  transition: 0.2s;
+  transition: 0.3s;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .task-card .task-actions button:hover {
+  background: var(--bg-active);
   color: var(--text-color);
+  border-color: var(--accent);
 }
 
-/* Опросы и мероприятия */
+.task-card .task-actions .edit-task { color: var(--accent); }
+.task-card .task-actions .edit-task:hover { background: rgba(255, 179, 71, 0.15); }
+.task-card .task-actions .delete-task { color: #e74c3c; }
+.task-card .task-actions .delete-task:hover { background: rgba(231, 76, 60, 0.15); }
+
 .poll-card,
 .event-card,
 .test-card {
@@ -1037,7 +1014,9 @@ body {
   font-size: 0.9rem;
 }
 
-/* Пустые состояния */
+/* ============================================================
+   ПУСТЫЕ СОСТОЯНИЯ И ПАГИНАЦИЯ
+   ============================================================ */
 .empty-state {
   text-align: center;
   padding: 40px 20px;
@@ -1050,7 +1029,6 @@ body {
   display: block;
 }
 
-/* Пагинация */
 .pagination {
   display: flex;
   gap: 8px;
@@ -1077,7 +1055,9 @@ body {
   background: var(--bg-active);
 }
 
-/* ===== РАСПИСАНИЕ ===== */
+/* ============================================================
+   РАСПИСАНИЕ (С ГОРИЗОНТАЛЬНОЙ ПРОКРУТКОЙ)
+   ============================================================ */
 .schedule-section {
   padding: 28px 32px;
 }
@@ -1140,22 +1120,28 @@ body {
   100% { transform: rotate(360deg); }
 }
 
+/* Обёртка таблицы с прокруткой */
 .table-wrapper {
-  overflow-x: auto;
+  overflow-x: auto;            /* Горизонтальная прокрутка */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
   border-radius: 24px;
   box-shadow: var(--shadow);
   background: var(--table-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--table-border);
+  width: 100%;
+  max-width: 100%;
 }
 
+/* Сама таблица */
 .schedule-table {
   width: 100%;
+  min-width: 700px; /* > ширины экрана на мобильных -> появится прокрутка */
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.9rem;
-  min-width: 700px;
   background: transparent;
 }
 
@@ -1253,7 +1239,9 @@ body {
   border-bottom: 1px solid var(--table-border);
 }
 
-/* ===== ТАЙМЕРЫ НА ГЛАВНОЙ ===== */
+/* ============================================================
+   ТАЙМЕРЫ
+   ============================================================ */
 .timers-block {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1329,7 +1317,125 @@ body {
   transform: rotate(60deg);
 }
 
-/* ===== ФУТЕР ===== */
+/* ============================================================
+   ДОМАШНЕЕ ЗАДАНИЕ (ДОПОЛНИТЕЛЬНЫЕ КНОПКИ)
+   ============================================================ */
+.add-task-btn {
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.add-task-btn:hover {
+  background: var(--btn-primary-hover);
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.add-task-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.add-subject-btn {
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
+  border: none;
+  padding: 12px 16px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.add-subject-btn:hover {
+  background: var(--btn-primary-hover);
+  transform: scale(1.02);
+}
+
+.subject-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 40px;
+  background: var(--bg-hover);
+  border: 1px solid transparent;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.subject-item:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+}
+
+.subject-item.active {
+  background: var(--bg-active);
+  border-color: var(--accent);
+}
+
+.subject-item .subject-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: 0.3s;
+}
+
+.subject-item.active .subject-name {
+  color: var(--text-color);
+}
+
+.subject-item .subject-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.subject-item .subject-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: 0.3s;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.subject-item .subject-actions button:hover {
+  color: var(--text-color);
+  background: var(--bg-hover);
+}
+
+.subject-item .subject-actions .edit-subject:hover {
+  color: var(--accent);
+}
+
+.subject-item .subject-actions .delete-subject:hover {
+  color: #e74c3c;
+}
+
+/* ============================================================
+   ФУТЕР
+   ============================================================ */
 .site-footer {
   grid-area: footer;
   background: var(--header-bg);
@@ -1344,7 +1450,9 @@ body {
   border: 1px solid var(--border-color);
 }
 
-/* ===== МОДАЛЬНЫЕ ОКНА ===== */
+/* ============================================================
+   МОДАЛЬНЫЕ ОКНА
+   ============================================================ */
 .modal {
   display: none;
   position: fixed;
@@ -1499,34 +1607,20 @@ body {
   border: 1px solid var(--border-color);
 }
 
-.question-editor .question-text input {
-  width: 100%;
-}
-
-.question-editor .question-options {
-  margin: 8px 0;
-}
-
+.question-editor .question-text input { width: 100%; }
+.question-editor .question-options { margin: 8px 0; }
 .question-editor .opt-row {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 4px 0;
 }
-
-.question-editor .opt-row input {
-  flex: 1;
-}
-
+.question-editor .opt-row input { flex: 1; }
 .question-editor .correct-badge {
   font-size: 0.75rem;
   color: var(--accent);
 }
-
-.question-editor .q-correct {
-  margin: 8px 0;
-}
-
+.question-editor .q-correct { margin: 8px 0; }
 .question-editor .remove-question-btn {
   background: #e74c3c;
   color: white;
@@ -1536,7 +1630,9 @@ body {
   cursor: pointer;
 }
 
-/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ В МОДАЛКЕ ===== */
+/* ============================================================
+   КНОПКИ ТЕМ В МОДАЛКЕ
+   ============================================================ */
 .theme-option {
   display: flex;
   align-items: center;
@@ -1553,16 +1649,19 @@ body {
   width: 100%;
   text-align: left;
 }
+
 .theme-option:hover {
   border-color: var(--accent);
   background: var(--bg-active);
   transform: translateX(4px);
 }
+
 .theme-option.active {
   border-color: var(--accent);
   background: var(--bg-active);
   box-shadow: 0 0 20px var(--accent-glow);
 }
+
 .theme-preview {
   width: 28px;
   height: 28px;
@@ -1572,11 +1671,14 @@ body {
   transition: 0.3s;
   background: var(--card-bg);
 }
+
 .theme-option.active .theme-preview {
   border-color: var(--accent);
 }
 
-/* ===== АНИМАЦИИ ===== */
+/* ============================================================
+   АНИМАЦИИ
+   ============================================================ */
 @keyframes slideDown {
   from { transform: translateY(-30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
@@ -1590,30 +1692,31 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* ===== АДАПТИВ ===== */
+/* ============================================================
+   АДАПТИВ (МОБИЛЬНЫЕ)
+   ============================================================ */
 @media (max-width: 850px) {
   .app-grid {
     gap: 16px;
     padding: 12px;
   }
-  
+
   .site-header {
     padding: 12px 16px;
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
-  
+
   .nav-links {
     justify-content: center;
     gap: 10px;
   }
-  
   .nav-links a {
     font-size: 0.85rem;
     padding: 4px 8px;
   }
-  
+
   .teachers-section,
   .schedule-section,
   .exams-hero,
@@ -1626,56 +1729,78 @@ body {
     padding: 16px 18px;
     border-radius: 24px;
   }
-  
+
   .teachers-grid,
   .exams-grid,
   .resources-grid {
     gap: 16px;
   }
-  
+
   .exam-card .card-header {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .resource-card {
     flex-direction: column;
   }
-  
+
   .schedule-header {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .schedule-actions {
     justify-content: space-between;
   }
-  
+
   .cell-content .edit-icon {
     opacity: 0.5;
   }
-  
+
   .modal-content {
     padding: 20px;
   }
-  
+
   .welcome-strip {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .strip-image img {
     width: 100%;
     height: auto;
     max-height: 180px;
   }
-  
+
   .logo h1 {
     font-size: 1.3rem;
   }
-  
+
   .sidebar {
     padding: 16px 14px;
+  }
+
+  /* ФОН НА МОБИЛЬНЫХ — УБИРАЕМ BLUR И ДЕЛАЕМ ПРОЗРАЧНЕЕ */
+  .bg-layer {
+    filter: none !important;
+    transform: none !important;
+    background-attachment: scroll !important;
+    opacity: 0.5 !important;
+  }
+
+  .bg-overlay {
+    opacity: 0.9 !important;
+  }
+
+  /* Обеспечиваем горизонтальную прокрутку таблицы */
+  .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .schedule-table {
+    min-width: 700px !important;
   }
 }
 
@@ -1684,305 +1809,27 @@ body {
     padding: 8px;
     gap: 12px;
   }
-  
+
   .timers-block {
     grid-template-columns: 1fr;
     gap: 12px;
     padding: 12px 14px;
   }
-  
+
   .timer-card {
     padding: 14px 16px;
   }
-  
+
   .timer-display {
     font-size: 0.85rem;
   }
-  
+
   .exam-card .detail-row {
     font-size: 0.8rem;
   }
-  
+
   .task-card {
     flex-direction: column;
     padding: 14px 16px;
   }
-}
-/* ============================================================
-   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ДОМАШНЕГО ЗАДАНИЯ
-   ============================================================ */
-
-/* Кнопка "Добавить задание" */
-.add-task-btn {
-  background: var(--accent);
-  color: var(--badge-color, #1e293b);
-  border: none;
-  padding: 10px 24px;
-  border-radius: 40px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  box-shadow: 0 4px 12px var(--accent-glow);
-}
-
-.add-task-btn:hover {
-  background: var(--btn-primary-hover);
-  transform: scale(1.03);
-  box-shadow: 0 6px 20px var(--accent-glow);
-}
-
-.add-task-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Кнопки в карточках заданий (редактировать / удалить) */
-.task-card .task-actions button {
-  background: var(--bg-hover);
-  border: 1px solid var(--border-color);
-  padding: 6px 14px;
-  border-radius: 40px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: 0.3s;
-  font-size: 0.85rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.task-card .task-actions button:hover {
-  background: var(--bg-active);
-  color: var(--text-color);
-  border-color: var(--accent);
-}
-
-.task-card .task-actions .edit-task {
-  color: var(--accent);
-}
-
-.task-card .task-actions .edit-task:hover {
-  background: rgba(255, 179, 71, 0.15);
-}
-
-.task-card .task-actions .delete-task {
-  color: #e74c3c;
-}
-
-.task-card .task-actions .delete-task:hover {
-  background: rgba(231, 76, 60, 0.15);
-}
-
-/* Кнопка "Добавить предмет" в сайдбаре */
-.add-subject-btn {
-  background: var(--accent);
-  color: var(--badge-color, #1e293b);
-  border: none;
-  padding: 12px 16px;
-  border-radius: 40px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  font-size: 1rem;
-}
-
-.add-subject-btn:hover {
-  background: var(--btn-primary-hover);
-  transform: scale(1.02);
-}
-
-/* Элементы списка предметов в сайдбаре */
-.subject-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 14px;
-  border-radius: 40px;
-  background: var(--bg-hover);
-  border: 1px solid transparent;
-  transition: 0.3s;
-  cursor: pointer;
-}
-
-.subject-item:hover {
-  background: var(--bg-active);
-  border-color: var(--accent);
-}
-
-.subject-item.active {
-  background: var(--bg-active);
-  border-color: var(--accent);
-}
-
-.subject-item .subject-name {
-  flex: 1;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: 0.3s;
-}
-
-.subject-item.active .subject-name {
-  color: var(--text-color);
-}
-
-.subject-item .subject-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.subject-item .subject-actions button {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: 0.3s;
-  padding: 4px 8px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-}
-
-.subject-item .subject-actions button:hover {
-  color: var(--text-color);
-  background: var(--bg-hover);
-}
-
-.subject-item .subject-actions .edit-subject:hover {
-  color: var(--accent);
-}
-
-.subject-item .subject-actions .delete-subject:hover {
-  color: #e74c3c;
-}
-
-/* ============================================================
-   ИСПРАВЛЕНИЕ ФОНОВОГО ИЗОБРАЖЕНИЯ (ГАРАНТИРОВАННО)
-   ============================================================ */
-.bg-layer {
-  background-attachment: fixed !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  filter: blur(14px) brightness(0.7);
-  transform: scale(1.05);
-  will-change: transform;
-  pointer-events: none;
-}
-
-/* Убедимся, что изображение применяется */
-.bg-layer {
-  background-image: var(--bg-image) !important;
-}
-/* ============================================================
-   АВАРИЙНОЕ ВОССТАНОВЛЕНИЕ ФОНА (РАБОТАЕТ ВСЕГДА)
-   ============================================================ */
-
-/* Убедимся, что bg-layer существует и получает картинку */
-.bg-layer {
-  background: var(--bg-image) center/cover no-repeat !important;
-  filter: blur(14px) brightness(0.7) !important;
-  transform: scale(1.05) !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: -2 !important;
-  pointer-events: none !important;
-}
-
-.bg-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: -1 !important;
-  background: var(--bg-overlay) !important;
-  pointer-events: none !important;
-}
-
-/* Запасной вариант на случай, если тема не загружена */
-body {
-  background: #1a1a2e !important;
-}
-
-/* Если по какой-то причине переменная --bg-image не подставляется,
-   используем картинку по умолчанию (замените URL на свою, если нужно) */
-.bg-layer {
-  background-image: url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80") !important;
-}
-
-/* Для каждой темы картинка подставляется через переменную, но на всякий случай дублируем */
-.theme-dark-blue .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-.theme-dark-green .bg-layer { background-image: url("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80") !important; }
-.theme-dark-purple .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-.theme-dark-red .bg-layer { background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80") !important; }
-.theme-light-gold .bg-layer { background-image: url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80") !important; }
-.theme-light-blue .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-.theme-light-green .bg-layer { background-image: url("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80") !important; }
-.theme-light-purple .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-.theme-light-red .bg-layer { background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80") !important; }
-
-/* ============================================================
-   ФИКС ФОНА ДЛЯ МОБИЛЬНЫХ (ГАРАНТИРОВАННО)
-   ============================================================ */
-
-@media (max-width: 850px) {
-  .bg-layer {
-    background-image: var(--bg-image) !important;
-    filter: none !important;
-    transform: none !important;
-    background-attachment: scroll !important;
-    background-size: cover !important;
-    background-position: center !important;
-    opacity: 0.5 !important;
-    display: block !important;
-    visibility: visible !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: -2 !important;
-    pointer-events: none !important;
-  }
-  
-  .bg-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: -1 !important;
-    background: var(--bg-overlay) !important;
-    pointer-events: none !important;
-    opacity: 0.9 !important;
-  }
-}
-
-/* Запасные картинки для каждой темы на случай, если переменная не подхватится */
-@media (max-width: 850px) {
-  .bg-layer {
-    background-image: url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80") !important;
-  }
-  .theme-dark-blue .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-  .theme-dark-green .bg-layer { background-image: url("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80") !important; }
-  .theme-dark-purple .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-  .theme-dark-red .bg-layer { background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80") !important; }
-  .theme-light-gold .bg-layer { background-image: url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80") !important; }
-  .theme-light-blue .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-  .theme-light-green .bg-layer { background-image: url("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80") !important; }
-  .theme-light-purple .bg-layer { background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80") !important; }
-  .theme-light-red .bg-layer { background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80") !important; }
 }
