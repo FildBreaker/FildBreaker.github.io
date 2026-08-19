@@ -1,4 +1,4 @@
-// app-settings.js
+// app-settings.js (без Service Worker)
 import { dataManager } from './dataManager.js';
 
 // ===== ЭКСПОРТ ДАННЫХ =====
@@ -41,15 +41,6 @@ export function importData(file) {
     }
   };
   reader.readAsText(file);
-}
-
-// ===== РЕГИСТРАЦИЯ SERVICE WORKER =====
-export function registerSW() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(() => console.log('✅ Service Worker зарегистрирован'))
-      .catch(err => console.error('❌ SW регистрация не удалась:', err));
-  }
 }
 
 // ===== ДОБАВЛЕНИЕ КНОПОК В САЙДБАР =====
@@ -102,5 +93,5 @@ export function initSidebarButtons() {
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', () => {
   initSidebarButtons();
-  registerSW();
+  // registerSW(); // <-- ОТКЛЮЧЕНО
 });
