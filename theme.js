@@ -40,17 +40,19 @@ export function applyTheme(themeName) {
     .join(' ');
   document.body.classList.add(`theme-${themeName}`);
   currentTheme = themeName;
-  // Сохраняем только локально
+  
+  // Сохраняем в localStorage (только локально)
   try {
     localStorage.setItem('b21-theme', themeName);
   } catch (e) { /* ignore */ }
+  
   if (themeModal && themeModal.style.display === 'flex') {
     renderThemeOptions();
   }
 }
 
 export async function loadTheme() {
-  // Загружаем только из localStorage
+  // Только локальное хранилище, без Firebase
   const localTheme = localStorage.getItem('b21-theme');
   if (localTheme && THEMES[localTheme]) {
     applyTheme(localTheme);
@@ -62,7 +64,8 @@ export async function loadTheme() {
 export async function saveTheme(themeName) {
   if (!THEMES[themeName]) return;
   applyTheme(themeName);
-  // Не сохраняем в Firebase, только локально
+  // Сохраняем только локально
+  // (убрана синхронизация с Firebase)
 }
 
 function createThemeModal() {
@@ -95,21 +98,23 @@ function renderThemeOptions() {
   const container = document.getElementById('themeOptions');
   if (!container) return;
   container.innerHTML = '';
-  // Группа тёмных
+
   const darkLabel = document.createElement('div');
   darkLabel.style.cssText = 'font-weight:600; margin-top:8px; color:var(--text-secondary);';
   darkLabel.textContent = '🌙 Тёмные';
   container.appendChild(darkLabel);
+
   Object.entries(THEMES).forEach(([key, label]) => {
     if (!key.startsWith('dark')) return;
     const btn = createThemeButton(key, label);
     container.appendChild(btn);
   });
-  // Группа светлых
+
   const lightLabel = document.createElement('div');
   lightLabel.style.cssText = 'font-weight:600; margin-top:12px; color:var(--text-secondary);';
   lightLabel.textContent = '☀️ Светлые';
   container.appendChild(lightLabel);
+
   Object.entries(THEMES).forEach(([key, label]) => {
     if (!key.startsWith('light')) return;
     const btn = createThemeButton(key, label);
