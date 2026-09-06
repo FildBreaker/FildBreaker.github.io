@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Расписание | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css?v=2">
@@ -29,7 +32,6 @@
       scrollbar-width: thin;
       scrollbar-color: var(--accent) var(--bg-hover);
       position: relative;
-      /* Добавим минимальную высоту для чувствительности скролла */
       min-height: 100px;
     }
     .table-wrapper::-webkit-scrollbar {
@@ -53,7 +55,6 @@
       border-spacing: 0;
       font-size: 0.9rem;
       background: transparent;
-      /* таблица будет шире экрана за счёт фиксированных колонок */
     }
 
     /* Задаём ширину колонок, чтобы таблица гарантированно была шире экрана */
