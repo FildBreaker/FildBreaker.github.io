@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Ресурсы | Б-31ЛЕС</title>
+  <title>Ресурсы | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css?v=3">
   <link rel="icon" href="data/icon.ico?v=3">
@@ -18,7 +18,7 @@
 <body>
 <div class="app-grid">
   <header class="site-header">
-    <div class="logo"><h1><i class="fas fa-folder-open"></i> Б-31ЛЕС</h1></div>
+    <div class="logo"><h1><i class="fas fa-folder-open"></i> Б-21ЛЕС</h1></div>
     <ul class="nav-links">
       <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
       <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Расписание</a></li>
@@ -37,15 +37,15 @@
       <button class="filter-btn" data-category="study"><i class="fas fa-book"></i> Учебники</button>
       <button class="filter-btn" data-category="video"><i class="fas fa-video"></i> Видео</button>
       <button class="filter-btn" data-category="test"><i class="fas fa-tasks"></i> Тесты</button>
-      <button class="filter-btn" data-category="soft"><i class="fas fa-laptop-code"></i> Прочее</button>
+      <button class="filter-btn" data-category="soft"><i class="fas fa-laptop-code"></i> ПО</button>
     </div>
-    <div class="sidebar-note"><i class="fas fa-database"></i><p>Архив нихрена в себе не содержит.</p></div>
+    <div class="sidebar-note"><i class="fas fa-database"></i><p>Архив содержит более 150+ файлов.</p></div>
   </aside>
 
   <main class="main-content">
     <div class="hero-resources">
-      <div class="hero-text"><h2><i class="fas fa-cloud-upload-alt"></i> Ресурсный центр</h2><p>Электронные книги, видео, тесты, прочее</p></div>
-      <div style="display:flex; gap:12px; align-items:center;">
+      <div class="hero-text"><h2><i class="fas fa-cloud-upload-alt"></i> Ресурсный центр</h2><p>Электронные книги, видео, тесты, ПО</p></div>
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
         <div class="hero-search"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск..."></div></div>
         <button id="addResourceBtn" class="reset-btn"><i class="fas fa-plus"></i> Добавить</button>
       </div>
@@ -55,7 +55,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>© 2026 Б-31ЛЕС · Отдельная свалка, чтобы ничего не терялось</p>
+    <p>© 2025 Б-21ЛЕС · Все данные синхронизируются в реальном времени</p>
   </footer>
 </div>
 
@@ -72,10 +72,18 @@
         <option value="study">Учебники</option>
         <option value="video">Видео</option>
         <option value="test">Тесты</option>
-        <option value="soft">Прочее</option>
+        <option value="soft">ПО</option>
       </select>
-      <label>Иконка</label>
-      <input type="text" id="resourceIcon" placeholder="fa-book-open">
+
+      <label>Иконка (выберите из предложенных или введите свой класс)</label>
+      <div class="icon-picker" id="iconPicker">
+        <!-- Предустановленные иконки (будут вставлены JS) -->
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+        <input type="text" id="resourceIcon" placeholder="fa-book-open (свой класс)" style="flex:1;">
+        <button type="button" id="clearIconBtn" class="cancel-btn" style="padding:6px 12px;">Очистить</button>
+      </div>
+
       <label>Мета-информация (например, PDF, 24 МБ)</label>
       <input type="text" id="resourceMeta" placeholder="PDF, 24 МБ">
       <label>Ссылка скачать</label>
@@ -91,9 +99,21 @@
 <script type="module">
   import { dataManager } from './dataManager.js';
 
+  // ===== СПИСОК ДОСТУПНЫХ ИКОНОК =====
+  const iconList = [
+    'fa-book', 'fa-book-open', 'fa-file-pdf', 'fa-file-alt',
+    'fa-video', 'fa-film', 'fa-youtube', 'fa-play-circle',
+    'fa-tasks', 'fa-check-circle', 'fa-question-circle', 'fa-puzzle-piece',
+    'fa-laptop-code', 'fa-desktop', 'fa-download', 'fa-cloud-download-alt',
+    'fa-link', 'fa-external-link-alt', 'fa-folder-open', 'fa-archive',
+    'fa-graduation-cap', 'fa-chalkboard-teacher', 'fa-user-graduate'
+  ];
+
+  // ===== СОСТОЯНИЕ =====
   let resources = [];
   let editResourceId = null;
 
+  // ===== ЗАГРУЗКА =====
   async function loadResources() {
     const saved = await dataManager.load('resources');
     if (saved && Array.isArray(saved)) {
@@ -113,6 +133,7 @@
     await dataManager.save('resources', resources);
   }
 
+  // ===== ОТОБРАЖЕНИЕ =====
   function renderResources() {
     const grid = document.getElementById('resourcesGrid');
     if (!resources.length) {
@@ -144,7 +165,6 @@
       card.querySelector('.delete-resource').addEventListener('click', () => deleteResource(res.id));
       grid.appendChild(card);
     });
-
     applyFilters();
   }
 
@@ -155,7 +175,7 @@
     return div.innerHTML;
   }
 
-  // --- Фильтрация ---
+  // ===== ФИЛЬТРАЦИЯ =====
   function applyFilters() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const activeCat = document.querySelector('.filter-btn.active-filter')?.dataset.category || 'all';
@@ -177,7 +197,27 @@
   });
   document.getElementById('searchInput').addEventListener('input', applyFilters);
 
-  // --- Модалка ---
+  // ===== МОДАЛКА С ВЫБОРОМ ИКОНОК =====
+  function renderIconPicker(selectedIcon) {
+    const container = document.getElementById('iconPicker');
+    container.innerHTML = '';
+    iconList.forEach(icon => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `icon-option ${selectedIcon === icon ? 'active' : ''}`;
+      btn.innerHTML = `<i class="fas ${icon}"></i>`;
+      btn.title = icon;
+      btn.addEventListener('click', () => {
+        // Убираем активный класс у всех
+        container.querySelectorAll('.icon-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('resourceIcon').value = icon;
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  // ===== ОТКРЫТИЕ / ЗАКРЫТИЕ МОДАЛКИ =====
   const modal = document.getElementById('resourceModal');
   const modalTitle = document.getElementById('resourceModalTitle');
   const form = document.getElementById('resourceForm');
@@ -190,6 +230,7 @@
 
   function openResourceModal(id = null) {
     editResourceId = id;
+    let currentIcon = '';
     if (id) {
       const res = resources.find(r => r.id === id);
       if (!res) return;
@@ -197,7 +238,8 @@
       titleInput.value = res.title || '';
       descInput.value = res.desc || '';
       catSelect.value = res.category || 'study';
-      iconInput.value = res.icon || '';
+      currentIcon = res.icon || '';
+      iconInput.value = currentIcon;
       metaInput.value = res.meta || '';
       linkInput.value = res.link || '';
     } else {
@@ -205,10 +247,12 @@
       titleInput.value = '';
       descInput.value = '';
       catSelect.value = 'study';
+      currentIcon = '';
       iconInput.value = '';
       metaInput.value = '';
       linkInput.value = '';
     }
+    renderIconPicker(currentIcon);
     modal.style.display = 'flex';
   }
 
@@ -217,6 +261,13 @@
     editResourceId = null;
   }
 
+  // Очистка выбранной иконки
+  document.getElementById('clearIconBtn').addEventListener('click', () => {
+    document.getElementById('resourceIcon').value = '';
+    renderIconPicker('');
+  });
+
+  // ===== СОХРАНЕНИЕ =====
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = titleInput.value.trim();
@@ -250,12 +301,13 @@
     renderResources();
   }
 
+  // ===== ОБРАБОТЧИКИ =====
   document.getElementById('closeResourceModal').addEventListener('click', closeResourceModal);
   document.getElementById('cancelResourceBtn').addEventListener('click', closeResourceModal);
   window.addEventListener('click', (e) => { if (e.target === modal) closeResourceModal(); });
   document.getElementById('addResourceBtn').addEventListener('click', () => openResourceModal());
 
-  // --- Кнопки сайдбара ---
+  // ===== КНОПКИ САЙДБАРА =====
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
