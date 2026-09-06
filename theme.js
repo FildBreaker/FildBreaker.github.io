@@ -1,15 +1,14 @@
-// theme.js
 import { dataManager } from './dataManager.js';
 
 export const THEMES = {
   'dark-gold':   '🌙 Тёмная золотая',
   'dark-blue':   '🌙 Тёмная синяя',
-  'dark-green':  '🌙 Тёмная зелёная',
+  'dark-green':  '🌙 Тёмная зеленая',
   'dark-purple': '🌙 Тёмная фиолетовая',
   'dark-red':    '🌙 Тёмная красная',
   'light-gold':  '☀️ Светлая золотая',
   'light-blue':  '☀️ Светлая синяя',
-  'light-green': '☀️ Светлая зелёная',
+  'light-green': '☀️ Светлая зеленая',
   'light-purple':'☀️ Светлая фиолетовая',
   'light-red':   '☀️ Светлая красная'
 };
@@ -40,32 +39,39 @@ export function applyTheme(themeName) {
     .join(' ');
   document.body.classList.add(`theme-${themeName}`);
   currentTheme = themeName;
-  
-  // Сохраняем в localStorage (только локально)
   try {
     localStorage.setItem('b21-theme', themeName);
   } catch (e) { /* ignore */ }
-  
   if (themeModal && themeModal.style.display === 'flex') {
     renderThemeOptions();
   }
 }
 
 export async function loadTheme() {
-  // Только локальное хранилище, без Firebase
   const localTheme = localStorage.getItem('b21-theme');
   if (localTheme && THEMES[localTheme]) {
     applyTheme(localTheme);
   } else {
     applyTheme('dark-gold');
   }
+  try {
+    const globalTheme = await dataManager.loadTheme();
+    if (globalTheme && THEMES[globalTheme] && globalTheme !== currentTheme) {
+      applyTheme(globalTheme);
+    }
+  } catch (e) {
+    console.warn('Не удалось загрузить тему из Firebase:', e);
+  }
 }
 
 export async function saveTheme(themeName) {
   if (!THEMES[themeName]) return;
   applyTheme(themeName);
-  // Сохраняем только локально
-  // (убрана синхронизация с Firebase)
+  try {
+    await dataManager.saveTheme(themeName);
+  } catch (e) {
+    console.warn('Не удалось сохранить тему в Firebase:', e);
+  }
 }
 
 function createThemeModal() {
@@ -82,7 +88,7 @@ function createThemeModal() {
       </h3>
       <div id="themeOptions" style="display:flex; flex-direction:column; gap:10px;"></div>
       <div style="margin-top:20px; text-align:center; font-size:0.8rem; color:var(--text-muted);">
-        Тема сохраняется только на этом устройстве
+        Тема сохраняется для всех пользователей (через Firebase)
       </div>
     </div>
   `;
@@ -98,46 +104,23 @@ function renderThemeOptions() {
   const container = document.getElementById('themeOptions');
   if (!container) return;
   container.innerHTML = '';
-
-  const darkLabel = document.createElement('div');
-  darkLabel.style.cssText = 'font-weight:600; margin-top:8px; color:var(--text-secondary);';
-  darkLabel.textContent = '🌙 Тёмные';
-  container.appendChild(darkLabel);
-
   Object.entries(THEMES).forEach(([key, label]) => {
-    if (!key.startsWith('dark')) return;
-    const btn = createThemeButton(key, label);
+    const btn = document.createElement('button');
+    btn.className = `theme-option ${currentTheme === key ? 'active' : ''}`;
+    btn.dataset.theme = key;
+    const color = themePreviewColors[key] || '#888';
+    btn.innerHTML = `
+      <span class="theme-preview" style="border-color: ${color};"></span>
+      <span>${label}</span>
+      ${currentTheme === key ? '<i class="fas fa-check" style="color:var(--accent); margin-left:auto;"></i>' : ''}
+    `;
+    btn.addEventListener('click', async () => {
+      await saveTheme(key);
+      renderThemeOptions();
+      setTimeout(closeThemeModal, 500);
+    });
     container.appendChild(btn);
   });
-
-  const lightLabel = document.createElement('div');
-  lightLabel.style.cssText = 'font-weight:600; margin-top:12px; color:var(--text-secondary);';
-  lightLabel.textContent = '☀️ Светлые';
-  container.appendChild(lightLabel);
-
-  Object.entries(THEMES).forEach(([key, label]) => {
-    if (!key.startsWith('light')) return;
-    const btn = createThemeButton(key, label);
-    container.appendChild(btn);
-  });
-}
-
-function createThemeButton(key, label) {
-  const btn = document.createElement('button');
-  btn.className = `theme-option ${currentTheme === key ? 'active' : ''}`;
-  btn.dataset.theme = key;
-  const color = themePreviewColors[key] || '#888';
-  btn.innerHTML = `
-    <span class="theme-preview" style="border-color: ${color};"></span>
-    <span>${label}</span>
-    ${currentTheme === key ? '<i class="fas fa-check" style="color:var(--accent); margin-left:auto;"></i>' : ''}
-  `;
-  btn.addEventListener('click', async () => {
-    await saveTheme(key);
-    renderThemeOptions();
-    setTimeout(closeThemeModal, 500);
-  });
-  return btn;
 }
 
 export function openThemeModal() {
