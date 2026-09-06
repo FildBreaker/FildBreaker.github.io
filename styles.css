@@ -1364,3 +1364,173 @@ body::after {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-hover);
 }
+/* ============================================================
+   УНИВЕРСАЛЬНАЯ ПОДСВЕТКА ДЛЯ ВСЕХ ИНТЕРАКТИВНЫХ ЭЛЕМЕНТОВ
+   ============================================================ */
+
+/* Кнопки действий в карточках (редактировать, удалить) */
+.edit-resource, .delete-resource,
+.edit-exam, .delete-exam,
+.edit-teacher, .delete-teacher,
+.edit-task, .delete-task,
+.edit-event, .delete-event,
+.edit-test, .delete-test,
+.edit-subject, .delete-subject,
+.edit-poll, .delete-poll,
+.take-test {
+  transition: all 0.2s ease;
+  border-radius: 40px;
+  padding: 4px 10px;
+}
+
+.edit-resource:hover, .edit-exam:hover, .edit-teacher:hover,
+.edit-task:hover, .edit-event:hover, .edit-test:hover,
+.edit-subject:hover, .edit-poll:hover {
+  background: var(--bg-hover);
+  color: var(--text-color) !important;
+  transform: scale(1.1);
+}
+
+.delete-resource:hover, .delete-exam:hover, .delete-teacher:hover,
+.delete-task:hover, .delete-event:hover, .delete-test:hover,
+.delete-subject:hover, .delete-poll:hover {
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c !important;
+  transform: scale(1.1);
+}
+
+.take-test:hover {
+  background: var(--bg-active);
+  color: var(--accent) !important;
+  transform: scale(1.05);
+}
+
+/* Ссылки в карточках (ресурсы, экзамены) */
+.card-link, .res-link, .event-link {
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.card-link:hover, .res-link:hover, .event-link:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+  transform: translateX(3px);
+}
+
+/* Элементы списка предметов в домашке */
+.subject-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 40px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: var(--bg-hover);
+  border: 1px solid transparent;
+}
+
+.subject-item:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  transform: translateX(3px);
+}
+
+.subject-item.active {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--text-color);
+}
+
+.subject-name {
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.subject-item:hover .subject-name,
+.subject-item.active .subject-name {
+  color: var(--text-color);
+}
+
+/* Кнопки пагинации */
+.pagination .page {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.pagination .page:hover {
+  background: var(--bg-active);
+  color: var(--text-color);
+  transform: translateY(-2px);
+}
+
+.pagination .page.active {
+  background: var(--accent);
+  color: var(--badge-color);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* Кнопки типа занятия в расписании (уже есть, но добавим усиление) */
+.type-toggle {
+  transition: all 0.2s ease;
+}
+
+.type-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.type-toggle.active {
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+/* Кнопки в модалках (добавить ссылку, удалить ссылку) */
+.add-link-btn, .remove-link-btn {
+  transition: all 0.2s ease;
+}
+
+.add-link-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.remove-link-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+/* Поля ввода (фокус уже есть, добавим легкую тень) */
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Кнопки в сайдбаре (настройки) уже имеют hover, добавим дополнительную тень */
+#settingsContainer .nav-btn:hover {
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* Общие ссылки */
+a {
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+/* Иконки в карточках ресурсов при наведении на карточку */
+.resource-card:hover .card-icon i {
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
+}
+
+/* Кнопка "Сбросить" в расписании */
+.reset-btn:hover {
+  box-shadow: 0 4px 20px var(--accent-glow);
+  transform: scale(1.05) translateY(-2px);
+}
