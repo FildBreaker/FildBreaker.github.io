@@ -11,12 +11,13 @@
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="icon" href="data/icon.ico?v=2">
   <style>
-    /* === ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ГОРИЗОНТАЛЬНОЙ ПРОКРУТКИ === */
+    /* === ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ГАРАНТИРОВАННОЙ ГОРИЗОНТАЛЬНОЙ ПРОКРУТКИ === */
     .table-wrapper {
-      overflow-x: auto;
+      overflow-x: scroll !important;           /* принудительно показываем скролл */
       overflow-y: visible;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;
+      -webkit-overflow-scrolling: touch !important;
+      touch-action: pan-x !important;
+      overscroll-behavior-x: contain;
       width: 100%;
       display: block;
       border-radius: 24px;
@@ -43,7 +44,7 @@
     }
     .schedule-table {
       width: 100%;
-      min-width: 720px;
+      min-width: 760px;                      /* шире экрана, чтобы появился скролл */
       border-collapse: separate;
       border-spacing: 0;
       font-size: 0.9rem;
@@ -86,7 +87,7 @@
     .schedule-cell {
       cursor: pointer;
       transition: background 0.2s;
-      min-width: 70px;
+      min-width: 80px;
     }
     .schedule-cell:hover {
       background: var(--table-row-hover);
@@ -155,7 +156,7 @@
         margin: 0 -2px;
       }
       .schedule-table {
-        min-width: 680px;
+        min-width: 720px;
         font-size: 0.8rem;
       }
       .schedule-table th,
@@ -179,7 +180,7 @@
     }
     @media (max-width: 420px) {
       .schedule-table {
-        min-width: 600px;
+        min-width: 640px;
         font-size: 0.7rem;
       }
       .schedule-table th,
@@ -316,7 +317,6 @@
     if (saved) {
       scheduleData = saved;
     } else {
-      // Если в Firebase ничего нет – используем пустой объект
       scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
       await dataManager.save('schedule', scheduleData);
     }
