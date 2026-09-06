@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Внеурочка | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data/icon.ico">
-  <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="dataManager.js"></script>
-  <script type="module" src="theme.js"></script>
-  <script type="module" src="app-settings.js"></script>
+  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="icon" href="data/icon.ico?v=3">
+  <script type="module" src="firebase-config.js?v=3"></script>
+  <script type="module" src="dataManager.js?v=3"></script>
+  <script type="module" src="theme.js?v=3"></script>
+  <script type="module" src="app-settings.js?v=3"></script>
 </head>
 <body>
-<div class="bg-layer"></div>
-<div class="bg-overlay"></div>  
 <div class="app-grid">
   <header class="site-header">
     <div class="logo"><h1><i class="fas fa-calendar-alt"></i> Внеурочная деятельность · Б‑21ЛЕС</h1></div>
@@ -24,6 +22,8 @@
       <li><a href="exam.html"><i class="fas fa-graduation-cap"></i> Экзамены</a></li>
       <li><a href="resources.html"><i class="fas fa-folder-open"></i> Ресурсы</a></li>
       <li><a href="homework.html"><i class="fas fa-tasks"></i> Домашка</a></li>
+      <li><a href="extracurricular.html" class="active"><i class="fas fa-calendar-plus"></i> Внеурочка</a></li>
+      <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</a></li>
     </ul>
   </header>
 
@@ -96,7 +96,6 @@
         });
       } catch(e) { console.warn(e); }
     } else {
-      // Демо-данные
       data.events = [
         { id: 'ev1', title: 'Лесная олимпиада', date: '2025-06-10', description: 'Командное соревнование по лесоведению.', link: '#' },
         { id: 'ev2', title: 'Лекция "Современные ГИС"', date: '2025-05-25', description: 'Приглашённый специалист из Рослесинфорг.', link: '#' }
@@ -186,318 +185,4 @@
           ${poll.options.map((opt, idx) => `
             <div class="poll-option">
               <div class="option-text">${escapeHtml(opt.text)}</div>
-              ${userVoted ? `
-                <div class="option-bar"><div class="bar-fill" style="width: ${(opt.votes/total*100)}%"></div></div>
-                <div class="option-stats">${opt.votes} голосов (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>
-              ` : `
-                <button class="vote-btn" data-poll="${poll.id}" data-optidx="${idx}">Голосовать</button>
-              `}
-            </div>
-          `).join('')}
-        </div>
-        <div class="poll-footer">Всего голосов: ${total}</div>
-      `;
-      if (!userVoted) {
-        pollCard.querySelectorAll('.vote-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const pollId = btn.dataset.poll;
-            const optIdx = parseInt(btn.dataset.optidx);
-            voteInPoll(pollId, optIdx);
-          });
-        });
-      }
-      pollCard.querySelector('.delete-poll')?.addEventListener('click', () => deleteItem('polls', poll.id));
-      container.appendChild(pollCard);
-    });
-  }
-
-  function voteInPoll(pollId, optionIndex) {
-    const poll = data.polls.find(p => p.id === pollId);
-    if (!poll || poll.userVoted) return;
-    poll.options[optionIndex].votes = (poll.options[optionIndex].votes || 0) + 1;
-    poll.totalVotes = (poll.totalVotes || 0) + 1;
-    poll.userVoted = true;
-    saveToLocalStorage();
-    renderCurrentSection();
-  }
-
-  // --- Тесты ---
-  function renderTests(container) {
-    if (data.tests.length === 0) {
-      container.innerHTML = `<div class="empty-state"><i class="fas fa-puzzle-piece"></i><p>Нет тестов. Добавьте новый тест.</p></div>`;
-      return;
-    }
-    container.innerHTML = '';
-    data.tests.forEach(test => {
-      const testCard = document.createElement('div');
-      testCard.className = 'test-card';
-      testCard.innerHTML = `
-        <div class="test-header">
-          <h3><i class="fas fa-brain"></i> ${escapeHtml(test.title)}</h3>
-          <div class="test-actions">
-            <button class="take-test" data-id="${test.id}"><i class="fas fa-play"></i> Пройти</button>
-            <button class="edit-test" data-id="${test.id}"><i class="fas fa-edit"></i></button>
-            <button class="delete-test" data-id="${test.id}"><i class="fas fa-trash-alt"></i></button>
-          </div>
-        </div>
-        <p>Вопросов: ${test.questions.length}</p>
-      `;
-      testCard.querySelector('.take-test')?.addEventListener('click', () => openTestModal(test.id));
-      testCard.querySelector('.edit-test')?.addEventListener('click', () => openEditModal('tests', test.id));
-      testCard.querySelector('.delete-test')?.addEventListener('click', () => deleteItem('tests', test.id));
-      container.appendChild(testCard);
-    });
-  }
-
-  function deleteItem(section, id) {
-    if (section === 'events') data.events = data.events.filter(ev => ev.id !== id);
-    if (section === 'polls') data.polls = data.polls.filter(p => p.id !== id);
-    if (section === 'tests') data.tests = data.tests.filter(t => t.id !== id);
-    saveToLocalStorage();
-    renderCurrentSection();
-  }
-
-  // --- Модалка добавления/редактирования ---
-  let editModalSection = null;
-  let editModalId = null;
-  const modal = document.getElementById('editModal');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalFields = document.getElementById('modalDynamicFields');
-
-  function openEditModal(section, id = null) {
-    editModalSection = section;
-    editModalId = id;
-    modalFields.innerHTML = '';
-    if (section === 'events') {
-      modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать мероприятие' : '<i class="fas fa-plus"></i> Добавить мероприятие';
-      modalFields.innerHTML = `
-        <label>Название</label><input type="text" id="evTitle" placeholder="Название события">
-        <label>Дата (ГГГГ-ММ-ДД)</label><input type="date" id="evDate">
-        <label>Описание</label><textarea id="evDesc" rows="2" placeholder="Краткое описание"></textarea>
-        <label>Ссылка (необязательно)</label><input type="url" id="evLink" placeholder="https://...">
-      `;
-      if (id) {
-        const ev = data.events.find(e => e.id === id);
-        if (ev) {
-          document.getElementById('evTitle').value = ev.title;
-          document.getElementById('evDate').value = ev.date;
-          document.getElementById('evDesc').value = ev.description;
-          document.getElementById('evLink').value = ev.link || '';
-        }
-      }
-    } else if (section === 'polls') {
-      modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать опрос' : '<i class="fas fa-plus"></i> Создать опрос';
-      modalFields.innerHTML = `
-        <label>Вопрос опроса</label><input type="text" id="pollQuestion" placeholder="Например: Какой формат занятий вам нравится?">
-        <label>Варианты ответов (каждый с новой строки)</label><textarea id="pollOptions" rows="3" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3"></textarea>
-      `;
-      if (id) {
-        const poll = data.polls.find(p => p.id === id);
-        if (poll) {
-          document.getElementById('pollQuestion').value = poll.question;
-          document.getElementById('pollOptions').value = poll.options.map(o => o.text).join('\n');
-        }
-      }
-    } else if (section === 'tests') {
-      modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать тест' : '<i class="fas fa-plus"></i> Создать тест';
-      modalFields.innerHTML = `
-        <label>Название теста</label><input type="text" id="testTitle" placeholder="Название">
-        <div id="questionsEditor"></div>
-        <button type="button" id="addQuestionBtn" class="add-link-btn"><i class="fas fa-plus"></i> Добавить вопрос</button>
-      `;
-      let questions = [];
-      if (id) {
-        const test = data.tests.find(t => t.id === id);
-        if (test) questions = test.questions;
-      }
-      function renderQuestionsEditor(qs) {
-        const container = document.getElementById('questionsEditor');
-        if (!container) return;
-        container.innerHTML = '';
-        qs.forEach((q, idx) => {
-          const qDiv = document.createElement('div');
-          qDiv.className = 'question-editor';
-          qDiv.innerHTML = `
-            <div class="question-text"><input type="text" placeholder="Текст вопроса" value="${escapeHtml(q.text)}" class="q-text"></div>
-            <div class="question-options">
-              ${q.options.map((opt, optIdx) => `
-                <div class="opt-row">
-                  <input type="text" placeholder="Вариант ${optIdx+1}" value="${escapeHtml(opt)}" class="q-opt">
-                  ${optIdx === q.correctIndex ? '<span class="correct-badge">✓ Правильный</span>' : ''}
-                </div>
-              `).join('')}
-            </div>
-            <select class="q-correct">
-              ${q.options.map((_, optIdx) => `<option value="${optIdx}" ${optIdx === q.correctIndex ? 'selected' : ''}>Правильный ответ: вариант ${optIdx+1}</option>`).join('')}
-            </select>
-            <button class="remove-question-btn">Удалить вопрос</button>
-          `;
-          qDiv.querySelector('.remove-question-btn').addEventListener('click', () => {
-            questions.splice(idx, 1);
-            renderQuestionsEditor(questions);
-          });
-          container.appendChild(qDiv);
-        });
-      }
-      window.questionsArray = questions;
-      renderQuestionsEditor(questions);
-      document.getElementById('addQuestionBtn').addEventListener('click', () => {
-        questions.push({ text: 'Новый вопрос', options: ['Вариант 1', 'Вариант 2'], correctIndex: 0 });
-        renderQuestionsEditor(questions);
-      });
-      if (id) {
-        const test = data.tests.find(t => t.id === id);
-        if (test) document.getElementById('testTitle').value = test.title;
-      }
-    }
-    modal.style.display = 'flex';
-  }
-
-  function saveModalItem() {
-    if (editModalSection === 'events') {
-      const title = document.getElementById('evTitle')?.value.trim();
-      const date = document.getElementById('evDate')?.value;
-      const desc = document.getElementById('evDesc')?.value.trim();
-      const link = document.getElementById('evLink')?.value.trim();
-      if (!title || !date) { alert('Заполните название и дату'); return; }
-      if (editModalId) {
-        const ev = data.events.find(e => e.id === editModalId);
-        if (ev) { ev.title = title; ev.date = date; ev.description = desc; ev.link = link || '#'; }
-      } else {
-        data.events.push({ id: Date.now().toString(), title, date, description: desc, link: link || '#' });
-      }
-    } else if (editModalSection === 'polls') {
-      const question = document.getElementById('pollQuestion')?.value.trim();
-      const optsText = document.getElementById('pollOptions')?.value;
-      if (!question || !optsText) { alert('Введите вопрос и варианты'); return; }
-      const optionsArray = optsText.split('\n').filter(s => s.trim().length > 0).map(t => ({ text: t.trim(), votes: 0 }));
-      if (optionsArray.length < 2) { alert('Нужно минимум 2 варианта'); return; }
-      if (editModalId) {
-        const poll = data.polls.find(p => p.id === editModalId);
-        if (poll) {
-          poll.question = question;
-          poll.options = optionsArray;
-          poll.totalVotes = 0;
-          poll.userVoted = false;
-        }
-      } else {
-        data.polls.push({ id: Date.now().toString(), question, options: optionsArray, totalVotes: 0, userVoted: false });
-      }
-    } else if (editModalSection === 'tests') {
-      const testTitle = document.getElementById('testTitle')?.value.trim();
-      if (!testTitle) { alert('Введите название теста'); return; }
-      const questions = [];
-      const qDivs = document.querySelectorAll('#questionsEditor .question-editor');
-      qDivs.forEach(div => {
-        const qText = div.querySelector('.q-text')?.value.trim();
-        const optInputs = div.querySelectorAll('.q-opt');
-        const options = Array.from(optInputs).map(inp => inp.value.trim()).filter(s => s);
-        const correctIdx = parseInt(div.querySelector('.q-correct')?.value);
-        if (qText && options.length >= 2) {
-          questions.push({ text: qText, options, correctIndex: correctIdx });
-        }
-      });
-      if (questions.length === 0) { alert('Добавьте хотя бы один вопрос с вариантами'); return; }
-      if (editModalId) {
-        const test = data.tests.find(t => t.id === editModalId);
-        if (test) { test.title = testTitle; test.questions = questions; }
-      } else {
-        data.tests.push({ id: Date.now().toString(), title: testTitle, questions });
-      }
-    }
-    saveToLocalStorage();
-    closeModal();
-    renderCurrentSection();
-  }
-
-  function closeModal() {
-    modal.style.display = 'none';
-    editModalSection = null;
-    editModalId = null;
-  }
-
-  // --- Тесты: прохождение ---
-  let currentTestId = null;
-  const testModal = document.getElementById('testModal');
-  const testQuestionsContainer = document.getElementById('testQuestionsContainer');
-  const testModalTitleSpan = document.getElementById('testModalTitle');
-
-  function openTestModal(testId) {
-    const test = data.tests.find(t => t.id === testId);
-    if (!test) return;
-    currentTestId = testId;
-    testModalTitleSpan.innerHTML = `<i class="fas fa-question-circle"></i> ${escapeHtml(test.title)}`;
-    testQuestionsContainer.innerHTML = '';
-    test.questions.forEach((q, idx) => {
-      const qDiv = document.createElement('div');
-      qDiv.className = 'test-question';
-      qDiv.innerHTML = `
-        <p><strong>${idx+1}. ${escapeHtml(q.text)}</strong></p>
-        <div class="test-options">
-          ${q.options.map((opt, optIdx) => `
-            <label><input type="radio" name="q${idx}" value="${optIdx}"> ${escapeHtml(opt)}</label>
-          `).join('')}
-        </div>
-      `;
-      testQuestionsContainer.appendChild(qDiv);
-    });
-    document.getElementById('testResult').innerHTML = '';
-    testModal.style.display = 'flex';
-  }
-
-  function submitTest() {
-    const test = data.tests.find(t => t.id === currentTestId);
-    if (!test) return;
-    let score = 0;
-    test.questions.forEach((q, idx) => {
-      const selected = document.querySelector(`input[name="q${idx}"]:checked`);
-      if (selected && parseInt(selected.value) === q.correctIndex) score++;
-    });
-    const resultDiv = document.getElementById('testResult');
-    resultDiv.innerHTML = `<i class="fas fa-chart-line"></i> Ваш результат: ${score} из ${test.questions.length} (${Math.round(score/test.questions.length*100)}%)`;
-  }
-
-  function closeTestModal() {
-    testModal.style.display = 'none';
-    currentTestId = null;
-  }
-
-  // --- Навигация и инициализация ---
-  function init() {
-    loadData();
-    document.querySelectorAll('.section-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentSection = btn.dataset.section;
-        renderCurrentSection();
-      });
-    });
-    document.getElementById('globalAddBtn').addEventListener('click', () => {
-      openEditModal(currentSection);
-    });
-    document.getElementById('closeModalBtn').onclick = closeModal;
-    document.getElementById('cancelModalBtn').onclick = closeModal;
-    document.getElementById('saveModalBtn').onclick = saveModalItem;
-    document.getElementById('closeTestModal').onclick = closeTestModal;
-    document.getElementById('cancelTestBtn').onclick = closeTestModal;
-    document.getElementById('submitTestBtn').onclick = submitTest;
-    window.onclick = (e) => {
-      if (e.target === modal) closeModal();
-      if (e.target === testModal) closeTestModal();
-    };
-  }
-  init();
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
-  }
-</script>
-</body>
-</html>
+             
