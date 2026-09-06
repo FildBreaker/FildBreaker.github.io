@@ -87,10 +87,16 @@
       <input type="text" id="editEndDate" placeholder="31.05.2026">
 
       <label>Тип занятия:</label>
-      <div style="display:flex; gap:12px; margin-top:6px;">
-        <button type="button" id="typeLecture" class="type-toggle" data-type="lecture">🎓 Лекция</button>
-        <button type="button" id="typePractice" class="type-toggle" data-type="practice">🛠 Практика</button>
-        <button type="button" id="typeNone" class="type-toggle active" data-type="">— Не указано</button>
+      <div style="display:flex; gap:12px; margin-top:6px; flex-wrap:wrap;">
+        <button type="button" id="typeLecture" class="type-toggle" data-type="lecture">
+          <i class="fas fa-chalkboard-teacher"></i> Лекция
+        </button>
+        <button type="button" id="typePractice" class="type-toggle" data-type="practice">
+          <i class="fas fa-tools"></i> Практика
+        </button>
+        <button type="button" id="typeNone" class="type-toggle active" data-type="">
+          <i class="fas fa-ban"></i> Не указано
+        </button>
       </div>
 
       <div class="modal-buttons">
@@ -198,7 +204,7 @@
     await dataManager.save('schedule', scheduleData);
   }
 
-  // ===== ОТОБРАЖЕНИЕ ТАБЛИЦЫ =====
+  // ===== ОТОБРАЖЕНИЕ ТАБЛИЦЫ (с иконками Font Awesome) =====
   function renderSchedule() {
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
@@ -214,12 +220,11 @@
         td.className = 'schedule-cell';
         const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '' };
 
-        // Собираем информацию для отображения
         let subjectHtml = lesson.subject ? escapeHtml(lesson.subject) : '—';
         let roomHtml = lesson.room ? ` (${escapeHtml(lesson.room)})` : '';
         let typeIcon = '';
-        if (lesson.type === 'lecture') typeIcon = '🎓 ';
-        else if (lesson.type === 'practice') typeIcon = '🛠 ';
+        if (lesson.type === 'lecture') typeIcon = '<i class="fas fa-chalkboard-teacher" style="color:var(--accent);"></i> ';
+        else if (lesson.type === 'practice') typeIcon = '<i class="fas fa-tools" style="color:var(--accent);"></i> ';
 
         let dateHtml = '';
         if (lesson.startDate || lesson.endDate) {
@@ -314,7 +319,6 @@
     const newStartDate = editStartDate.value.trim();
     let newEndDate = editEndDate.value.trim();
 
-    // Проверка формата дат (если заполнены)
     const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
     if (newStartDate && !datePattern.test(newStartDate)) {
       alert('Дата начала должна быть в формате ДД.ММ.ГГГГ');
@@ -369,6 +373,5 @@
 
   loadSchedule();
 </script>
-
 </body>
 </html>
