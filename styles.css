@@ -35,10 +35,7 @@
   --badge-color: #1e293b;
 }
 
-/* ---- ТЁМНЫЕ ТЕМЫ ---- */
-/* 1. Тёмная золотая (по умолчанию) – уже в :root, ничего не меняем */
-
-/* 2. Тёмная синяя */
+/* ---- ТЁМНЫЕ ТЕМЫ (золотая, синяя, зелёная, фиолетовая, красная) ---- */
 .theme-dark-blue {
   --bg-overlay: rgba(26, 42, 58, 0.85);
   --primary-bg: #1a2a3a;
@@ -64,8 +61,6 @@
   --badge-bg: #4a8cff;
   --badge-color: #fff;
 }
-
-/* 3. Тёмная зелёная */
 .theme-dark-green {
   --bg-overlay: rgba(26, 58, 42, 0.85);
   --primary-bg: #1a3a2a;
@@ -91,8 +86,6 @@
   --badge-bg: #4caf50;
   --badge-color: #fff;
 }
-
-/* 4. Тёмная фиолетовая */
 .theme-dark-purple {
   --bg-overlay: rgba(42, 26, 58, 0.85);
   --primary-bg: #2a1a3a;
@@ -118,8 +111,6 @@
   --badge-bg: #ab47bc;
   --badge-color: #fff;
 }
-
-/* 5. Тёмная красная */
 .theme-dark-red {
   --bg-overlay: rgba(58, 26, 26, 0.85);
   --primary-bg: #3a1a1a;
@@ -147,7 +138,6 @@
 }
 
 /* ---- СВЕТЛЫЕ ТЕМЫ ---- */
-/* 6. Светлая золотая */
 .theme-light-gold {
   --bg-overlay: rgba(255, 248, 235, 0.85);
   --primary-bg: #f5f0e8;
@@ -178,8 +168,6 @@
   --badge-bg: #b8860b;
   --badge-color: #fff;
 }
-
-/* 7. Светлая синяя */
 .theme-light-blue {
   --bg-overlay: rgba(235, 245, 255, 0.85);
   --primary-bg: #f0f5ff;
@@ -210,8 +198,6 @@
   --badge-bg: #1a6b8a;
   --badge-color: #fff;
 }
-
-/* 8. Светлая зелёная */
 .theme-light-green {
   --bg-overlay: rgba(235, 255, 240, 0.85);
   --primary-bg: #f0faf2;
@@ -242,8 +228,6 @@
   --badge-bg: #1a7a3a;
   --badge-color: #fff;
 }
-
-/* 9. Светлая фиолетовая */
 .theme-light-purple {
   --bg-overlay: rgba(245, 240, 255, 0.85);
   --primary-bg: #f5f0ff;
@@ -274,8 +258,6 @@
   --badge-bg: #6a1a8a;
   --badge-color: #fff;
 }
-
-/* 10. Светлая красная */
 .theme-light-red {
   --bg-overlay: rgba(255, 240, 240, 0.85);
   --primary-bg: #faf0f0;
@@ -323,19 +305,22 @@ body {
   line-height: 1.5;
   min-height: 100vh;
   scroll-behavior: smooth;
+  position: relative;
 }
 
+/* Фоновый слой – fixed и всегда сзади */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   background: var(--bg-overlay), var(--bg-image) center/cover no-repeat;
-  background-attachment: fixed;
   z-index: -1;
   will-change: transform;
+  /* Для Android отключаем фиксацию, но оставляем как есть, т.к. fixed работает */
+  background-attachment: fixed;
 }
 
-/* Исправление для Android – фиксированный фон часто ломается, переключаем на scroll */
+/* На мобильных fixed ломается – переключаем на scroll */
 @media (max-width: 768px) {
   body::before {
     background-attachment: scroll;
@@ -363,6 +348,10 @@ body::before {
     grid-template-areas: "header" "sidebar" "main" "footer";
     gap: 20px;
     padding: 16px;
+  }
+  /* Убираем sticky у сайдбара на мобильных, чтобы не было наслоения */
+  .sidebar {
+    position: static !important;
   }
 }
 
@@ -429,6 +418,11 @@ body::before {
   position: sticky;
   top: 20px;
   animation: fadeIn 0.8s ease;
+}
+@media (max-width: 850px) {
+  .sidebar {
+    position: static;
+  }
 }
 
 .sidebar h3 {
@@ -588,7 +582,7 @@ body::before {
   color: var(--text-secondary);
 }
 
-/* ===== КАРТОЧКИ (преподаватели, экзамены, ресурсы, домашка, опросы) ===== */
+/* ===== КАРТОЧКИ ===== */
 .teachers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -716,7 +710,7 @@ body::before {
   padding: 20px 24px;
 }
 
-/* ===== РАСПИСАНИЕ – НОВЫЙ КРАСИВЫЙ ДИЗАЙН ===== */
+/* ===== РАСПИСАНИЕ – горизонтальная прокрутка ===== */
 .schedule-section {
   padding: 28px 32px;
 }
@@ -779,20 +773,61 @@ body::before {
   100% { transform: rotate(360deg); }
 }
 
+/* КОНТЕЙНЕР ДЛЯ ПРОКРУТКИ */
 .table-wrapper {
   overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  width: 100%;
+  display: block;
   border-radius: 24px;
   background: var(--card-bg);
   box-shadow: var(--shadow);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-hover);
+  position: relative;
+}
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.table-wrapper::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 4px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--link-hover);
 }
 
+/* ТАБЛИЦА – фиксированная ширина для появления скролла */
 .schedule-table {
-  width: 100%;
+  width: auto;
+  min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.9rem;
   background: transparent;
-  min-width: 700px;
+  table-layout: fixed;
+}
+
+.schedule-table th:first-child,
+.schedule-table td:first-child {
+  width: 160px;
+  min-width: 160px;
+  max-width: 160px;
+  white-space: nowrap;
+}
+.schedule-table th:not(:first-child),
+.schedule-table td:not(:first-child) {
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
 }
 
 .schedule-table th {
@@ -802,8 +837,8 @@ body::before {
   text-align: center;
   font-weight: 600;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
-
 .schedule-table th:first-child {
   border-top-left-radius: 24px;
 }
@@ -817,24 +852,24 @@ body::before {
   vertical-align: middle;
   background: var(--card-bg);
   transition: background 0.2s;
+  overflow: hidden;
+  word-break: break-word;
+  hyphens: auto;
 }
-
 .schedule-table tr:last-child td {
   border-bottom: none;
 }
-
 .schedule-table td:first-child {
   font-weight: 600;
   color: var(--text-secondary);
   background: var(--bg-hover);
-  width: 160px;
+  white-space: nowrap;
 }
 
 .schedule-cell {
   cursor: pointer;
   transition: background 0.2s;
 }
-
 .schedule-cell:hover {
   background: var(--table-row-hover);
 }
@@ -844,21 +879,23 @@ body::before {
   flex-direction: column;
   gap: 4px;
   position: relative;
+  overflow: hidden;
+  word-break: break-word;
 }
-
 .cell-content .subject {
   font-weight: 500;
   font-size: 0.9rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
-
 .cell-content .end-date {
   font-size: 0.75rem;
   color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
-
 .cell-content .edit-icon {
   position: absolute;
   top: 2px;
@@ -868,7 +905,6 @@ body::before {
   opacity: 0;
   transition: opacity 0.2s;
 }
-
 .schedule-cell:hover .edit-icon {
   opacity: 1;
 }
@@ -880,6 +916,23 @@ body::before {
   font-size: 0.8rem;
   padding: 6px;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Подсказка о прокрутке для мобильных */
+.scroll-hint {
+  display: none;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  padding: 4px 0 0;
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+}
+@media (max-width: 850px) {
+  .scroll-hint {
+    display: block;
+  }
 }
 
 /* ===== ФУТЕР ===== */
@@ -996,7 +1049,7 @@ body::before {
 }
 .close-modal:hover { color: var(--text-color); }
 
-/* Дополнительные стили для кнопок внутри модалок */
+/* Дополнительные стили */
 .add-link-btn {
   background: var(--accent);
   color: var(--badge-color, #1e293b);
@@ -1008,10 +1061,7 @@ body::before {
   margin-top: 8px;
   transition: 0.3s;
 }
-
-.add-link-btn:hover {
-  transform: scale(1.05);
-}
+.add-link-btn:hover { transform: scale(1.05); }
 
 .link-input-group {
   display: flex;
@@ -1019,12 +1069,7 @@ body::before {
   margin-top: 8px;
   flex-wrap: wrap;
 }
-
-.link-input-group input {
-  flex: 1;
-  min-width: 120px;
-}
-
+.link-input-group input { flex: 1; min-width: 120px; }
 .remove-link-btn {
   background: #e74c3c;
   color: white;
@@ -1036,7 +1081,7 @@ body::before {
 }
 .remove-link-btn:hover { background: #c0392b; }
 
-/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ В МОДАЛКЕ (из theme.js) ===== */
+/* Кнопки тем */
 .theme-option {
   display: flex;
   align-items: center;
@@ -1072,10 +1117,7 @@ body::before {
   transition: 0.3s;
   background: var(--card-bg);
 }
-.theme-option.active .theme-preview {
-  border-color: var(--accent);
-}
-/* Цвета для превью каждой темы (задаются в theme.js) */
+.theme-option.active .theme-preview { border-color: var(--accent); }
 
 /* ===== АНИМАЦИИ ===== */
 @keyframes slideDown {
@@ -1125,6 +1167,53 @@ body::before {
     justify-content: space-between;
   }
   .cell-content .edit-icon {
-    opacity: 0.5; /* всегда видно на мобильных */
+    opacity: 0.5;
   }
+
+  /* Уменьшаем ширину колонок для маленьких экранов */
+  .schedule-table th:first-child,
+  .schedule-table td:first-child {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+  }
+  .schedule-table th:not(:first-child),
+  .schedule-table td:not(:first-child) {
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
+  }
+  .schedule-table {
+    font-size: 0.8rem;
+  }
+  .schedule-table th,
+  .schedule-table td {
+    padding: 10px 8px;
+  }
+  .cell-content .subject { font-size: 0.8rem; }
+  .cell-content .end-date { font-size: 0.65rem; }
+}
+@media (max-width: 420px) {
+  .schedule-table th:first-child,
+  .schedule-table td:first-child {
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+  }
+  .schedule-table th:not(:first-child),
+  .schedule-table td:not(:first-child) {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+  }
+  .schedule-table {
+    font-size: 0.7rem;
+  }
+  .schedule-table th,
+  .schedule-table td {
+    padding: 8px 6px;
+  }
+  .cell-content .subject { font-size: 0.7rem; }
+  .cell-content .end-date { font-size: 0.55rem; }
+  .break-row td { font-size: 0.65rem; padding: 4px; }
 }
