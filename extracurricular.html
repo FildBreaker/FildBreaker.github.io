@@ -125,13 +125,13 @@
     if (!container) return;
 
     if (currentSection === 'events') {
-      headerEl.innerHTML = `<h2><i class="fas fa-party-horn"></i> Мероприятия</h2><p>Ближайшие события, конкурсы, лекции и встречи</p>`;
+      headerEl.innerHTML = `<h2><i class="fas fa-party-horn"></i> Мероприятия</h2><p>Ближайшие события и дни сурка</p>`;
       renderEvents(container);
     } else if (currentSection === 'polls') {
-      headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение, результаты видны всем</p>`;
+      headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение, которое мы обязательно не учтём</p>`;
       renderPolls(container);
     } else if (currentSection === 'tests') {
-      headerEl.innerHTML = `<h2><i class="fas fa-puzzle-piece"></i> Тесты</h2><p>Проверьте знания и получите результат</p>`;
+      headerEl.innerHTML = `<h2><i class="fas fa-puzzle-piece"></i> Тесты</h2><p>Проверьте тупость и получите результат</p>`;
       renderTests(container);
     }
   }
