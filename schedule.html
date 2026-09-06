@@ -10,241 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="icon" href="data/icon.ico?v=2">
-  <style>
-    /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ТОЛЬКО ДЛЯ РАСПИСАНИЯ ===== */
-    /* Скролл таблицы (горизонтальный) – работает на всех устройствах */
-    .table-wrapper {
-      overflow-x: auto;
-      overflow-y: visible;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;
-      overscroll-behavior-x: contain;
-      width: 100%;
-      display: block;
-      border-radius: 24px;
-      background: var(--card-bg);
-      box-shadow: var(--shadow);
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent) var(--bg-hover);
-      position: relative;
-    }
-    .table-wrapper::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
-    }
-    .table-wrapper::-webkit-scrollbar-track {
-      background: var(--bg-hover);
-      border-radius: 4px;
-    }
-    .table-wrapper::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 4px;
-    }
-    .table-wrapper::-webkit-scrollbar-thumb:hover {
-      background: var(--link-hover);
-    }
-
-    /* Таблица – фиксированная ширина колонок, чтобы появился скролл */
-    .schedule-table {
-      width: auto;
-      min-width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 0.9rem;
-      background: transparent;
-      table-layout: fixed;
-    }
-    .schedule-table th:first-child,
-    .schedule-table td:first-child {
-      width: 160px;
-      min-width: 160px;
-      max-width: 160px;
-      white-space: nowrap;
-    }
-    .schedule-table th:not(:first-child),
-    .schedule-table td:not(:first-child) {
-      width: 130px;
-      min-width: 130px;
-      max-width: 130px;
-    }
-
-    /* Оформление (дублируем из основного CSS, но с учётом переноса) */
-    .schedule-table th {
-      background: var(--table-header-bg);
-      color: var(--table-header-color);
-      padding: 14px 12px;
-      text-align: center;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-    }
-    .schedule-table th:first-child {
-      border-top-left-radius: 24px;
-    }
-    .schedule-table th:last-child {
-      border-top-right-radius: 24px;
-    }
-
-    .schedule-table td {
-      padding: 12px 10px;
-      border-bottom: 1px solid var(--border-color);
-      vertical-align: middle;
-      background: var(--card-bg);
-      transition: background 0.2s;
-      overflow: hidden;
-      word-break: break-word;
-      hyphens: auto;
-    }
-    .schedule-table tr:last-child td {
-      border-bottom: none;
-    }
-    .schedule-table td:first-child {
-      font-weight: 600;
-      color: var(--text-secondary);
-      background: var(--bg-hover);
-      white-space: nowrap;
-    }
-
-    .schedule-cell {
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .schedule-cell:hover {
-      background: var(--table-row-hover);
-    }
-    .cell-content {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      position: relative;
-      overflow: hidden;
-      word-break: break-word;
-    }
-    .cell-content .subject {
-      font-weight: 500;
-      font-size: 0.9rem;
-      word-break: break-word;
-      overflow-wrap: break-word;
-    }
-    .cell-content .end-date {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
-    }
-    .cell-content .edit-icon {
-      position: absolute;
-      top: 2px;
-      right: 4px;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .schedule-cell:hover .edit-icon {
-      opacity: 1;
-    }
-
-    .break-row td {
-      background: var(--table-header-bg);
-      color: var(--table-header-color);
-      text-align: center;
-      font-size: 0.8rem;
-      padding: 6px;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-
-    /* Подсказка о прокрутке для мобильных */
-    .scroll-hint {
-      display: none;
-      text-align: center;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      padding: 4px 0 0;
-      opacity: 0.6;
-      letter-spacing: 0.5px;
-    }
-    @media (max-width: 850px) {
-      .scroll-hint {
-        display: block;
-      }
-    }
-
-    /* Адаптив */
-    @media (max-width: 650px) {
-      .schedule-section {
-        padding: 16px 12px;
-        border-radius: 24px;
-      }
-      .table-wrapper {
-        border-radius: 16px;
-        margin: 0 -2px;
-      }
-      .schedule-table {
-        font-size: 0.8rem;
-      }
-      .schedule-table th,
-      .schedule-table td {
-        padding: 10px 8px;
-      }
-      .schedule-table th:first-child,
-      .schedule-table td:first-child {
-        width: 120px;
-        min-width: 120px;
-        max-width: 120px;
-      }
-      .schedule-table th:not(:first-child),
-      .schedule-table td:not(:first-child) {
-        width: 100px;
-        min-width: 100px;
-        max-width: 100px;
-      }
-      .cell-content .subject {
-        font-size: 0.8rem;
-      }
-      .cell-content .end-date {
-        font-size: 0.65rem;
-      }
-      .cell-content .edit-icon {
-        opacity: 0.5;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .schedule-table {
-        font-size: 0.7rem;
-      }
-      .schedule-table th,
-      .schedule-table td {
-        padding: 8px 6px;
-      }
-      .schedule-table th:first-child,
-      .schedule-table td:first-child {
-        width: 90px;
-        min-width: 90px;
-        max-width: 90px;
-      }
-      .schedule-table th:not(:first-child),
-      .schedule-table td:not(:first-child) {
-        width: 80px;
-        min-width: 80px;
-        max-width: 80px;
-      }
-      .cell-content .subject {
-        font-size: 0.7rem;
-      }
-      .cell-content .end-date {
-        font-size: 0.55rem;
-      }
-      .break-row td {
-        font-size: 0.65rem;
-        padding: 4px;
-      }
-    }
-  </style>
+  <!-- Стили для расписания уже включены в общий styles.css, но оставляем дополнительные на всякий случай -->
 </head>
 <body>
 <div class="app-grid">
@@ -303,6 +69,7 @@
   </footer>
 </div>
 
+<!-- Модалка редактирования -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <span class="close-modal">&times;</span>
@@ -324,7 +91,7 @@
   import { initSidebarButtons } from './app-settings.js';
   import { loadTheme } from './theme.js';
 
-  // Пустое расписание (без демо-данных)
+  // Пустое расписание
   function createEmptySchedule() {
     const empty = {};
     for (let day = 0; day < 7; day++) {
@@ -478,7 +245,7 @@
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
 
-  // ===== ДОБАВЛЯЕМ КНОПКУ ТЕМЫ =====
+  // Добавляем кнопку темы и применяем текущую тему
   initSidebarButtons();
   loadTheme();
 
