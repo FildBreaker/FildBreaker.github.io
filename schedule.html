@@ -11,53 +11,25 @@
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="icon" href="data/icon.ico?v=2">
   <style>
-    /* ===== ГЛОБАЛЬНЫЙ СКРОЛЛ СТРАНИЦЫ ===== */
+    /* ===== СКРОЛЛ ВСЕЙ СТРАНИЦЫ (ГОРИЗОНТАЛЬНЫЙ) ===== */
     html, body {
-      overflow-x: auto;              /* страница может скроллиться горизонтально */
+      overflow-x: auto;               /* страница может скроллиться вправо */
       -webkit-overflow-scrolling: touch;
-    }
-
-    /* ===== КОНТЕЙНЕР ТАБЛИЦЫ ===== */
-    .table-wrapper {
-      overflow-x: scroll !important;
-      overflow-y: visible;
-      -webkit-overflow-scrolling: touch !important;
-      touch-action: pan-x !important;
-      overscroll-behavior-x: contain;
-      width: 100%;
-      display: block;
-      border-radius: 24px;
-      background: var(--card-bg);
-      box-shadow: var(--shadow);
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent) var(--bg-hover);
-      position: relative;
-      min-height: 100px;
-    }
-    .table-wrapper::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
-    }
-    .table-wrapper::-webkit-scrollbar-track {
-      background: var(--bg-hover);
-      border-radius: 4px;
-    }
-    .table-wrapper::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 4px;
     }
 
     /* ===== ТАБЛИЦА ===== */
     .schedule-table {
       width: auto;
-      min-width: 100%;
+      min-width: 100%;               /* чтобы таблица была шире, если колонки не влазят */
       border-collapse: separate;
       border-spacing: 0;
       font-size: 0.9rem;
       background: transparent;
+      /* задаём фиксированную ширину колонок, чтобы таблица гарантированно была шире экрана */
+      table-layout: fixed;
     }
 
-    /* Задаём ширину колонок, чтобы таблица гарантированно была шире экрана */
+    /* Ширина колонок: первая (время) – 160px, остальные – по 130px */
     .schedule-table th:first-child,
     .schedule-table td:first-child {
       width: 160px;
@@ -72,6 +44,7 @@
       max-width: 130px;
     }
 
+    /* Оформление (всё как в styles.css, но дублируем для надёжности) */
     .schedule-table th {
       background: var(--table-header-bg);
       color: var(--table-header-color);
@@ -152,7 +125,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* ===== ПОДСКАЗКА ДЛЯ МОБИЛЬНЫХ ===== */
+    /* Подсказка о прокрутке для мобильных */
     .scroll-hint {
       display: none;
       text-align: center;
@@ -173,10 +146,6 @@
       .schedule-section {
         padding: 16px 12px;
         border-radius: 24px;
-      }
-      .table-wrapper {
-        border-radius: 16px;
-        margin: 0 -2px;
       }
       .schedule-table {
         font-size: 0.8rem;
