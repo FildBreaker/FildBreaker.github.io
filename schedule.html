@@ -11,13 +11,40 @@
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="icon" href="data/icon.ico?v=2">
   <style>
-    /* ===== ГЛОБАЛЬНЫЙ СКРОЛЛ СТРАНИЦЫ (горизонтальный) ===== */
-    html, body {
+    /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ТОЛЬКО ДЛЯ РАСПИСАНИЯ ===== */
+    /* Скролл таблицы (горизонтальный) – работает на всех устройствах */
+    .table-wrapper {
       overflow-x: auto;
+      overflow-y: visible;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;
+      overscroll-behavior-x: contain;
+      width: 100%;
+      display: block;
+      border-radius: 24px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) var(--bg-hover);
+      position: relative;
+    }
+    .table-wrapper::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .table-wrapper::-webkit-scrollbar-track {
+      background: var(--bg-hover);
+      border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: var(--link-hover);
     }
 
-    /* ===== ТАБЛИЦА ===== */
+    /* Таблица – фиксированная ширина колонок, чтобы появился скролл */
     .schedule-table {
       width: auto;
       min-width: 100%;
@@ -25,10 +52,8 @@
       border-spacing: 0;
       font-size: 0.9rem;
       background: transparent;
-      table-layout: fixed;           /* фиксированная ширина колонок */
+      table-layout: fixed;
     }
-
-    /* Ширина колонок: время – 160px, дни – 130px */
     .schedule-table th:first-child,
     .schedule-table td:first-child {
       width: 160px;
@@ -43,7 +68,7 @@
       max-width: 130px;
     }
 
-    /* Оформление */
+    /* Оформление (дублируем из основного CSS, но с учётом переноса) */
     .schedule-table th {
       background: var(--table-header-bg);
       color: var(--table-header-color);
@@ -66,9 +91,9 @@
       vertical-align: middle;
       background: var(--card-bg);
       transition: background 0.2s;
-      overflow: hidden;             /* чтобы содержимое не вылезало */
-      word-break: break-word;       /* перенос длинных слов */
-      hyphens: auto;                /* перенос по слогам (опционально) */
+      overflow: hidden;
+      word-break: break-word;
+      hyphens: auto;
     }
     .schedule-table tr:last-child td {
       border-bottom: none;
@@ -92,7 +117,7 @@
       flex-direction: column;
       gap: 4px;
       position: relative;
-      overflow: hidden;             /* чтобы дочерние элементы не вылезали */
+      overflow: hidden;
       word-break: break-word;
     }
     .cell-content .subject {
@@ -107,7 +132,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      white-space: nowrap;          /* дата не переносится */
+      white-space: nowrap;
     }
     .cell-content .edit-icon {
       position: absolute;
@@ -129,7 +154,6 @@
       font-size: 0.8rem;
       padding: 6px;
       letter-spacing: 0.5px;
-      word-break: normal;
       white-space: nowrap;
     }
 
@@ -149,11 +173,15 @@
       }
     }
 
-    /* ===== АДАПТИВ ===== */
+    /* Адаптив */
     @media (max-width: 650px) {
       .schedule-section {
         padding: 16px 12px;
         border-radius: 24px;
+      }
+      .table-wrapper {
+        border-radius: 16px;
+        margin: 0 -2px;
       }
       .schedule-table {
         font-size: 0.8rem;
