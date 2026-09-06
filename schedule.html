@@ -321,6 +321,8 @@
 
 <script type="module">
   import { dataManager } from './dataManager.js';
+  import { initSidebarButtons } from './app-settings.js';
+  import { loadTheme } from './theme.js';
 
   // Пустое расписание (без демо-данных)
   function createEmptySchedule() {
@@ -475,6 +477,10 @@
   document.getElementById('btnTeachers')?.addEventListener('click', () => window.location.href = 'teacher.html');
   document.getElementById('btnResources')?.addEventListener('click', () => window.location.href = 'resources.html');
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href = 'homework.html');
+
+  // ===== ДОБАВЛЯЕМ КНОПКУ ТЕМЫ =====
+  initSidebarButtons();
+  loadTheme();
 
   loadSchedule();
 </script>
