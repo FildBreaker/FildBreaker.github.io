@@ -11,25 +11,24 @@
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="icon" href="data/icon.ico?v=2">
   <style>
-    /* ===== СКРОЛЛ ВСЕЙ СТРАНИЦЫ (ГОРИЗОНТАЛЬНЫЙ) ===== */
+    /* ===== ГЛОБАЛЬНЫЙ СКРОЛЛ СТРАНИЦЫ (горизонтальный) ===== */
     html, body {
-      overflow-x: auto;               /* страница может скроллиться вправо */
+      overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
 
     /* ===== ТАБЛИЦА ===== */
     .schedule-table {
       width: auto;
-      min-width: 100%;               /* чтобы таблица была шире, если колонки не влазят */
+      min-width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       font-size: 0.9rem;
       background: transparent;
-      /* задаём фиксированную ширину колонок, чтобы таблица гарантированно была шире экрана */
-      table-layout: fixed;
+      table-layout: fixed;           /* фиксированная ширина колонок */
     }
 
-    /* Ширина колонок: первая (время) – 160px, остальные – по 130px */
+    /* Ширина колонок: время – 160px, дни – 130px */
     .schedule-table th:first-child,
     .schedule-table td:first-child {
       width: 160px;
@@ -44,7 +43,7 @@
       max-width: 130px;
     }
 
-    /* Оформление (всё как в styles.css, но дублируем для надёжности) */
+    /* Оформление */
     .schedule-table th {
       background: var(--table-header-bg);
       color: var(--table-header-color);
@@ -67,7 +66,9 @@
       vertical-align: middle;
       background: var(--card-bg);
       transition: background 0.2s;
-      word-break: break-word;
+      overflow: hidden;             /* чтобы содержимое не вылезало */
+      word-break: break-word;       /* перенос длинных слов */
+      hyphens: auto;                /* перенос по слогам (опционально) */
     }
     .schedule-table tr:last-child td {
       border-bottom: none;
@@ -76,6 +77,7 @@
       font-weight: 600;
       color: var(--text-secondary);
       background: var(--bg-hover);
+      white-space: nowrap;
     }
 
     .schedule-cell {
@@ -90,11 +92,14 @@
       flex-direction: column;
       gap: 4px;
       position: relative;
+      overflow: hidden;             /* чтобы дочерние элементы не вылезали */
+      word-break: break-word;
     }
     .cell-content .subject {
       font-weight: 500;
       font-size: 0.9rem;
       word-break: break-word;
+      overflow-wrap: break-word;
     }
     .cell-content .end-date {
       font-size: 0.75rem;
@@ -102,6 +107,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      white-space: nowrap;          /* дата не переносится */
     }
     .cell-content .edit-icon {
       position: absolute;
@@ -123,6 +129,8 @@
       font-size: 0.8rem;
       padding: 6px;
       letter-spacing: 0.5px;
+      word-break: normal;
+      white-space: nowrap;
     }
 
     /* Подсказка о прокрутке для мобильных */
