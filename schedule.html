@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <title>Расписание | Б-21ЛЕС</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="icon" href="data/icon.ico?v=2">
   <style>
-    /* === ГАРАНТИРОВАННАЯ ГОРИЗОНТАЛЬНАЯ ПРОКРУТКА === */
+    /* ===== ГЛОБАЛЬНЫЙ СКРОЛЛ СТРАНИЦЫ ===== */
+    html, body {
+      overflow-x: auto;              /* страница может скроллиться горизонтально */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ===== КОНТЕЙНЕР ТАБЛИЦЫ ===== */
     .table-wrapper {
       overflow-x: scroll !important;
       overflow-y: visible;
@@ -26,6 +29,8 @@
       scrollbar-width: thin;
       scrollbar-color: var(--accent) var(--bg-hover);
       position: relative;
+      /* Добавим минимальную высоту для чувствительности скролла */
+      min-height: 100px;
     }
     .table-wrapper::-webkit-scrollbar {
       height: 6px;
@@ -39,18 +44,16 @@
       background: var(--accent);
       border-radius: 4px;
     }
-    .table-wrapper::-webkit-scrollbar-thumb:hover {
-      background: var(--link-hover);
-    }
 
+    /* ===== ТАБЛИЦА ===== */
     .schedule-table {
-      table-layout: fixed;                /* фиксированная ширина колонок */
-      width: auto;                       /* подстраивается под содержимое */
+      width: auto;
       min-width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       font-size: 0.9rem;
       background: transparent;
+      /* таблица будет шире экрана за счёт фиксированных колонок */
     }
 
     /* Задаём ширину колонок, чтобы таблица гарантированно была шире экрана */
@@ -63,9 +66,9 @@
     }
     .schedule-table th:not(:first-child),
     .schedule-table td:not(:first-child) {
-      width: 120px;
-      min-width: 120px;
-      max-width: 120px;
+      width: 130px;
+      min-width: 130px;
+      max-width: 130px;
     }
 
     .schedule-table th {
@@ -148,7 +151,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* Подсказка о прокрутке для мобильных */
+    /* ===== ПОДСКАЗКА ДЛЯ МОБИЛЬНЫХ ===== */
     .scroll-hint {
       display: none;
       text-align: center;
@@ -164,7 +167,7 @@
       }
     }
 
-    /* Адаптив для маленьких экранов – уменьшаем размеры, но сохраняем ширину колонок */
+    /* ===== АДАПТИВ ===== */
     @media (max-width: 650px) {
       .schedule-section {
         padding: 16px 12px;
@@ -313,7 +316,7 @@
 <script type="module">
   import { dataManager } from './dataManager.js';
 
-  // ===== ПУСТОЕ РАСПИСАНИЕ (без демо-данных) =====
+  // Пустое расписание (без демо-данных)
   function createEmptySchedule() {
     const empty = {};
     for (let day = 0; day < 7; day++) {
@@ -454,6 +457,7 @@
   document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
   document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
 
+  // Кнопки сайдбара
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
