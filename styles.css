@@ -1318,3 +1318,49 @@ body::after {
 .type-toggle.active i {
   color: var(--accent);
 }
+/* ===== КАСТОМНЫЙ СКРОЛЛ ДЛЯ МОДАЛОК ===== */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--btn-primary-hover);
+}
+
+/* Для Firefox */
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-hover);
+}
+
+/* Для контейнера с опциями тем (если понадобится) */
+#themeOptions::-webkit-scrollbar {
+  width: 5px;
+}
+
+#themeOptions::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 10px;
+}
+
+#themeOptions::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+
+#themeOptions {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-hover);
+}
