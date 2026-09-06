@@ -11,9 +11,9 @@
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="icon" href="data/icon.ico?v=2">
   <style>
-    /* === ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ГАРАНТИРОВАННОЙ ГОРИЗОНТАЛЬНОЙ ПРОКРУТКИ === */
+    /* === ГАРАНТИРОВАННАЯ ГОРИЗОНТАЛЬНАЯ ПРОКРУТКА === */
     .table-wrapper {
-      overflow-x: scroll !important;           /* принудительно показываем скролл */
+      overflow-x: scroll !important;
       overflow-y: visible;
       -webkit-overflow-scrolling: touch !important;
       touch-action: pan-x !important;
@@ -42,15 +42,32 @@
     .table-wrapper::-webkit-scrollbar-thumb:hover {
       background: var(--link-hover);
     }
+
     .schedule-table {
-      width: 100%;
-      min-width: 760px;                      /* шире экрана, чтобы появился скролл */
+      table-layout: fixed;                /* фиксированная ширина колонок */
+      width: auto;                       /* подстраивается под содержимое */
+      min-width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       font-size: 0.9rem;
       background: transparent;
-      table-layout: auto;
     }
+
+    /* Задаём ширину колонок, чтобы таблица гарантированно была шире экрана */
+    .schedule-table th:first-child,
+    .schedule-table td:first-child {
+      width: 160px;
+      min-width: 160px;
+      max-width: 160px;
+      white-space: nowrap;
+    }
+    .schedule-table th:not(:first-child),
+    .schedule-table td:not(:first-child) {
+      width: 120px;
+      min-width: 120px;
+      max-width: 120px;
+    }
+
     .schedule-table th {
       background: var(--table-header-bg);
       color: var(--table-header-color);
@@ -66,12 +83,14 @@
     .schedule-table th:last-child {
       border-top-right-radius: 24px;
     }
+
     .schedule-table td {
       padding: 12px 10px;
       border-bottom: 1px solid var(--border-color);
       vertical-align: middle;
       background: var(--card-bg);
       transition: background 0.2s;
+      word-break: break-word;
     }
     .schedule-table tr:last-child td {
       border-bottom: none;
@@ -80,14 +99,11 @@
       font-weight: 600;
       color: var(--text-secondary);
       background: var(--bg-hover);
-      width: 160px;
-      min-width: 140px;
-      white-space: nowrap;
     }
+
     .schedule-cell {
       cursor: pointer;
       transition: background 0.2s;
-      min-width: 80px;
     }
     .schedule-cell:hover {
       background: var(--table-row-hover);
@@ -97,7 +113,6 @@
       flex-direction: column;
       gap: 4px;
       position: relative;
-      min-width: 60px;
     }
     .cell-content .subject {
       font-weight: 500;
@@ -123,6 +138,7 @@
     .schedule-cell:hover .edit-icon {
       opacity: 1;
     }
+
     .break-row td {
       background: var(--table-header-bg);
       color: var(--table-header-color);
@@ -131,6 +147,7 @@
       padding: 6px;
       letter-spacing: 0.5px;
     }
+
     /* Подсказка о прокрутке для мобильных */
     .scroll-hint {
       display: none;
@@ -146,6 +163,8 @@
         display: block;
       }
     }
+
+    /* Адаптив для маленьких экранов – уменьшаем размеры, но сохраняем ширину колонок */
     @media (max-width: 650px) {
       .schedule-section {
         padding: 16px 12px;
@@ -156,17 +175,23 @@
         margin: 0 -2px;
       }
       .schedule-table {
-        min-width: 720px;
         font-size: 0.8rem;
       }
       .schedule-table th,
       .schedule-table td {
         padding: 10px 8px;
       }
+      .schedule-table th:first-child,
       .schedule-table td:first-child {
         width: 120px;
+        min-width: 120px;
+        max-width: 120px;
+      }
+      .schedule-table th:not(:first-child),
+      .schedule-table td:not(:first-child) {
+        width: 100px;
         min-width: 100px;
-        font-size: 0.75rem;
+        max-width: 100px;
       }
       .cell-content .subject {
         font-size: 0.8rem;
@@ -178,19 +203,26 @@
         opacity: 0.5;
       }
     }
+
     @media (max-width: 420px) {
       .schedule-table {
-        min-width: 640px;
         font-size: 0.7rem;
       }
       .schedule-table th,
       .schedule-table td {
         padding: 8px 6px;
       }
+      .schedule-table th:first-child,
       .schedule-table td:first-child {
         width: 90px;
+        min-width: 90px;
+        max-width: 90px;
+      }
+      .schedule-table th:not(:first-child),
+      .schedule-table td:not(:first-child) {
+        width: 80px;
         min-width: 80px;
-        font-size: 0.65rem;
+        max-width: 80px;
       }
       .cell-content .subject {
         font-size: 0.7rem;
