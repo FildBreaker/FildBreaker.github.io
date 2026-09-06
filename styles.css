@@ -1277,3 +1277,44 @@ body::after {
     padding: 20px;
   }
 }
+/* ===== КНОПКИ-ПЕРЕКЛЮЧАТЕЛИ ТИПА ЗАНЯТИЯ (в модалке расписания) ===== */
+.type-toggle {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 40px;
+  padding: 8px 18px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.type-toggle:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--text-color);
+  transform: translateY(-2px);
+}
+
+.type-toggle.active {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--text-color);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.type-toggle i {
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.type-toggle.active i {
+  color: var(--accent);
+}
