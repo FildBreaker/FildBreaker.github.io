@@ -13,6 +13,20 @@ export const THEMES = {
   'light-red':   '☀️ Светлая красная'
 };
 
+// Фоновые изображения для каждой темы (высокое разрешение, подходят по цвету)
+const THEME_BG = {
+  'dark-gold':   'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80',
+  'dark-blue':   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
+  'dark-green':  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80',
+  'dark-purple': 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80', // можно подобрать фиолетовый
+  'dark-red':    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
+  'light-gold':  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80',
+  'light-blue':  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
+  'light-green': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80',
+  'light-purple':'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80',
+  'light-red':   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80'
+};
+
 const themePreviewColors = {
   'dark-gold':   '#ffb347',
   'dark-blue':   '#4a8cff',
@@ -33,11 +47,17 @@ export function applyTheme(themeName) {
   if (!themeName || !THEMES[themeName]) {
     themeName = 'dark-gold';
   }
+  // Удаляем старый класс темы
   document.body.className = document.body.className
     .split(' ')
     .filter(c => !c.startsWith('theme-'))
     .join(' ');
   document.body.classList.add(`theme-${themeName}`);
+  
+  // Устанавливаем фоновое изображение через CSS-переменную
+  const bgUrl = THEME_BG[themeName] || THEME_BG['dark-gold'];
+  document.documentElement.style.setProperty('--bg-image-url', `url("${bgUrl}")`);
+  
   currentTheme = themeName;
   try {
     localStorage.setItem('b21-theme', themeName);
