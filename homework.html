@@ -56,8 +56,8 @@
     <h3 id="subjectModalTitle"><i class="fas fa-graduation-cap"></i> Новый предмет</h3>
     <input type="text" id="subjectNameInput" placeholder="Название предмета" autocomplete="off">
     <div class="modal-buttons">
-      <button id="saveSubjectBtn" class="save-btn">Сохранить</button>
-      <button id="cancelSubjectBtn" class="cancel-btn">Отмена</button>
+      <button id="saveSubjectBtn" type="button" class="save-btn">Сохранить</button>
+      <button id="cancelSubjectBtn" type="button" class="cancel-btn">Отмена</button>
     </div>
   </div>
 </div>
@@ -74,8 +74,8 @@
     <label>Дополнительные метки (опционально)</label>
     <input type="text" id="taskTags" placeholder="Ключевые слова через запятую">
     <div class="modal-buttons">
-      <button id="saveTaskBtn" class="save-btn">Сохранить задание</button>
-      <button id="cancelTaskBtn" class="cancel-btn">Отмена</button>
+      <button id="saveTaskBtn" type="button" class="save-btn">Сохранить задание</button>
+      <button id="cancelTaskBtn" type="button" class="cancel-btn">Отмена</button>
     </div>
   </div>
 </div>
@@ -222,7 +222,7 @@
   }
   async function addTask(subjectId, taskData) {
     const subject = homeworkData.subjects.find(s => s.id === subjectId);
-    if (!subject) return;
+    if (!subject) { console.error('[addTask] subject not found:', subjectId); return; }
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
     subject.tasks.push({ id: newId, desc: taskData.desc || '', links: taskData.links || [], tags: taskData.tags || '' });
     await saveData();
@@ -329,6 +329,7 @@
 
     taskModal.style.display = 'flex';
   }
+
   function closeTaskModal() {
     taskModal.style.display = 'none';
     editTaskId = null;
@@ -336,16 +337,37 @@
     if (c) c.innerHTML = '';
     taskEditor = null;
   }
+
   async function saveTaskFromModal() {
-    const descHtml = taskEditor ? taskEditor.getContent() : '';
-    const descText = taskEditor ? taskEditor.getText().trim() : '';
-    if (!descText) return alert('Введите описание задания');
-    const links = collectLinks();
-    const tags = taskTags.value.trim();
-    const taskData = { desc: sanitizeHtml(descHtml), links, tags };
-    if (editTaskId) await updateTask(currentSubjectId, editTaskId, taskData);
-    else await addTask(currentSubjectId, taskData);
-    closeTaskModal();
+    try {
+      console.log('[SaveTask] handler called');
+      console.log('[SaveTask] editTaskId =', editTaskId, ', currentSubjectId =', currentSubjectId);
+      if (!currentSubjectId) { alert('Не выбран предмет'); return; }
+
+      const descHtml = taskEditor ? taskEditor.getContent() : '';
+      const descText = taskEditor ? taskEditor.getText().trim() : '';
+      console.log('[SaveTask] descText length:', descText.length, 'html length:', descHtml.length);
+
+      if (!descText) { alert('Введите описание задания'); return; }
+
+      const links = collectLinks();
+      const tags = taskTags.value.trim();
+      const taskData = { desc: sanitizeHtml(descHtml), links, tags };
+      console.log('[SaveTask] taskData ready:', taskData);
+
+      if (editTaskId) {
+        await updateTask(currentSubjectId, editTaskId, taskData);
+        console.log('[SaveTask] updated');
+      } else {
+        await addTask(currentSubjectId, taskData);
+        console.log('[SaveTask] added');
+      }
+      closeTaskModal();
+      console.log('[SaveTask] modal closed');
+    } catch (err) {
+      console.error('[SaveTask] ERROR:', err);
+      alert('Ошибка сохранения: ' + (err && err.message ? err.message : err));
+    }
   }
 
   document.getElementById('addSubjectBtn').addEventListener('click', () => openSubjectModal());
@@ -355,7 +377,20 @@
   document.getElementById('saveSubjectBtn').addEventListener('click', saveSubjectFromModal);
   document.getElementById('closeTaskModal').addEventListener('click', closeTaskModal);
   document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
-  document.getElementById('saveTaskBtn').addEventListener('click', saveTaskFromModal);
+
+  const saveBtn = document.getElementById('saveTaskBtn');
+  console.log('[Init] saveTaskBtn found:', !!saveBtn);
+  if (saveBtn) {
+    saveBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[SaveTask] click event received');
+      saveTaskFromModal();
+    });
+  } else {
+    console.error('[Init] saveTaskBtn NOT FOUND');
+  }
+
   addLinkBtn.addEventListener('click', () => addLinkGroup('', ''));
 
   window.addEventListener('click', (e) => {
