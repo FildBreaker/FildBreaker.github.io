@@ -166,7 +166,7 @@
 
   async function saveData() { await dataManager.save('homework', homeworkData); }
 
-  function renderSubjects() {
+    function renderSubjects() {
     const container = document.getElementById('subjectsList');
     container.innerHTML = '';
     homeworkData.subjects.forEach(subj => {
@@ -180,8 +180,15 @@
           <button class="delete-subject" data-id="${subj.id}"><i class="fas fa-trash"></i></button>
         </div>
       `;
-      div.querySelector('.subject-name').addEventListener('click', () => selectSubject(subj.id));
-      div.querySelector('.edit-subject').addEventListener('click', (e) => { e.stopPropagation(); openSubjectModal(subj.id); });
+      // Клик по всему элементу (кроме кнопок) — переключение предмета
+      div.addEventListener('click', (e) => {
+        if (e.target.closest('button')) return;
+        selectSubject(subj.id);
+      });
+      div.querySelector('.edit-subject').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSubjectModal(subj.id);
+      });
       div.querySelector('.delete-subject').addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!confirm(`Удалить предмет "${subj.name}" и все его задания?`)) return;
