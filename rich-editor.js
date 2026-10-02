@@ -1,9 +1,5 @@
 // rich-editor.js
-// ============================================================
-// Единый Rich-Text редактор для всего сайта
-// ============================================================
-
-const ALLOWED_TAGS = ['B','I','U','S','BR','SPAN','P','DIV','STRONG','EM','FONT','MARK','SUB','SUP'];
+const ALLOWED_TAGS = ['B','I','U','S','BR','SPAN','STRONG','EM','FONT','MARK','SUB','SUP'];
 
 export function escapeHtml(str) {
   if (str == null) return '';
@@ -15,16 +11,13 @@ export function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// Очистка HTML от опасных тегов/атрибутов
 export function sanitizeHtml(html) {
   if (!html) return '';
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
-
   function walk(node) {
-    if (node.nodeType === 3) return; // text
+    if (node.nodeType === 3) return;
     if (node.nodeType !== 1) return;
-
     const tag = node.tagName;
     if (!ALLOWED_TAGS.includes(tag)) {
       const frag = document.createDocumentFragment();
@@ -32,36 +25,31 @@ export function sanitizeHtml(html) {
       node.parentNode.replaceChild(frag, node);
       return;
     }
-
     [...node.attributes].forEach(attr => {
       const name = attr.name.toLowerCase();
       const value = attr.value;
       if (name.startsWith('on')) node.removeAttribute(attr.name);
-      if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(value)) {
-        node.removeAttribute(attr.name);
-      }
-      // Разрешаем только class из известных анимаций
+      if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(value)) node.removeAttribute(attr.name);
       if (name === 'class') {
         const safe = value.split(/\s+/).filter(c => c.startsWith('anim-')).join(' ');
         if (safe) node.setAttribute('class', safe);
         else node.removeAttribute('class');
       }
+      if (name === 'style') {
+        const safeStyle = value.split(';').filter(s => /^\s*(color|background-color)\s*:/i.test(s)).join(';');
+        if (safeStyle) node.setAttribute('style', safeStyle);
+        else node.removeAttribute('style');
+      }
     });
-
     [...node.childNodes].forEach(walk);
   }
-
   [...tmp.childNodes].forEach(walk);
   return tmp.innerHTML;
 }
 
-// ============================================================
-// СОЗДАНИЕ РЕДАКТОРА
-// ============================================================
 export function createRichEditor(target, options = {}) {
   const container = typeof target === 'string' ? document.getElementById(target) : target;
   if (!container) return null;
-
   const placeholder = options.placeholder || 'Введите текст...';
   const initial = options.value || '';
   const minHeight = options.minHeight || '100px';
@@ -69,30 +57,31 @@ export function createRichEditor(target, options = {}) {
   container.classList.add('rich-editor-wrapper');
   container.innerHTML = `
     <div class="rich-toolbar" role="toolbar">
-      <button type="button" data-cmd="bold" title="Жирный (Ctrl+B)"><i class="fas fa-bold"></i></button>
-      <button type="button" data-cmd="italic" title="Курсив (Ctrl+I)"><i class="fas fa-italic"></i></button>
-      <button type="button" data-cmd="underline" title="Подчёркнутый (Ctrl+U)"><i class="fas fa-underline"></i></button>
+      <button type="button" data-cmd="bold" title="Жирный"><i class="fas fa-bold"></i></button>
+      <button type="button" data-cmd="italic" title="Курсив"><i class="fas fa-italic"></i></button>
+      <button type="button" data-cmd="underline" title="Подчёркнутый"><i class="fas fa-underline"></i></button>
       <button type="button" data-cmd="strikeThrough" title="Зачёркнутый"><i class="fas fa-strikethrough"></i></button>
       <span class="rich-sep"></span>
-      <label class="rich-color-picker" title="Цвет текста">
+      <button type="button" class="rich-color-btn" data-cmd="foreColor" title="Цвет текста">
         <i class="fas fa-font"></i>
-        <input type="color" data-cmd="foreColor" value="#ffb347">
-      </label>
-      <label class="rich-color-picker" title="Выделение">
+        <span class="rich-color-swatch" data-swatch="foreColor" style="background:#ffb347;"></span>
+      </button>
+      <input type="color" class="rich-color-input-hidden" data-input="foreColor" value="#ffb347">
+      <button type="button" class="rich-color-btn" data-cmd="hiliteColor" title="Выделение">
         <i class="fas fa-highlighter"></i>
-        <input type="color" data-cmd="hiliteColor" value="#fff3b0">
-      </label>
+        <span class="rich-color-swatch" data-swatch="hiliteColor" style="background:#fff3b0;"></span>
+      </button>
+      <input type="color" class="rich-color-input-hidden" data-input="hiliteColor" value="#fff3b0">
       <span class="rich-sep"></span>
       <button type="button" data-anim="anim-glow" title="Свечение"><i class="fas fa-sun"></i></button>
       <button type="button" data-anim="anim-pulse" title="Пульсация"><i class="fas fa-heartbeat"></i></button>
       <button type="button" data-anim="anim-shake" title="Тряска"><i class="fas fa-bolt"></i></button>
       <button type="button" data-anim="anim-gradient" title="Градиент"><i class="fas fa-fill-drip"></i></button>
       <span class="rich-sep"></span>
-      <button type="button" data-cmd="removeFormat" title="Очистить формат"><i class="fas fa-eraser"></i></button>
+      <button type="button" data-cmd="removeFormat" title="Очистить"><i class="fas fa-eraser"></i></button>
     </div>
     <div class="rich-content" contenteditable="true" data-placeholder="${escapeHtml(placeholder)}" style="min-height:${minHeight};">${initial}</div>
   `;
-
   const content = container.querySelector('.rich-content');
   const toolbar = container.querySelector('.rich-toolbar');
 
@@ -106,14 +95,14 @@ export function createRichEditor(target, options = {}) {
       } catch (_) {}
     });
   }
-
   function updatePlaceholder() {
-    const empty = content.textContent.trim() === '' && !content.querySelector('img, br + *, span');
+    const empty = content.textContent.trim() === '' && !content.querySelector('span');
     content.classList.toggle('empty', empty);
   }
 
-  toolbar.querySelectorAll('[data-cmd]').forEach(btn => {
-    if (btn.tagName === 'INPUT') return;
+  // Обычные команды (жирный, курсив, ...)
+  toolbar.querySelectorAll('button[data-cmd]').forEach(btn => {
+    if (btn.classList.contains('rich-color-btn')) return; // кнопки цвета обрабатываются отдельно
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
       e.preventDefault();
@@ -123,14 +112,31 @@ export function createRichEditor(target, options = {}) {
     });
   });
 
-  toolbar.querySelectorAll('input[type="color"]').forEach(input => {
-    input.addEventListener('mousedown', e => e.preventDefault());
-    input.addEventListener('input', e => {
-      content.focus();
-      document.execCommand(input.dataset.cmd, false, e.target.value);
+  // Кнопки выбора цвета: клик по кнопке → открывает скрытый input
+  toolbar.querySelectorAll('.rich-color-btn').forEach(btn => {
+    btn.addEventListener('mousedown', e => e.preventDefault());
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const cmd = btn.dataset.cmd;
+      const input = toolbar.querySelector(`.rich-color-input-hidden[data-input="${cmd}"]`);
+      if (input) input.click();
     });
   });
 
+  // Скрытые инпуты цвета — применяем выбранный цвет + обновляем полоску
+  toolbar.querySelectorAll('.rich-color-input-hidden').forEach(input => {
+    input.addEventListener('input', e => {
+      content.focus();
+      const cmd = input.dataset.input;
+      const color = e.target.value;
+      document.execCommand(cmd, false, color);
+      // Обновляем цветную полоску у соответствующей кнопки
+      const swatch = toolbar.querySelector(`.rich-color-swatch[data-swatch="${cmd}"]`);
+      if (swatch) swatch.style.background = color;
+    });
+  });
+
+  // Анимации текста
   toolbar.querySelectorAll('[data-anim]').forEach(btn => {
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
@@ -143,8 +149,6 @@ export function createRichEditor(target, options = {}) {
   content.addEventListener('mouseup', updateState);
   content.addEventListener('focus', updateState);
   content.addEventListener('input', updatePlaceholder);
-
-  // Вставка — чистый текст, \n → <br>, чтобы переносы сохранялись
   content.addEventListener('paste', e => {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
@@ -152,8 +156,6 @@ export function createRichEditor(target, options = {}) {
     document.execCommand('insertHTML', false, html);
     updatePlaceholder();
   });
-
-  // Enter → <br> вместо <div>
   content.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -178,8 +180,6 @@ function applyAnimation(content, animClass) {
   if (!sel || !sel.rangeCount) return;
   const range = sel.getRangeAt(0);
   if (range.collapsed) return;
-
-  // Если уже есть span с этим классом — убираем (toggle)
   let parent = range.commonAncestorContainer;
   if (parent.nodeType === 3) parent = parent.parentNode;
   if (parent && parent.classList && parent.classList.contains(animClass)) {
@@ -191,12 +191,10 @@ function applyAnimation(content, animClass) {
     }
     return;
   }
-
   const span = document.createElement('span');
   span.className = animClass;
-  try {
-    range.surroundContents(span);
-  } catch (_) {
+  try { range.surroundContents(span); }
+  catch (_) {
     const frag = range.extractContents();
     span.appendChild(frag);
     range.insertNode(span);
