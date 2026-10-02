@@ -385,18 +385,42 @@ body {
   scroll-behavior: smooth;
 }
 
+/* ============================================================
+   ФОН: 3 слоя — градиент (instant) → картинка (fade) → overlay
+   ============================================================ */
+
+/* Слой 1: градиент-подложка — мгновенный, без сети */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
-  background: var(--bg-image-url) center/cover no-repeat;
+  z-index: -3;
+  background: var(--bg-image-css, linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f));
   filter: blur(10px);
   -webkit-filter: blur(10px);
   transform: scale(1.05);
   will-change: transform;
 }
 
+/* Слой 2: картинка — плавно проявляется через opacity */
+#bgImageLayer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--bg-image-url, none) center/cover no-repeat;
+  filter: blur(10px);
+  -webkit-filter: blur(10px);
+  transform: scale(1.05);
+  opacity: 0;
+  transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+  pointer-events: none;
+}
+#bgImageLayer.visible {
+  opacity: 1;
+}
+
+/* Слой 3: затемнение для читаемости */
 body::after {
   content: "";
   position: fixed;
@@ -404,6 +428,26 @@ body::after {
   z-index: -1;
   background: var(--bg-overlay);
   pointer-events: none;
+}
+
+/* ============================================================
+   Стартовые градиенты — мгновенно, до загрузки картинки
+   ============================================================ */
+html:not([data-theme]),
+html[data-theme="dark-gold"]   { --bg-image-css: linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f); }
+html[data-theme="dark-blue"]   { --bg-image-css: linear-gradient(135deg, #0a1628, #1a2a4a, #1f3a6a); }
+html[data-theme="dark-green"]  { --bg-image-css: linear-gradient(135deg, #0a1f0a, #1a3a1a, #2a5a2a); }
+html[data-theme="dark-purple"] { --bg-image-css: linear-gradient(135deg, #1a0a2a, #2a1a4a, #3a2a6a); }
+html[data-theme="dark-red"]    { --bg-image-css: linear-gradient(135deg, #2a0a0a, #4a1a1a, #6a2a2a); }
+html[data-theme="light-gold"]  { --bg-image-css: linear-gradient(135deg, #fdf6e3, #f5e6ca, #ecd4b0); }
+html[data-theme="light-blue"]  { --bg-image-css: linear-gradient(135deg, #e8f0fe, #d0e0f5, #b8d0ec); }
+html[data-theme="light-green"] { --bg-image-css: linear-gradient(135deg, #e8f5e8, #d0ecda, #b8e3cc); }
+html[data-theme="light-purple"]{ --bg-image-css: linear-gradient(135deg, #f0e8f5, #e0d0ec, #d0b8e3); }
+html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8, #ecd0d0, #e3b8b8); }
+
+/* Пока тема не определена — overlay слабее, чтобы градиент дышал */
+html:not([data-theme]) body {
+  --bg-overlay: rgba(0, 0, 0, 0.45);
 }
 
 .app-grid {
