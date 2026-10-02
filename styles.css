@@ -2444,3 +2444,49 @@ a:hover {
     0 0 14px var(--accent-glow);
   transform: scale(1.05);
 }
+
+/* ============================================================
+   DRAG-AND-DROP СОРТИРОВКА
+   ============================================================ */
+.drag-sort-container > [data-id] {
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+.drag-sort-container > [data-id]:active { cursor: grabbing; }
+.drag-sort-container.drag-active > [data-id] { cursor: grabbing; }
+
+.drag-placeholder {
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg-active);
+  opacity: 0.55;
+  pointer-events: none;
+  box-sizing: border-box;
+  transition: opacity 0.2s ease;
+}
+
+.dragging-source {
+  opacity: 0.22 !important;
+  filter: grayscale(0.7);
+}
+
+.drag-ghost {
+  border-radius: var(--radius);
+  box-shadow:
+    0 22px 44px rgba(0, 0, 0, 0.45),
+    0 0 0 1px var(--accent-glow),
+    0 0 32px -4px var(--accent-glow);
+  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  will-change: left, top, transform;
+}
+
+body.drag-in-progress,
+body.drag-in-progress * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+.drag-sort-container .subject-item[data-id] { cursor: grab; }
+.drag-sort-container .subject-item.dragging-source { opacity: 0.22 !important; }
