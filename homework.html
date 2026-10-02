@@ -7,13 +7,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css?v=3">
   <link rel="icon" href="data/icon.ico?v=3">
+  <script src="page-animations.js?v=3"></script>
+  <script src="card-tilt.js?v=3"></script>
+  <script src="drag-sort.js?v=3"></script>
   <script type="module" src="firebase-config.js?v=3"></script>
   <script type="module" src="dataManager.js?v=3"></script>
   <script type="module" src="rich-editor.js?v=3"></script>
   <script type="module" src="theme.js?v=3"></script>
   <script type="module" src="app-settings.js?v=3"></script>
-  <script src="page-animations.js?v=3"></script>
-  <script src="card-tilt.js?v=3"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -92,11 +93,9 @@
   let editTaskId = null;
   let taskEditor = null;
 
-  // ===== НОРМАЛИЗАЦИЯ ДАННЫХ (чиним массив/объект от Firebase) =====
   function toArray(val) {
     if (Array.isArray(val)) return val;
     if (val && typeof val === 'object') {
-      // Firebase мог вернуть объект с числовыми ключами
       return Object.keys(val).sort((a,b) => Number(a) - Number(b)).map(k => val[k]);
     }
     return [];
@@ -127,10 +126,11 @@
   }
 
   async function loadData() {
+    if (window.showSkeleton) window.showSkeleton('tasksContainer', 3, 'row');
+
     const saved = await dataManager.load('homework');
     homeworkData = normalizeHomework(saved);
 
-    // Если вообще пусто — начальные данные
     if (homeworkData.subjects.length === 0 && !saved) {
       homeworkData = {
         subjects: [
@@ -140,6 +140,8 @@
       };
       await dataManager.save('homework', homeworkData);
     }
+
+    if (window.hideSkeleton) window.hideSkeleton('tasksContainer');
 
     renderSubjects();
     const activeId = sessionStorage.getItem('activeSubjectId');
@@ -156,6 +158,7 @@
     homeworkData.subjects.forEach(subj => {
       const div = document.createElement('div');
       div.className = `subject-item ${currentSubjectId === subj.id ? 'active' : ''}`;
+      div.dataset.id = subj.id;
       div.innerHTML = `
         <span class="subject-name"><i class="fas fa-chalkboard"></i> ${escapeHtml(subj.name)}</span>
         <div class="subject-actions">
@@ -203,6 +206,7 @@
     tasks.forEach(task => {
       const card = document.createElement('div');
       card.className = 'task-card';
+      card.dataset.id = task.id;
       let linksHtml = '';
       if (task.links && task.links.length) {
         linksHtml = '<div class="task-links"><i class="fas fa-link"></i> Ресурсы: ';
@@ -443,6 +447,35 @@
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
 
   loadData();
+
+  // Drag-and-drop: задания внутри текущего предмета
+  const tasksContainer = document.getElementById('tasksContainer');
+  window.enableDragSort(tasksContainer, {
+    itemSelector: '.task-card',
+    onReorder: async (newIds) => {
+      if (!currentSubjectId) return;
+      const subject = homeworkData.subjects.find(s => s.id === currentSubjectId);
+      if (!subject) return;
+      const map = new Map(subject.tasks.map(t => [t.id, t]));
+      subject.tasks = newIds.map(id => map.get(id)).filter(Boolean);
+      await saveData();
+      renderTasks(subject.tasks);
+      showToast('Порядок сохранён');
+    }
+  });
+
+  // Drag-and-drop: предметы в сайдбаре
+  const subjectsList = document.getElementById('subjectsList');
+  window.enableDragSort(subjectsList, {
+    itemSelector: '.subject-item',
+    onReorder: async (newIds) => {
+      const map = new Map(homeworkData.subjects.map(s => [s.id, s]));
+      homeworkData.subjects = newIds.map(id => map.get(id)).filter(Boolean);
+      await saveData();
+      renderSubjects();
+      showToast('Порядок сохранён');
+    }
+  });
 </script>
 </body>
 </html>
