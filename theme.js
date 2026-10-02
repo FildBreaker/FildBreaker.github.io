@@ -18,7 +18,12 @@ const THEME_BG = {
   'dark-gold':   'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80', 
   'dark-blue':   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
   'dark-green':  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80',
-  'dark-purple': 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1920&q=80',
+  'dark-purple': [
+    'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1920&q=80',
+    'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&q=80',
+    'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?w=1920&q=80',
+    'https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1920&q=80'
+  ],
   'dark-red':    'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80',
   'light-gold':  'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80',
   'light-blue':  'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=1920&q=80',
