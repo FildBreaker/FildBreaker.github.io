@@ -12,6 +12,7 @@
   <link rel="icon" href="data/icon.ico?v=3">
   <script type="module" src="firebase-config.js?v=3"></script>
   <script type="module" src="dataManager.js?v=3"></script>
+  <script type="module" src="rich-editor.js?v=3"></script>
   <script type="module" src="theme.js?v=3"></script>
   <script type="module" src="app-settings.js?v=3"></script>
 </head>
@@ -38,7 +39,7 @@
       <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
       <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
     </div>
-    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Болшой блат следит за тобой.</p></div>
+    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Большой брат следит за тобой.</p></div>
   </aside>
 
   <main class="main-content">
@@ -53,9 +54,7 @@
       <div class="table-wrapper">
         <table class="schedule-table" id="scheduleTable">
           <thead>
-            <tr>
-              <th>Пара</th><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th>
-            </tr>
+            <tr><th>Пара</th><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
           </thead>
           <tbody id="scheduleBody"></tbody>
         </table>
@@ -64,11 +63,10 @@
   </main>
 
   <footer class="site-footer">
-    <p>© 2026 Б-31ЛЕС · Данные эти никому не сдались. Ыыы</p>
+    <p>© 2026 Б-31ЛЕС · Данные эти никому не сдались.</p>
   </footer>
 </div>
 
-<!-- Модалка редактирования пары -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <span class="close-modal">&times;</span>
@@ -76,29 +74,20 @@
     <form id="editForm">
       <label>Предмет:</label>
       <input type="text" id="editSubject" placeholder="Название предмета">
-
       <label>Аудитория:</label>
       <input type="text" id="editRoom" placeholder="Номер аудитории">
-
       <label>Дата начала (ДД.ММ.ГГГГ) – опционально:</label>
       <input type="text" id="editStartDate" placeholder="01.09.2025">
-
       <label>Дата окончания (ДД.ММ.ГГГГ) – опционально:</label>
       <input type="text" id="editEndDate" placeholder="31.05.2026">
-
       <label>Тип занятия:</label>
       <div style="display:flex; gap:12px; margin-top:6px; flex-wrap:wrap;">
-        <button type="button" id="typeLecture" class="type-toggle" data-type="lecture">
-          <i class="fas fa-chalkboard-teacher"></i> Лекция
-        </button>
-        <button type="button" id="typePractice" class="type-toggle" data-type="practice">
-          <i class="fas fa-tools"></i> Практика
-        </button>
-        <button type="button" id="typeNone" class="type-toggle active" data-type="">
-          <i class="fas fa-ban"></i> Не указано
-        </button>
+        <button type="button" id="typeLecture" class="type-toggle" data-type="lecture"><i class="fas fa-chalkboard-teacher"></i> Лекция</button>
+        <button type="button" id="typePractice" class="type-toggle" data-type="practice"><i class="fas fa-tools"></i> Практика</button>
+        <button type="button" id="typeNone" class="type-toggle active" data-type=""><i class="fas fa-ban"></i> Не указано</button>
       </div>
-
+      <label>Заметки (опционально):</label>
+      <div id="editNotesEditor"></div>
       <div class="modal-buttons">
         <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
         <button type="button" class="cancel-btn">Отмена</button>
@@ -109,8 +98,8 @@
 
 <script type="module">
   import { dataManager } from './dataManager.js';
+  import { createRichEditor, sanitizeHtml } from './rich-editor.js';
 
-  // ===== НАЧАЛЬНЫЕ ДАННЫЕ (с новыми полями) =====
   const defaultSchedule = {
     0: {
       1: { subject: "Проектная деятельность (П)", room: "1-210", startDate: "", endDate: "31.05.2026", type: "practice" },
@@ -152,59 +141,33 @@
       5: { subject: "", room: "", startDate: "", endDate: "", type: "" },
       6: { subject: "", room: "", startDate: "", endDate: "", type: "" }
     },
-    5: {
-      1: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      2: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      3: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      4: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      5: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      6: { subject: "", room: "", startDate: "", endDate: "", type: "" }
-    },
-    6: {
-      1: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      2: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      3: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      4: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      5: { subject: "", room: "", startDate: "", endDate: "", type: "" },
-      6: { subject: "", room: "", startDate: "", endDate: "", type: "" }
-    }
+    5: { 1: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 2: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 3: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 4: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } },
+    6: { 1: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 2: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 3: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 4: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } }
   };
 
   const pairTimes = {
-    1: "1 пара (9:00 – 10:30)",
-    2: "2 пара (10:45 – 12:15)",
-    3: "3 пара (12:30 – 14:00)",
-    4: "4 пара (14:40 – 16:10)",
-    5: "5 пара (16:20 – 17:50)",
-    6: "6 пара (18:00 – 19:30)"
+    1: "1 пара (9:00 – 10:30)", 2: "2 пара (10:45 – 12:15)", 3: "3 пара (12:30 – 14:00)",
+    4: "4 пара (14:40 – 16:10)", 5: "5 пара (16:20 – 17:50)", 6: "6 пара (18:00 – 19:30)"
   };
-  const breaks = {
-    1: "Перерыв: 15 минут",
-    2: "Перерыв: 15 минут",
-    3: "Перерыв: 40 минут",
-    4: "Перерыв: 10 минут",
-    5: "Перерыв: 10 минут"
-  };
+  const breaks = { 1: "Перерыв: 15 минут", 2: "Перерыв: 15 минут", 3: "Перерыв: 40 минут", 4: "Перерыв: 10 минут", 5: "Перерыв: 10 минут" };
   const MAX_PAIR = 6;
   let scheduleData = {};
 
-  // ===== ЗАГРУЗКА И СОХРАНЕНИЕ =====
   async function loadSchedule() {
     const saved = await dataManager.load('schedule');
-    if (saved) {
-      scheduleData = saved;
-    } else {
-      scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
-      await dataManager.save('schedule', scheduleData);
-    }
+    if (saved) scheduleData = saved;
+    else { scheduleData = JSON.parse(JSON.stringify(defaultSchedule)); await dataManager.save('schedule', scheduleData); }
     renderSchedule();
   }
+  async function saveSchedule() { await dataManager.save('schedule', scheduleData); }
 
-  async function saveSchedule() {
-    await dataManager.save('schedule', scheduleData);
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
-  // ===== ОТОБРАЖЕНИЕ ТАБЛИЦЫ (с иконками Font Awesome) =====
   function renderSchedule() {
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
@@ -214,18 +177,15 @@
       tdTime.className = 'pair-time';
       tdTime.innerHTML = `<strong>${pairTimes[pair]}</strong>`;
       tr.appendChild(tdTime);
-
       for (let day = 0; day < 7; day++) {
         const td = document.createElement('td');
         td.className = 'schedule-cell';
-        const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '' };
-
+        const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '' };
         let subjectHtml = lesson.subject ? escapeHtml(lesson.subject) : '—';
         let roomHtml = lesson.room ? ` (${escapeHtml(lesson.room)})` : '';
         let typeIcon = '';
         if (lesson.type === 'lecture') typeIcon = '<i class="fas fa-chalkboard-teacher" style="color:var(--accent);"></i> ';
         else if (lesson.type === 'practice') typeIcon = '<i class="fas fa-tools" style="color:var(--accent);"></i> ';
-
         let dateHtml = '';
         if (lesson.startDate || lesson.endDate) {
           let parts = [];
@@ -233,11 +193,13 @@
           if (lesson.endDate) parts.push(`до ${escapeHtml(lesson.endDate)}`);
           dateHtml = `<div class="end-date"><i class="far fa-calendar-alt"></i> ${parts.join(' ')}</div>`;
         }
-
+        let notesHtml = '';
+        if (lesson.notes) notesHtml = `<div class="cell-notes rich-display">${sanitizeHtml(lesson.notes)}</div>`;
         td.innerHTML = `
           <div class="cell-content">
             <div class="subject">${typeIcon}${subjectHtml}${roomHtml}</div>
             ${dateHtml}
+            ${notesHtml}
             <div class="edit-icon"><i class="fas fa-pen"></i></div>
           </div>
         `;
@@ -247,7 +209,6 @@
         tr.appendChild(td);
       }
       tbody.appendChild(tr);
-
       if (pair < MAX_PAIR) {
         const breakTr = document.createElement('tr');
         breakTr.className = 'break-row';
@@ -260,16 +221,9 @@
     }
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // ===== РЕДАКТИРОВАНИЕ (МОДАЛКА) =====
   let currentEditDay = null, currentEditPair = null;
   let selectedType = '';
+  let notesEditor = null;
 
   const modal = document.getElementById('editModal');
   const editSubject = document.getElementById('editSubject');
@@ -280,7 +234,6 @@
   const typePractice = document.getElementById('typePractice');
   const typeNone = document.getElementById('typeNone');
 
-  // Переключатели типа
   function setType(type) {
     selectedType = type;
     [typeLecture, typePractice, typeNone].forEach(btn => btn.classList.remove('active'));
@@ -288,7 +241,6 @@
     else if (type === 'practice') typePractice.classList.add('active');
     else typeNone.classList.add('active');
   }
-
   typeLecture.addEventListener('click', () => setType('lecture'));
   typePractice.addEventListener('click', () => setType('practice'));
   typeNone.addEventListener('click', () => setType(''));
@@ -296,12 +248,19 @@
   function openEditModal(day, pair) {
     currentEditDay = day;
     currentEditPair = pair;
-    const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '' };
+    const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '' };
     editSubject.value = lesson.subject || '';
     editRoom.value = lesson.room || '';
     editStartDate.value = lesson.startDate || '';
     editEndDate.value = lesson.endDate || '';
     setType(lesson.type || '');
+
+    if (notesEditor) notesEditor = null;
+    const nc = document.getElementById('editNotesEditor');
+    nc.innerHTML = '';
+    notesEditor = createRichEditor(nc, { placeholder: 'Дополнительные заметки...', minHeight: '60px' });
+    notesEditor.setContent(lesson.notes || '');
+
     modal.style.display = 'flex';
   }
 
@@ -309,41 +268,31 @@
     modal.style.display = 'none';
     currentEditDay = null;
     currentEditPair = null;
+    notesEditor = null;
+    const nc = document.getElementById('editNotesEditor');
+    if (nc) nc.innerHTML = '';
   }
 
   async function saveEdit() {
     if (currentEditDay === null || currentEditPair === null) return;
-
     const newSubject = editSubject.value.trim();
     const newRoom = editRoom.value.trim();
     const newStartDate = editStartDate.value.trim();
     let newEndDate = editEndDate.value.trim();
-
     const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
-    if (newStartDate && !datePattern.test(newStartDate)) {
-      alert('Дата начала должна быть в формате ДД.ММ.ГГГГ');
-      return;
-    }
-    if (newEndDate && !datePattern.test(newEndDate)) {
-      alert('Дата окончания должна быть в формате ДД.ММ.ГГГГ');
-      return;
-    }
-
+    if (newStartDate && !datePattern.test(newStartDate)) { alert('Дата начала должна быть в формате ДД.ММ.ГГГГ'); return; }
+    if (newEndDate && !datePattern.test(newEndDate)) { alert('Дата окончания должна быть в формате ДД.ММ.ГГГГ'); return; }
+    const newNotes = notesEditor ? sanitizeHtml(notesEditor.getContent()) : '';
     if (!scheduleData[currentEditDay]) scheduleData[currentEditDay] = {};
     scheduleData[currentEditDay][currentEditPair] = {
-      subject: newSubject,
-      room: newRoom,
-      startDate: newStartDate,
-      endDate: newEndDate,
-      type: selectedType || ''
+      subject: newSubject, room: newRoom, startDate: newStartDate, endDate: newEndDate,
+      type: selectedType || '', notes: newNotes
     };
-
     await saveSchedule();
     renderSchedule();
     closeModal();
   }
 
-  // ===== СБРОС =====
   async function resetToDefault() {
     if (!confirm('Сбросить расписание к исходному?')) return;
     scheduleData = JSON.parse(JSON.stringify(defaultSchedule));
@@ -351,14 +300,12 @@
     renderSchedule();
   }
 
-  // ===== ОБРАБОТЧИКИ =====
   document.querySelector('.close-modal')?.addEventListener('click', closeModal);
   document.querySelector('.cancel-btn')?.addEventListener('click', closeModal);
   window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   document.getElementById('editForm')?.addEventListener('submit', (e) => { e.preventDefault(); saveEdit(); });
   document.getElementById('resetScheduleBtn')?.addEventListener('click', resetToDefault);
 
-  // ===== КНОПКИ САЙДБАРА =====
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;

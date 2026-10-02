@@ -13,18 +13,18 @@ export const THEMES = {
   'light-red':   '☀️ Светлая красная'
 };
 
-// Фоновые изображения для каждой темы (высокое разрешение, подходят по цвету)
+// Уникальные фоны для каждой темы
 const THEME_BG = {
-  'dark-gold':   'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80',
+  'dark-gold':   'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80',
   'dark-blue':   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
   'dark-green':  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80',
-  'dark-purple': 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80', // можно подобрать фиолетовый
-  'dark-red':    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
-  'light-gold':  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80',
-  'light-blue':  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
-  'light-green': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80',
-  'light-purple':'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80',
-  'light-red':   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80'
+  'dark-purple': 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1920&q=80',
+  'dark-red':    'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80',
+  'light-gold':  'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80',
+  'light-blue':  'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=1920&q=80',
+  'light-green': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80',
+  'light-purple':'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=1920&q=80',
+  'light-red':   'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1920&q=80'
 };
 
 const themePreviewColors = {
@@ -44,54 +44,36 @@ let currentTheme = 'dark-gold';
 let themeModal = null;
 
 export function applyTheme(themeName) {
-  if (!themeName || !THEMES[themeName]) {
-    themeName = 'dark-gold';
-  }
-  // Удаляем старый класс темы
+  if (!themeName || !THEMES[themeName]) themeName = 'dark-gold';
   document.body.className = document.body.className
     .split(' ')
     .filter(c => !c.startsWith('theme-'))
     .join(' ');
   document.body.classList.add(`theme-${themeName}`);
-  
-  // Устанавливаем фоновое изображение через CSS-переменную
   const bgUrl = THEME_BG[themeName] || THEME_BG['dark-gold'];
   document.documentElement.style.setProperty('--bg-image-url', `url("${bgUrl}")`);
-  
   currentTheme = themeName;
-  try {
-    localStorage.setItem('b21-theme', themeName);
-  } catch (e) { /* ignore */ }
-  if (themeModal && themeModal.style.display === 'flex') {
-    renderThemeOptions();
-  }
+  try { localStorage.setItem('b21-theme', themeName); } catch (e) {}
+  if (themeModal && themeModal.style.display === 'flex') renderThemeOptions();
 }
 
 export async function loadTheme() {
   const localTheme = localStorage.getItem('b21-theme');
-  if (localTheme && THEMES[localTheme]) {
-    applyTheme(localTheme);
-  } else {
-    applyTheme('dark-gold');
-  }
+  if (localTheme && THEMES[localTheme]) applyTheme(localTheme);
+  else applyTheme('dark-gold');
   try {
     const globalTheme = await dataManager.loadTheme();
     if (globalTheme && THEMES[globalTheme] && globalTheme !== currentTheme) {
       applyTheme(globalTheme);
     }
-  } catch (e) {
-    console.warn('Не удалось загрузить тему из Firebase:', e);
-  }
+  } catch (e) { console.warn('Не удалось загрузить тему:', e); }
 }
 
 export async function saveTheme(themeName) {
   if (!THEMES[themeName]) return;
   applyTheme(themeName);
-  try {
-    await dataManager.saveTheme(themeName);
-  } catch (e) {
-    console.warn('Не удалось сохранить тему в Firebase:', e);
-  }
+  try { await dataManager.saveTheme(themeName); }
+  catch (e) { console.warn('Не удалось сохранить тему:', e); }
 }
 
 function createThemeModal() {
@@ -114,9 +96,7 @@ function createThemeModal() {
   `;
   document.body.appendChild(modal);
   themeModal = modal;
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeThemeModal();
-  });
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeThemeModal(); });
   renderThemeOptions();
 }
 
@@ -144,9 +124,7 @@ function renderThemeOptions() {
 }
 
 export function openThemeModal() {
-  if (!document.getElementById('themeModal')) {
-    createThemeModal();
-  }
+  if (!document.getElementById('themeModal')) createThemeModal();
   themeModal = document.getElementById('themeModal');
   if (themeModal) {
     renderThemeOptions();
@@ -155,9 +133,7 @@ export function openThemeModal() {
 }
 
 export function closeThemeModal() {
-  if (themeModal) {
-    themeModal.style.display = 'none';
-  }
+  if (themeModal) themeModal.style.display = 'none';
 }
 
 window.openThemeModal = openThemeModal;

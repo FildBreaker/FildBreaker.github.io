@@ -9,6 +9,7 @@
   <link rel="icon" href="data/icon.ico?v=3">
   <script type="module" src="firebase-config.js?v=3"></script>
   <script type="module" src="dataManager.js?v=3"></script>
+  <script type="module" src="rich-editor.js?v=3"></script>
   <script type="module" src="theme.js?v=3"></script>
   <script type="module" src="app-settings.js?v=3"></script>
 </head>
@@ -47,11 +48,10 @@
   </main>
 
   <footer class="site-footer">
-    <p>© 2026 Учебно-деградируемый портал Б‑31ЛЕС — Если ты пассив в учёбе, жди актива в лице жизни в состоянии гона.</p>
+    <p>© 2026 Учебно-деградируемый портал Б‑31ЛЕС</p>
   </footer>
 </div>
 
-<!-- Модалка добавления/редактирования -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeModalBtn">&times;</span>
@@ -64,7 +64,6 @@
   </div>
 </div>
 
-<!-- Модалка прохождения теста -->
 <div id="testModal" class="modal">
   <div class="modal-content test-modal-content">
     <span class="close-modal" id="closeTestModal">&times;</span>
@@ -78,44 +77,42 @@
   </div>
 </div>
 
-<script>
-  // ===== МОДЕЛЬ ДАННЫХ =====
-  let data = { events: [], polls: [], tests: [] };
+<script type="module">
+  import { dataManager } from './dataManager.js';
+  import { createRichEditor, sanitizeHtml, escapeHtml } from './rich-editor.js';
 
-  function loadData() {
-    const saved = localStorage.getItem('extracurricularDB');
+  let data = { events: [], polls: [], tests: [] };
+  let eventDescEditor = null;
+
+  async function loadData() {
+    const saved = await dataManager.load('extracurricular');
     if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        data.events = parsed.events || [];
-        data.polls = parsed.polls || [];
-        data.tests = parsed.tests || [];
-        data.polls.forEach(poll => {
-          if (!poll.totalVotes) poll.totalVotes = poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
-          if (poll.userVoted === undefined) poll.userVoted = false;
-        });
-      } catch(e) { console.warn(e); }
+      data.events = saved.events || [];
+      data.polls = saved.polls || [];
+      data.tests = saved.tests || [];
     } else {
       data.events = [
-        { id: 'ev1', title: 'Лесная олимпиада', date: '2025-06-10', description: 'Командное соревнование по лесоведению.', link: '#' },
-        { id: 'ev2', title: 'Лекция "Современные ГИС"', date: '2025-05-25', description: 'Приглашённый специалист из Рослесинфорг.', link: '#' }
+        { id: 'ev1', title: 'Лесная олимпиада', date: '2026-06-10', description: 'Командное соревнование по лесоведению.', link: '#' },
+        { id: 'ev2', title: 'Лекция "Современные ГИС"', date: '2026-05-25', description: 'Приглашённый специалист.', link: '#' }
       ];
       data.polls = [
-        { id: 'poll1', question: 'Какое направление вам интереснее?', options: [{text:'Лесоводство', votes:12}, {text:'Экология', votes:8}, {text:'ГИС', votes:5}], totalVotes:25, userVoted: false }
+        { id: 'poll1', question: 'Какое направление интереснее?', options: [{text:'Лесоводство', votes:12}, {text:'Экология', votes:8}, {text:'ГИС', votes:5}], totalVotes:25, userVoted: false }
       ];
       data.tests = [
         { id: 'test1', title: 'Основы дендрологии', questions: [
-          { text: 'Какое дерево является хвойным?', options: ['Берёза', 'Сосна', 'Дуб', 'Клён'], correctIndex: 1 },
-          { text: 'Что такое таксация леса?', options: ['Учёт лесных ресурсов', 'Посадка деревьев', 'Борьба с вредителями', 'Охрана леса'], correctIndex: 0 }
+          { text: 'Какое дерево хвойное?', options: ['Берёза', 'Сосна', 'Дуб', 'Клён'], correctIndex: 1 }
         ] }
       ];
+      await dataManager.save('extracurricular', data);
     }
+    data.polls.forEach(p => {
+      if (!p.totalVotes) p.totalVotes = p.options.reduce((s,o)=>s+(o.votes||0),0);
+      if (p.userVoted === undefined) p.userVoted = false;
+    });
     renderCurrentSection();
   }
 
-  function saveToLocalStorage() {
-    localStorage.setItem('extracurricularDB', JSON.stringify(data));
-  }
+  async function saveAll() { await dataManager.save('extracurricular', data); }
 
   let currentSection = 'events';
 
@@ -123,23 +120,21 @@
     const headerEl = document.getElementById('sectionHeader');
     const container = document.getElementById('contentContainer');
     if (!container) return;
-
     if (currentSection === 'events') {
       headerEl.innerHTML = `<h2><i class="fas fa-party-horn"></i> Мероприятия</h2><p>Ближайшие события и дни сурка</p>`;
       renderEvents(container);
     } else if (currentSection === 'polls') {
-      headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение, которое мы обязательно не учтём</p>`;
+      headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение</p>`;
       renderPolls(container);
     } else if (currentSection === 'tests') {
-      headerEl.innerHTML = `<h2><i class="fas fa-puzzle-piece"></i> Тесты</h2><p>Проверьте тупость и получите результат</p>`;
+      headerEl.innerHTML = `<h2><i class="fas fa-puzzle-piece"></i> Тесты</h2><p>Проверьте знания</p>`;
       renderTests(container);
     }
   }
 
-  // --- Мероприятия ---
   function renderEvents(container) {
     if (data.events.length === 0) {
-      container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Пока нет мероприятий. Нажмите "Добавить"</p></div>`;
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Пока нет мероприятий</p></div>`;
       return;
     }
     container.innerHTML = '';
@@ -148,15 +143,15 @@
       card.className = 'event-card';
       card.innerHTML = `
         <div class="card-header-event">
-          <div class="event-date"><i class="fas fa-calendar-day"></i> ${ev.date}</div>
+          <div class="event-date"><i class="fas fa-calendar-day"></i> ${escapeHtml(ev.date)}</div>
           <div class="event-actions">
             <button class="edit-event" data-id="${ev.id}"><i class="fas fa-edit"></i></button>
             <button class="delete-event" data-id="${ev.id}"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
         <h3>${escapeHtml(ev.title)}</h3>
-        <p>${escapeHtml(ev.description)}</p>
-        ${ev.link && ev.link !== '#' ? `<a href="${ev.link}" target="_blank" class="event-link">Подробнее <i class="fas fa-external-link-alt"></i></a>` : ''}
+        <div class="rich-display">${sanitizeHtml(ev.description)}</div>
+        ${ev.link && ev.link !== '#' ? `<a href="${escapeHtml(ev.link)}" target="_blank" class="event-link">Подробнее <i class="fas fa-external-link-alt"></i></a>` : ''}
       `;
       card.querySelector('.edit-event')?.addEventListener('click', () => openEditModal('events', ev.id));
       card.querySelector('.delete-event')?.addEventListener('click', () => deleteItem('events', ev.id));
@@ -164,10 +159,9 @@
     });
   }
 
-  // --- Опросы ---
   function renderPolls(container) {
     if (data.polls.length === 0) {
-      container.innerHTML = `<div class="empty-state"><i class="fas fa-chart-simple"></i><p>Нет активных опросов. Создайте первый!</p></div>`;
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-chart-simple"></i><p>Нет опросов</p></div>`;
       return;
     }
     container.innerHTML = '';
@@ -181,16 +175,14 @@
           <h3><i class="fas fa-poll"></i> ${escapeHtml(poll.question)}</h3>
           <button class="delete-poll" data-id="${poll.id}"><i class="fas fa-trash-alt"></i></button>
         </div>
-        <div class="poll-options" id="poll-${poll.id}">
+        <div class="poll-options">
           ${poll.options.map((opt, idx) => `
             <div class="poll-option">
               <div class="option-text">${escapeHtml(opt.text)}</div>
               ${userVoted ? `
                 <div class="option-bar"><div class="bar-fill" style="width: ${(opt.votes/total*100)}%"></div></div>
-                <div class="option-stats">${opt.votes} голосов (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>
-              ` : `
-                <button class="vote-btn" data-poll="${poll.id}" data-optidx="${idx}">Голосовать</button>
-              `}
+                <div class="option-stats">${opt.votes} (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>
+              ` : `<button class="vote-btn" data-poll="${poll.id}" data-optidx="${idx}">Голосовать</button>`}
             </div>
           `).join('')}
         </div>
@@ -198,11 +190,7 @@
       `;
       if (!userVoted) {
         pollCard.querySelectorAll('.vote-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const pollId = btn.dataset.poll;
-            const optIdx = parseInt(btn.dataset.optidx);
-            voteInPoll(pollId, optIdx);
-          });
+          btn.addEventListener('click', () => voteInPoll(btn.dataset.poll, parseInt(btn.dataset.optidx)));
         });
       }
       pollCard.querySelector('.delete-poll')?.addEventListener('click', () => deleteItem('polls', poll.id));
@@ -210,20 +198,19 @@
     });
   }
 
-  function voteInPoll(pollId, optionIndex) {
+  async function voteInPoll(pollId, optionIndex) {
     const poll = data.polls.find(p => p.id === pollId);
     if (!poll || poll.userVoted) return;
     poll.options[optionIndex].votes = (poll.options[optionIndex].votes || 0) + 1;
     poll.totalVotes = (poll.totalVotes || 0) + 1;
     poll.userVoted = true;
-    saveToLocalStorage();
+    await saveAll();
     renderCurrentSection();
   }
 
-  // --- Тесты ---
   function renderTests(container) {
     if (data.tests.length === 0) {
-      container.innerHTML = `<div class="empty-state"><i class="fas fa-puzzle-piece"></i><p>Нет тестов. Добавьте новый тест.</p></div>`;
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-puzzle-piece"></i><p>Нет тестов</p></div>`;
       return;
     }
     container.innerHTML = '';
@@ -248,15 +235,14 @@
     });
   }
 
-  function deleteItem(section, id) {
+  async function deleteItem(section, id) {
     if (section === 'events') data.events = data.events.filter(ev => ev.id !== id);
     if (section === 'polls') data.polls = data.polls.filter(p => p.id !== id);
     if (section === 'tests') data.tests = data.tests.filter(t => t.id !== id);
-    saveToLocalStorage();
+    await saveAll();
     renderCurrentSection();
   }
 
-  // --- Модалка добавления/редактирования ---
   let editModalSection = null;
   let editModalId = null;
   const modal = document.getElementById('editModal');
@@ -267,136 +253,111 @@
     editModalSection = section;
     editModalId = id;
     modalFields.innerHTML = '';
+
     if (section === 'events') {
-      modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать мероприятие' : '<i class="fas fa-plus"></i> Добавить мероприятие';
+      modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать' : '<i class="fas fa-plus"></i> Добавить';
       modalFields.innerHTML = `
         <label>Название</label><input type="text" id="evTitle" placeholder="Название события">
         <label>Дата (ГГГГ-ММ-ДД)</label><input type="date" id="evDate">
-        <label>Описание</label><textarea id="evDesc" rows="2" placeholder="Краткое описание"></textarea>
+        <label>Описание</label><div id="evDescEditor"></div>
         <label>Ссылка (необязательно)</label><input type="url" id="evLink" placeholder="https://...">
       `;
-      if (id) {
-        const ev = data.events.find(e => e.id === id);
-        if (ev) {
-          document.getElementById('evTitle').value = ev.title;
-          document.getElementById('evDate').value = ev.date;
-          document.getElementById('evDesc').value = ev.description;
-          document.getElementById('evLink').value = ev.link || '';
-        }
+      const ev = id ? data.events.find(e => e.id === id) : null;
+      if (ev) {
+        document.getElementById('evTitle').value = ev.title || '';
+        document.getElementById('evDate').value = ev.date || '';
+        document.getElementById('evLink').value = ev.link || '';
       }
+      const ed = document.getElementById('evDescEditor');
+      eventDescEditor = createRichEditor(ed, { placeholder: 'Описание события...', minHeight: '90px' });
+      eventDescEditor.setContent(ev ? (ev.description || '') : '');
     } else if (section === 'polls') {
       modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать опрос' : '<i class="fas fa-plus"></i> Создать опрос';
       modalFields.innerHTML = `
-        <label>Вопрос опроса</label><input type="text" id="pollQuestion" placeholder="Например: Какой формат занятий вам нравится?">
-        <label>Варианты ответов (каждый с новой строки)</label><textarea id="pollOptions" rows="3" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3"></textarea>
+        <label>Вопрос опроса</label><input type="text" id="pollQuestion">
+        <label>Варианты ответов (каждый с новой строки)</label><textarea id="pollOptions" rows="3"></textarea>
       `;
-      if (id) {
-        const poll = data.polls.find(p => p.id === id);
-        if (poll) {
-          document.getElementById('pollQuestion').value = poll.question;
-          document.getElementById('pollOptions').value = poll.options.map(o => o.text).join('\n');
-        }
+      const poll = id ? data.polls.find(p => p.id === id) : null;
+      if (poll) {
+        document.getElementById('pollQuestion').value = poll.question;
+        document.getElementById('pollOptions').value = poll.options.map(o => o.text).join('\n');
       }
     } else if (section === 'tests') {
       modalTitle.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать тест' : '<i class="fas fa-plus"></i> Создать тест';
       modalFields.innerHTML = `
-        <label>Название теста</label><input type="text" id="testTitle" placeholder="Название">
+        <label>Название теста</label><input type="text" id="testTitle">
         <div id="questionsEditor"></div>
         <button type="button" id="addQuestionBtn" class="add-link-btn"><i class="fas fa-plus"></i> Добавить вопрос</button>
       `;
-      let questions = [];
-      if (id) {
-        const test = data.tests.find(t => t.id === id);
-        if (test) questions = test.questions;
-      }
-      function renderQuestionsEditor(qs) {
-        const container = document.getElementById('questionsEditor');
-        if (!container) return;
-        container.innerHTML = '';
-        qs.forEach((q, idx) => {
+      let questions = id ? (data.tests.find(t => t.id === id)?.questions || []) : [];
+      const renderQE = () => {
+        const c = document.getElementById('questionsEditor');
+        c.innerHTML = '';
+        questions.forEach((q, idx) => {
           const qDiv = document.createElement('div');
           qDiv.className = 'question-editor';
           qDiv.innerHTML = `
-            <div class="question-text"><input type="text" placeholder="Текст вопроса" value="${escapeHtml(q.text)}" class="q-text"></div>
+            <div class="question-text"><input type="text" value="${escapeHtml(q.text)}" class="q-text"></div>
             <div class="question-options">
-              ${q.options.map((opt, optIdx) => `
-                <div class="opt-row">
-                  <input type="text" placeholder="Вариант ${optIdx+1}" value="${escapeHtml(opt)}" class="q-opt">
-                  ${optIdx === q.correctIndex ? '<span class="correct-badge">✓ Правильный</span>' : ''}
-                </div>
-              `).join('')}
+              ${q.options.map((opt) => `<div class="opt-row"><input type="text" value="${escapeHtml(opt)}" class="q-opt"></div>`).join('')}
             </div>
             <select class="q-correct">
-              ${q.options.map((_, optIdx) => `<option value="${optIdx}" ${optIdx === q.correctIndex ? 'selected' : ''}>Правильный ответ: вариант ${optIdx+1}</option>`).join('')}
+              ${q.options.map((_, oi) => `<option value="${oi}" ${oi===q.correctIndex?'selected':''}>Правильный: ${oi+1}</option>`).join('')}
             </select>
-            <button class="remove-question-btn">Удалить вопрос</button>
+            <button class="remove-question-btn">Удалить</button>
           `;
-          qDiv.querySelector('.remove-question-btn').addEventListener('click', () => {
-            questions.splice(idx, 1);
-            renderQuestionsEditor(questions);
-          });
-          container.appendChild(qDiv);
+          qDiv.querySelector('.remove-question-btn').addEventListener('click', () => { questions.splice(idx, 1); renderQE(); });
+          c.appendChild(qDiv);
         });
-      }
-      window.questionsArray = questions;
-      renderQuestionsEditor(questions);
+      };
+      renderQE();
       document.getElementById('addQuestionBtn').addEventListener('click', () => {
         questions.push({ text: 'Новый вопрос', options: ['Вариант 1', 'Вариант 2'], correctIndex: 0 });
-        renderQuestionsEditor(questions);
+        renderQE();
       });
-      if (id) {
-        const test = data.tests.find(t => t.id === id);
-        if (test) document.getElementById('testTitle').value = test.title;
-      }
+      if (id) document.getElementById('testTitle').value = data.tests.find(t => t.id === id).title;
     }
     modal.style.display = 'flex';
   }
 
-  function saveModalItem() {
+  async function saveModalItem() {
     if (editModalSection === 'events') {
       const title = document.getElementById('evTitle')?.value.trim();
       const date = document.getElementById('evDate')?.value;
-      const desc = document.getElementById('evDesc')?.value.trim();
       const link = document.getElementById('evLink')?.value.trim();
+      const descHtml = eventDescEditor ? sanitizeHtml(eventDescEditor.getContent()) : '';
+      const descText = eventDescEditor ? eventDescEditor.getText().trim() : '';
       if (!title || !date) { alert('Заполните название и дату'); return; }
+      if (!descText) { alert('Введите описание'); return; }
       if (editModalId) {
         const ev = data.events.find(e => e.id === editModalId);
-        if (ev) { ev.title = title; ev.date = date; ev.description = desc; ev.link = link || '#'; }
+        if (ev) { ev.title = title; ev.date = date; ev.description = descHtml; ev.link = link || '#'; }
       } else {
-        data.events.push({ id: Date.now().toString(), title, date, description: desc, link: link || '#' });
+        data.events.push({ id: Date.now().toString(), title, date, description: descHtml, link: link || '#' });
       }
     } else if (editModalSection === 'polls') {
       const question = document.getElementById('pollQuestion')?.value.trim();
       const optsText = document.getElementById('pollOptions')?.value;
       if (!question || !optsText) { alert('Введите вопрос и варианты'); return; }
-      const optionsArray = optsText.split('\n').filter(s => s.trim().length > 0).map(t => ({ text: t.trim(), votes: 0 }));
+      const optionsArray = optsText.split('\n').filter(s => s.trim()).map(t => ({ text: t.trim(), votes: 0 }));
       if (optionsArray.length < 2) { alert('Нужно минимум 2 варианта'); return; }
       if (editModalId) {
         const poll = data.polls.find(p => p.id === editModalId);
-        if (poll) {
-          poll.question = question;
-          poll.options = optionsArray;
-          poll.totalVotes = 0;
-          poll.userVoted = false;
-        }
+        if (poll) { poll.question = question; poll.options = optionsArray; poll.totalVotes = 0; poll.userVoted = false; }
       } else {
         data.polls.push({ id: Date.now().toString(), question, options: optionsArray, totalVotes: 0, userVoted: false });
       }
     } else if (editModalSection === 'tests') {
       const testTitle = document.getElementById('testTitle')?.value.trim();
-      if (!testTitle) { alert('Введите название теста'); return; }
+      if (!testTitle) { alert('Введите название'); return; }
       const questions = [];
-      const qDivs = document.querySelectorAll('#questionsEditor .question-editor');
-      qDivs.forEach(div => {
+      document.querySelectorAll('#questionsEditor .question-editor').forEach(div => {
         const qText = div.querySelector('.q-text')?.value.trim();
-        const optInputs = div.querySelectorAll('.q-opt');
-        const options = Array.from(optInputs).map(inp => inp.value.trim()).filter(s => s);
+        const options = Array.from(div.querySelectorAll('.q-opt')).map(i => i.value.trim()).filter(Boolean);
         const correctIdx = parseInt(div.querySelector('.q-correct')?.value);
-        if (qText && options.length >= 2) {
-          questions.push({ text: qText, options, correctIndex: correctIdx });
-        }
+        if (qText && options.length >= 2) questions.push({ text: qText, options, correctIndex: correctIdx });
       });
-      if (questions.length === 0) { alert('Добавьте хотя бы один вопрос с вариантами'); return; }
+      if (questions.length === 0) { alert('Добавьте хотя бы один вопрос'); return; }
       if (editModalId) {
         const test = data.tests.find(t => t.id === editModalId);
         if (test) { test.title = testTitle; test.questions = questions; }
@@ -404,7 +365,7 @@
         data.tests.push({ id: Date.now().toString(), title: testTitle, questions });
       }
     }
-    saveToLocalStorage();
+    await saveAll();
     closeModal();
     renderCurrentSection();
   }
@@ -413,9 +374,9 @@
     modal.style.display = 'none';
     editModalSection = null;
     editModalId = null;
+    eventDescEditor = null;
   }
 
-  // --- Тесты: прохождение ---
   let currentTestId = null;
   const testModal = document.getElementById('testModal');
   const testQuestionsContainer = document.getElementById('testQuestionsContainer');
@@ -433,9 +394,7 @@
       qDiv.innerHTML = `
         <p><strong>${idx+1}. ${escapeHtml(q.text)}</strong></p>
         <div class="test-options">
-          ${q.options.map((opt, optIdx) => `
-            <label><input type="radio" name="q${idx}" value="${optIdx}"> ${escapeHtml(opt)}</label>
-          `).join('')}
+          ${q.options.map((opt, oi) => `<label><input type="radio" name="q${idx}" value="${oi}"> ${escapeHtml(opt)}</label>`).join('')}
         </div>
       `;
       testQuestionsContainer.appendChild(qDiv);
@@ -449,11 +408,11 @@
     if (!test) return;
     let score = 0;
     test.questions.forEach((q, idx) => {
-      const selected = document.querySelector(`input[name="q${idx}"]:checked`);
-      if (selected && parseInt(selected.value) === q.correctIndex) score++;
+      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+      if (sel && parseInt(sel.value) === q.correctIndex) score++;
     });
-    const resultDiv = document.getElementById('testResult');
-    resultDiv.innerHTML = `<i class="fas fa-chart-line"></i> Ваш результат: ${score} из ${test.questions.length} (${Math.round(score/test.questions.length*100)}%)`;
+    document.getElementById('testResult').innerHTML =
+      `<i class="fas fa-chart-line"></i> ${score} из ${test.questions.length} (${Math.round(score/test.questions.length*100)}%)`;
   }
 
   function closeTestModal() {
@@ -461,7 +420,6 @@
     currentTestId = null;
   }
 
-  // --- Навигация и инициализация ---
   function init() {
     loadData();
     document.querySelectorAll('.section-btn').forEach(btn => {
@@ -472,31 +430,19 @@
         renderCurrentSection();
       });
     });
-    document.getElementById('globalAddBtn').addEventListener('click', () => {
-      openEditModal(currentSection);
-    });
+    document.getElementById('globalAddBtn').addEventListener('click', () => openEditModal(currentSection));
     document.getElementById('closeModalBtn').onclick = closeModal;
     document.getElementById('cancelModalBtn').onclick = closeModal;
     document.getElementById('saveModalBtn').onclick = saveModalItem;
     document.getElementById('closeTestModal').onclick = closeTestModal;
     document.getElementById('cancelTestBtn').onclick = closeTestModal;
     document.getElementById('submitTestBtn').onclick = submitTest;
-    window.onclick = (e) => {
+    window.addEventListener('click', e => {
       if (e.target === modal) closeModal();
       if (e.target === testModal) closeTestModal();
-    };
-  }
-  init();
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
     });
   }
+  init();
 </script>
 </body>
 </html>

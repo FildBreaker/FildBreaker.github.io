@@ -12,6 +12,7 @@
   <link rel="icon" href="data/icon.ico?v=3">
   <script type="module" src="firebase-config.js?v=3"></script>
   <script type="module" src="dataManager.js?v=3"></script>
+  <script type="module" src="rich-editor.js?v=3"></script>
   <script type="module" src="theme.js?v=3"></script>
   <script type="module" src="app-settings.js?v=3"></script>
 </head>
@@ -43,15 +44,12 @@
 
   <main class="main-content">
     <div class="exams-hero">
-      <div class="hero-text">
-        <h2><i class="fas fa-chalkboard"></i> Стенд экзаменов</h2>
-      </div>
+      <div class="hero-text"><h2><i class="fas fa-chalkboard"></i> Стенд экзаменов</h2></div>
       <div style="display:flex; gap:12px; align-items:center;">
         <span class="hero-badge"><i class="fas fa-calendar-alt"></i> Зимняя сессия 2026</span>
         <button id="addExamBtn" class="reset-btn"><i class="fas fa-plus"></i> Добавить экзамен</button>
       </div>
     </div>
-
     <div class="exams-grid" id="examsGrid"></div>
   </main>
 
@@ -60,7 +58,6 @@
   </footer>
 </div>
 
-<!-- Модалка редактирования экзамена -->
 <div id="examModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeExamModal">&times;</span>
@@ -75,6 +72,8 @@
       <input type="text" id="examResources" placeholder="Билеты, Wiki, Видео">
       <label>Ссылка на методичку (URL)</label>
       <input type="text" id="examMethod" placeholder="https://...">
+      <label>Заметки (опционально):</label>
+      <div id="examNotesEditor"></div>
       <div class="modal-buttons">
         <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
         <button type="button" id="cancelExamBtn" class="cancel-btn">Отмена</button>
@@ -85,50 +84,30 @@
 
 <script type="module">
   import { dataManager } from './dataManager.js';
+  import { createRichEditor, sanitizeHtml, escapeHtml } from './rich-editor.js';
 
   let exams = [];
   let editExamId = null;
+  let notesEditor = null;
 
   async function loadExams() {
     const saved = await dataManager.load('exams');
-    if (saved && Array.isArray(saved)) {
-      exams = saved;
-    } else {
+    if (saved && Array.isArray(saved)) exams = saved;
+    else {
       exams = [
-        {
-          id: '1',
-          subject: 'Лесоводство и таксация',
-          date: '17 июня 2025, 10:00',
-          room: '202 (лесной факультет)',
-          teacher: 'доцент Сидорова Е.В.',
-          format: 'устный билет + практика',
-          resources: ['Билеты', 'Wiki', 'Видео'],
-          method: 'методичка.pdf'
-        },
-        {
-          id: '2',
-          subject: 'Лесная селекция',
-          date: '19 июня 2025, 10:00',
-          room: '305 (лесной факультет)',
-          teacher: 'профессор Лебедев А.И.',
-          format: 'тестирование + устно',
-          resources: ['Лекции', 'Статьи'],
-          method: 'селекция_методичка.pdf'
-        }
+        { id: '1', subject: 'Лесоводство и таксация', date: '17 июня 2025, 10:00', room: '202 (лесной факультет)', teacher: 'доцент Сидорова Е.В.', format: 'устный билет + практика', resources: ['Билеты', 'Wiki', 'Видео'], method: 'методичка.pdf' },
+        { id: '2', subject: 'Лесная селекция', date: '19 июня 2025, 10:00', room: '305 (лесной факультет)', teacher: 'профессор Лебедев А.И.', format: 'тестирование + устно', resources: ['Лекции', 'Статьи'], method: 'селекция_методичка.pdf' }
       ];
       await dataManager.save('exams', exams);
     }
     renderExams();
   }
-
-  async function saveExams() {
-    await dataManager.save('exams', exams);
-  }
+  async function saveExams() { await dataManager.save('exams', exams); }
 
   function renderExams() {
     const grid = document.getElementById('examsGrid');
     if (!exams.length) {
-      grid.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Нет экзаменов. Нажмите "Добавить экзамен".</p></div>`;
+      grid.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Нет экзаменов.</p></div>`;
       return;
     }
     grid.innerHTML = '';
@@ -163,6 +142,7 @@
           </div>
         ` : ''}
         ${exam.method ? `<div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">${escapeHtml(exam.method)}</a></div>` : ''}
+        ${exam.notes ? `<div class="exam-notes rich-display">${sanitizeHtml(exam.notes)}</div>` : ''}
       `;
       card.querySelector('.edit-exam').addEventListener('click', () => openExamModal(exam.id));
       card.querySelector('.delete-exam').addEventListener('click', () => deleteExam(exam.id));
@@ -170,14 +150,6 @@
     });
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // --- Модалка ---
   const modal = document.getElementById('examModal');
   const modalTitle = document.getElementById('examModalTitle');
   const form = document.getElementById('examForm');
@@ -191,9 +163,8 @@
 
   function openExamModal(id = null) {
     editExamId = id;
-    if (id) {
-      const exam = exams.find(e => e.id === id);
-      if (!exam) return;
+    const exam = id ? exams.find(e => e.id === id) : null;
+    if (exam) {
       modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать экзамен';
       subjectInput.value = exam.subject || '';
       dateInput.value = exam.date || '';
@@ -204,20 +175,22 @@
       methodInput.value = exam.method || '';
     } else {
       modalTitle.innerHTML = '<i class="fas fa-plus"></i> Добавить экзамен';
-      subjectInput.value = '';
-      dateInput.value = '';
-      roomInput.value = '';
-      teacherInput.value = '';
-      formatInput.value = '';
-      resourcesInput.value = '';
-      methodInput.value = '';
+      subjectInput.value = dateInput.value = roomInput.value = teacherInput.value = formatInput.value = resourcesInput.value = methodInput.value = '';
     }
+    if (notesEditor) notesEditor = null;
+    const nc = document.getElementById('examNotesEditor');
+    nc.innerHTML = '';
+    notesEditor = createRichEditor(nc, { placeholder: 'Дополнительные заметки...', minHeight: '60px' });
+    notesEditor.setContent(exam ? (exam.notes || '') : '');
     modal.style.display = 'flex';
   }
 
   function closeExamModal() {
     modal.style.display = 'none';
     editExamId = null;
+    notesEditor = null;
+    const nc = document.getElementById('examNotesEditor');
+    if (nc) nc.innerHTML = '';
   }
 
   form.addEventListener('submit', async (e) => {
@@ -229,17 +202,13 @@
     const format = formatInput.value.trim();
     const resourcesStr = resourcesInput.value.trim();
     const method = methodInput.value.trim();
-    if (!subject || !date || !room || !teacher || !format) {
-      alert('Заполните все обязательные поля');
-      return;
-    }
+    if (!subject || !date || !room || !teacher || !format) { alert('Заполните все обязательные поля'); return; }
     const resources = resourcesStr ? resourcesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-    const examData = { subject, date, room, teacher, format, resources, method };
+    const notes = notesEditor ? sanitizeHtml(notesEditor.getContent()) : '';
+    const examData = { subject, date, room, teacher, format, resources, method, notes };
     if (editExamId) {
       const idx = exams.findIndex(e => e.id === editExamId);
-      if (idx !== -1) {
-        exams[idx] = { ...exams[idx], ...examData };
-      }
+      if (idx !== -1) exams[idx] = { ...exams[idx], ...examData };
     } else {
       exams.push({ id: Date.now().toString(), ...examData });
     }
@@ -260,7 +229,6 @@
   window.addEventListener('click', (e) => { if (e.target === modal) closeExamModal(); });
   document.getElementById('addExamBtn').addEventListener('click', () => openExamModal());
 
-  // --- Кнопки сайдбара ---
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;

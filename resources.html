@@ -12,6 +12,7 @@
   <link rel="icon" href="data/icon.ico?v=3">
   <script type="module" src="firebase-config.js?v=3"></script>
   <script type="module" src="dataManager.js?v=3"></script>
+  <script type="module" src="rich-editor.js?v=3"></script>
   <script type="module" src="theme.js?v=3"></script>
   <script type="module" src="app-settings.js?v=3"></script>
 </head>
@@ -59,14 +60,14 @@
   </footer>
 </div>
 
-<!-- Модалка ресурса -->
 <div id="resourceModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeResourceModal">&times;</span>
     <h3 id="resourceModalTitle"><i class="fas fa-edit"></i> Ресурс</h3>
     <form id="resourceForm">
       <label>Название</label><input type="text" id="resourceTitle" required>
-      <label>Описание</label><input type="text" id="resourceDesc" required>
+      <label>Описание</label>
+      <div id="resourceDescEditor"></div>
       <label>Категория</label>
       <select id="resourceCategory" required>
         <option value="study">Учебники</option>
@@ -76,9 +77,7 @@
       </select>
 
       <label>Иконка (выберите из предложенных или введите свой класс)</label>
-      <div class="icon-picker" id="iconPicker">
-        <!-- Предустановленные иконки (будут вставлены JS) -->
-      </div>
+      <div class="icon-picker" id="iconPicker"></div>
       <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
         <input type="text" id="resourceIcon" placeholder="fa-book-open (свой класс)" style="flex:1;">
         <button type="button" id="clearIconBtn" class="cancel-btn" style="padding:6px 12px;">Очистить</button>
@@ -98,8 +97,8 @@
 
 <script type="module">
   import { dataManager } from './dataManager.js';
+  import { createRichEditor, sanitizeHtml, escapeHtml } from './rich-editor.js';
 
-  // ===== СПИСОК ДОСТУПНЫХ ИКОНОК =====
   const iconList = [
     'fa-book', 'fa-book-open', 'fa-file-pdf', 'fa-file-alt',
     'fa-video', 'fa-film', 'fa-youtube', 'fa-play-circle',
@@ -109,16 +108,14 @@
     'fa-graduation-cap', 'fa-chalkboard-teacher', 'fa-user-graduate'
   ];
 
-  // ===== СОСТОЯНИЕ =====
   let resources = [];
   let editResourceId = null;
+  let descEditor = null;
 
-  // ===== ЗАГРУЗКА =====
   async function loadResources() {
     const saved = await dataManager.load('resources');
-    if (saved && Array.isArray(saved)) {
-      resources = saved;
-    } else {
+    if (saved && Array.isArray(saved)) resources = saved;
+    else {
       resources = [
         { id: '1', title: 'Лесоводство. Полный курс', desc: 'Учебник PDF, 320 стр.', category: 'study', icon: 'fa-book-open', meta: 'PDF, 24 МБ', link: '#' },
         { id: '2', title: 'Лекции по таксации', desc: 'Плейлист из 12 видео', category: 'video', icon: 'fa-video', meta: 'YouTube', link: '#' },
@@ -128,12 +125,8 @@
     }
     renderResources();
   }
+  async function saveResources() { await dataManager.save('resources', resources); }
 
-  async function saveResources() {
-    await dataManager.save('resources', resources);
-  }
-
-  // ===== ОТОБРАЖЕНИЕ =====
   function renderResources() {
     const grid = document.getElementById('resourcesGrid');
     if (!resources.length) {
@@ -150,7 +143,7 @@
         <div class="card-icon"><i class="fas ${icon}"></i></div>
         <div class="card-content">
           <h3>${escapeHtml(res.title)}</h3>
-          <p>${escapeHtml(res.desc)}</p>
+          <div class="rich-display">${sanitizeHtml(res.desc)}</div>
           <div class="card-meta">
             <span><i class="fas fa-tag"></i> ${escapeHtml(res.meta || '')}</span>
             <div style="display:flex; gap:8px;">
@@ -168,14 +161,6 @@
     applyFilters();
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // ===== ФИЛЬТРАЦИЯ =====
   function applyFilters() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const activeCat = document.querySelector('.filter-btn.active-filter')?.dataset.category || 'all';
@@ -197,7 +182,6 @@
   });
   document.getElementById('searchInput').addEventListener('input', applyFilters);
 
-  // ===== МОДАЛКА С ВЫБОРОМ ИКОНОК =====
   function renderIconPicker(selectedIcon) {
     const container = document.getElementById('iconPicker');
     container.innerHTML = '';
@@ -208,7 +192,6 @@
       btn.innerHTML = `<i class="fas ${icon}"></i>`;
       btn.title = icon;
       btn.addEventListener('click', () => {
-        // Убираем активный класс у всех
         container.querySelectorAll('.icon-option').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('resourceIcon').value = icon;
@@ -217,12 +200,10 @@
     });
   }
 
-  // ===== ОТКРЫТИЕ / ЗАКРЫТИЕ МОДАЛКИ =====
   const modal = document.getElementById('resourceModal');
   const modalTitle = document.getElementById('resourceModalTitle');
   const form = document.getElementById('resourceForm');
   const titleInput = document.getElementById('resourceTitle');
-  const descInput = document.getElementById('resourceDesc');
   const catSelect = document.getElementById('resourceCategory');
   const iconInput = document.getElementById('resourceIcon');
   const metaInput = document.getElementById('resourceMeta');
@@ -231,21 +212,21 @@
   function openResourceModal(id = null) {
     editResourceId = id;
     let currentIcon = '';
+    let currentDesc = '';
     if (id) {
       const res = resources.find(r => r.id === id);
       if (!res) return;
       modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать ресурс';
       titleInput.value = res.title || '';
-      descInput.value = res.desc || '';
       catSelect.value = res.category || 'study';
       currentIcon = res.icon || '';
       iconInput.value = currentIcon;
       metaInput.value = res.meta || '';
       linkInput.value = res.link || '';
+      currentDesc = res.desc || '';
     } else {
       modalTitle.innerHTML = '<i class="fas fa-plus"></i> Добавить ресурс';
       titleInput.value = '';
-      descInput.value = '';
       catSelect.value = 'study';
       currentIcon = '';
       iconInput.value = '';
@@ -253,39 +234,44 @@
       linkInput.value = '';
     }
     renderIconPicker(currentIcon);
+
+    if (descEditor) descEditor = null;
+    const ed = document.getElementById('resourceDescEditor');
+    ed.innerHTML = '';
+    descEditor = createRichEditor(ed, { placeholder: 'Краткое описание ресурса...', minHeight: '80px' });
+    descEditor.setContent(currentDesc);
+
     modal.style.display = 'flex';
   }
 
   function closeResourceModal() {
     modal.style.display = 'none';
     editResourceId = null;
+    const ed = document.getElementById('resourceDescEditor');
+    if (ed) ed.innerHTML = '';
+    descEditor = null;
   }
 
-  // Очистка выбранной иконки
   document.getElementById('clearIconBtn').addEventListener('click', () => {
     document.getElementById('resourceIcon').value = '';
     renderIconPicker('');
   });
 
-  // ===== СОХРАНЕНИЕ =====
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = titleInput.value.trim();
-    const desc = descInput.value.trim();
     const category = catSelect.value;
     const icon = iconInput.value.trim() || 'fa-file';
     const meta = metaInput.value.trim();
     const link = linkInput.value.trim() || '#';
-    if (!title || !desc) {
-      alert('Заполните название и описание');
-      return;
-    }
+    const desc = descEditor ? sanitizeHtml(descEditor.getContent()) : '';
+    const descText = descEditor ? descEditor.getText().trim() : '';
+    if (!title) { alert('Введите название'); return; }
+    if (!descText) { alert('Введите описание'); return; }
     const resData = { title, desc, category, icon, meta, link };
     if (editResourceId) {
       const idx = resources.findIndex(r => r.id === editResourceId);
-      if (idx !== -1) {
-        resources[idx] = { ...resources[idx], ...resData };
-      }
+      if (idx !== -1) resources[idx] = { ...resources[idx], ...resData };
     } else {
       resources.push({ id: Date.now().toString(), ...resData });
     }
@@ -301,13 +287,11 @@
     renderResources();
   }
 
-  // ===== ОБРАБОТЧИКИ =====
   document.getElementById('closeResourceModal').addEventListener('click', closeResourceModal);
   document.getElementById('cancelResourceBtn').addEventListener('click', closeResourceModal);
   window.addEventListener('click', (e) => { if (e.target === modal) closeResourceModal(); });
   document.getElementById('addResourceBtn').addEventListener('click', () => openResourceModal());
 
-  // ===== КНОПКИ САЙДБАРА =====
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
