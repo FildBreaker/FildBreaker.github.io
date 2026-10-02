@@ -1,4 +1,6 @@
 // rich-editor.js
+import { openColorPicker } from './color-picker.js';
+
 const ALLOWED_TAGS = ['B','I','U','S','BR','SPAN','STRONG','EM','FONT','MARK','SUB','SUP'];
 
 export function escapeHtml(str) {
@@ -64,14 +66,12 @@ export function createRichEditor(target, options = {}) {
       <span class="rich-sep"></span>
       <button type="button" class="rich-color-btn" data-cmd="foreColor" title="Цвет текста">
         <i class="fas fa-font"></i>
-        <span class="rich-color-swatch" data-swatch="foreColor" style="background:#ffb347;"></span>
+        <span class="rich-color-swatch" data-swatch="foreColor" data-color="#ffb347" style="background:#ffb347;"></span>
       </button>
-      <input type="color" class="rich-color-input-hidden" data-input="foreColor" value="#ffb347">
       <button type="button" class="rich-color-btn" data-cmd="hiliteColor" title="Выделение">
         <i class="fas fa-highlighter"></i>
-        <span class="rich-color-swatch" data-swatch="hiliteColor" style="background:#fff3b0;"></span>
+        <span class="rich-color-swatch" data-swatch="hiliteColor" data-color="#fff3b0" style="background:#fff3b0;"></span>
       </button>
-      <input type="color" class="rich-color-input-hidden" data-input="hiliteColor" value="#fff3b0">
       <span class="rich-sep"></span>
       <button type="button" data-anim="anim-glow" title="Свечение"><i class="fas fa-sun"></i></button>
       <button type="button" data-anim="anim-pulse" title="Пульсация"><i class="fas fa-heartbeat"></i></button>
@@ -100,9 +100,9 @@ export function createRichEditor(target, options = {}) {
     content.classList.toggle('empty', empty);
   }
 
-  // Обычные команды (жирный, курсив, ...)
+  // Обычные команды
   toolbar.querySelectorAll('button[data-cmd]').forEach(btn => {
-    if (btn.classList.contains('rich-color-btn')) return; // кнопки цвета обрабатываются отдельно
+    if (btn.classList.contains('rich-color-btn')) return;
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
       e.preventDefault();
@@ -112,27 +112,42 @@ export function createRichEditor(target, options = {}) {
     });
   });
 
-  // Кнопки выбора цвета: клик по кнопке → открывает скрытый input
+  // Кнопки выбора цвета → открывают наш кастомный пикер
   toolbar.querySelectorAll('.rich-color-btn').forEach(btn => {
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
       e.preventDefault();
+      e.stopPropagation();
       const cmd = btn.dataset.cmd;
-      const input = toolbar.querySelector(`.rich-color-input-hidden[data-input="${cmd}"]`);
-      if (input) input.click();
-    });
-  });
-
-  // Скрытые инпуты цвета — применяем выбранный цвет + обновляем полоску
-  toolbar.querySelectorAll('.rich-color-input-hidden').forEach(input => {
-    input.addEventListener('input', e => {
-      content.focus();
-      const cmd = input.dataset.input;
-      const color = e.target.value;
-      document.execCommand(cmd, false, color);
-      // Обновляем цветную полоску у соответствующей кнопки
       const swatch = toolbar.querySelector(`.rich-color-swatch[data-swatch="${cmd}"]`);
-      if (swatch) swatch.style.background = color;
+      const initial = swatch?.dataset.color || '#ffb347';
+
+      // Запоминаем выделение до открытия попапа
+      const sel = window.getSelection();
+      let savedRange = null;
+      if (sel.rangeCount) {
+        try { savedRange = sel.getRangeAt(0).cloneRange(); } catch (_) {}
+      }
+
+      openColorPicker({
+        anchorEl: btn,
+        initial,
+        onPick: (color) => {
+          content.focus();
+          // Восстанавливаем выделение
+          if (savedRange) {
+            const s = window.getSelection();
+            s.removeAllRanges();
+            s.addRange(savedRange);
+          }
+          document.execCommand(cmd, false, color);
+          if (swatch) {
+            swatch.style.background = color;
+            swatch.dataset.color = color;
+          }
+          updateState();
+        }
+      });
     });
   });
 
