@@ -2005,20 +2005,13 @@ a:hover {
   margin: 0;
 }
 /* ============================================================
-   МЯГКАЯ ПЕРЕЛИВАЮЩАЯСЯ ПОДСВЕТКА КАРТОЧЕК (v2)
+   ПЛАВНАЯ ПОДСВЕТКА КАРТОЧЕК (v3 — оптимизированная)
+   Анимируются только transform + opacity (GPU)
    ============================================================ */
 
-@keyframes auraMove {
-  0%   { background-position:   0%   0%; }
-  25%  { background-position: 100%   0%; }
-  50%  { background-position: 100% 100%; }
-  75%  { background-position:   0% 100%; }
-  100% { background-position:   0%   0%; }
-}
-
-@keyframes auraBreath {
-  0%, 100% { opacity: 0.25; }
-  50%      { opacity: 0.55; }
+@keyframes floatAura {
+  0%, 100% { transform: translate3d(-4%, -3%, 0) scale(1);    opacity: 0.10; }
+  50%      { transform: translate3d( 4%,  3%, 0) scale(1.18); opacity: 0.22; }
 }
 
 .teacher-card,
@@ -2029,15 +2022,17 @@ a:hover {
 .event-card,
 .test-card {
   position: relative;
-  overflow: hidden;             /* внутренний градиент не вылезает за скругления */
+  overflow: hidden;
   border: 1px solid var(--border-color);
+  contain: layout paint style;             /* изолируем перерисовку внутри карточки */
   transition:
-    transform 0.35s cubic-bezier(0.2, 0, 0, 1),
-    box-shadow 0.35s ease,
-    border-color 0.35s ease;
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  backface-visibility: hidden;
+  transform: translateZ(0);                /* включает GPU-слой заранее */
 }
 
-/* ВНУТРЕННИЙ градиент — виден всегда, мягко переливается */
+/* Единственный псевдоэлемент — мягкая аура */
 .teacher-card::before,
 .exam-card::before,
 .resource-card::before,
@@ -2047,30 +2042,22 @@ a:hover {
 .test-card::before {
   content: "";
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background:
-    radial-gradient(
-      60% 70% at 20% 10%,
-      var(--accent-glow) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      50% 60% at 80% 90%,
-      var(--accent-glow) 0%,
-      transparent 65%
-    );
-  background-size: 200% 200%, 200% 200%;
-  opacity: 0.22;
+  inset: -30%;                              /* шире карточки, чтобы волна красиво выходила */
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--accent-glow) 0%,
+    transparent 55%
+  );
+  filter: blur(32px);
+  opacity: 0.10;
   pointer-events: none;
   z-index: 0;
-  animation:
-    auraMove 10s ease-in-out infinite,
-    auraBreath 5s ease-in-out infinite;
-  transition: opacity 0.4s ease;
+  will-change: transform, opacity;
+  animation: floatAura 14s ease-in-out infinite;
+  transform: translate3d(0, 0, 0);
 }
 
-/* Контент карточки — выше градиента */
+/* Контент карточки — выше ауры */
 .teacher-card > *,
 .exam-card > *,
 .resource-card > *,
@@ -2082,7 +2069,7 @@ a:hover {
   z-index: 1;
 }
 
-/* Hover — усиливаем внутренний градиент и добавляем мягкий внешний ореол */
+/* Hover — плавное усиление, без рывков */
 .teacher-card:hover,
 .exam-card:hover,
 .resource-card:hover,
@@ -2091,10 +2078,9 @@ a:hover {
 .event-card:hover,
 .test-card:hover {
   transform: translateY(-4px);
-  border-color: var(--border-color);     /* НЕ делаем акцентный — оставляем дефолт */
   box-shadow:
-    0 14px 32px rgba(0, 0, 0, 0.28),
-    0 0 32px -6px var(--accent-glow);
+    0 14px 30px rgba(0, 0, 0, 0.26),
+    0 0 28px -8px var(--accent-glow);
 }
 
 .teacher-card:hover::before,
@@ -2104,10 +2090,11 @@ a:hover {
 .poll-card:hover::before,
 .event-card:hover::before,
 .test-card:hover::before {
-  opacity: 0.6;
+  animation-duration: 6s;                   /* при hover — быстрее, но всё ещё плавно */
+  opacity: 0.28;
 }
 
-/* Светлые темы — градиент мягче и тени слабее */
+/* Светлые темы — тени мягче */
 .theme-light-gold .teacher-card:hover,
 .theme-light-gold .exam-card:hover,
 .theme-light-gold .resource-card:hover,
@@ -2144,10 +2131,11 @@ a:hover {
 .theme-light-red .event-card:hover,
 .theme-light-red .test-card:hover {
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.12),
-    0 0 28px -6px var(--accent-glow);
+    0 14px 28px rgba(0, 0, 0, 0.10),
+    0 0 24px -8px var(--accent-glow);
 }
 
+/* Reduce motion — отключаем */
 @media (prefers-reduced-motion: reduce) {
   .teacher-card::before,
   .exam-card::before,
@@ -2157,6 +2145,16 @@ a:hover {
   .event-card::before,
   .test-card::before {
     animation: none;
+    opacity: 0.12;
+  }
+  .teacher-card,
+  .exam-card,
+  .resource-card,
+  .task-card,
+  .poll-card,
+  .event-card,
+  .test-card {
+    transition: none;
   }
   .teacher-card:hover,
   .exam-card:hover,
