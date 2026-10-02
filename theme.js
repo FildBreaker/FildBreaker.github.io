@@ -114,16 +114,6 @@ function testImageUrl(url) {
   });
 }
 
-function testImageUrl(url) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = url;
-    setTimeout(() => resolve(false), 6000);
-  });
-}
-
 async function findWorkingBg(themeName, startIndex = 0) {
   const list = THEME_BG_LIST[themeName] || [];
   for (let i = 0; i < list.length; i++) {
@@ -154,7 +144,7 @@ async function setBackgroundForTheme(themeName, startIndex = 0) {
   // Фаза 1: если картинка уже видна — плавно гасим (fade-out)
   if (layer.classList.contains('visible')) {
     layer.classList.remove('visible');
-    await new Promise(r => setTimeout(r, 550)); // половина transition
+    await new Promise(r => setTimeout(r, 550));
   }
 
   const result = await findWorkingBg(themeName, startIndex);
@@ -201,6 +191,7 @@ export function applyTheme(themeName) {
     renderThemeOptions();
   }
 }
+
 export async function cycleBackground() {
   const list = THEME_BG_LIST[currentTheme] || [];
   if (!list.length) return;
@@ -216,7 +207,6 @@ export async function loadTheme() {
   try {
     const globalTheme = await dataManager.loadTheme();
     if (globalTheme && THEMES[globalTheme]) {
-      // Применяем только если реальная тема в DOM отличается
       const activeInDOM = readThemeFromDOM();
       if (globalTheme !== activeInDOM) applyTheme(globalTheme);
     }
@@ -264,7 +254,6 @@ function renderThemeOptions() {
   const container = document.getElementById('themeOptions');
   if (!container) return;
 
-  // ГЛАВНОЕ: активную тему берём из DOM, а не из переменной
   const activeTheme = readThemeFromDOM() || currentTheme;
 
   container.innerHTML = '';
@@ -282,7 +271,6 @@ function renderThemeOptions() {
     `;
     btn.addEventListener('click', async () => {
       await saveTheme(key);
-      // После сохранения сразу обновляем UI
       renderThemeOptions();
       setTimeout(closeThemeModal, 500);
     });
@@ -293,7 +281,6 @@ function renderThemeOptions() {
 export function openThemeModal() {
   if (!document.getElementById('themeModal')) createThemeModal();
 
-  // Синхронизируем currentTheme с реальным состоянием DOM
   const activeInDOM = readThemeFromDOM();
   if (activeInDOM) currentTheme = activeInDOM;
 
