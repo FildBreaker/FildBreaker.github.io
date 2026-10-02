@@ -2490,3 +2490,17 @@ body.drag-in-progress * {
 
 .drag-sort-container .subject-item[data-id] { cursor: grab; }
 .drag-sort-container .subject-item.dragging-source { opacity: 0.22 !important; }
+
+/* ============================================================
+   ОПТИМИЗАЦИЯ РЕНДЕРА (без визуальных изменений)
+   ============================================================ */
+.teacher-card,
+.exam-card,
+.resource-card,
+.task-card,
+.poll-card,
+.event-card,
+.test-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 220px;
+}
