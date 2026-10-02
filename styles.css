@@ -1729,3 +1729,102 @@ a:hover {
   0%   { background-position: 0% center; }
   100% { background-position: 200% center; }
 }
+/* ============================================================
+   КНОПКА "ДОБАВИТЬ ЗАДАНИЕ" — стиль + анимации
+   ============================================================ */
+.add-task-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 40px;
+  background: linear-gradient(135deg, var(--accent), #f5d742);
+  color: var(--badge-color, #1e293b);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 4px 14px var(--accent-glow);
+  isolation: isolate;
+}
+
+/* Мягкое пульсирующее свечение вокруг кнопки */
+.add-task-btn:not(:disabled) {
+  animation: taskBtnPulse 2.4s ease-in-out infinite;
+}
+@keyframes taskBtnPulse {
+  0%, 100% { box-shadow: 0 4px 14px var(--accent-glow); }
+  50%      { box-shadow: 0 4px 24px var(--accent-glow), 0 0 32px var(--accent-glow); }
+}
+
+/* Блик, пробегающий по кнопке */
+.add-task-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-25deg);
+  z-index: 1;
+  pointer-events: none;
+}
+.add-task-btn:not(:disabled):hover::before {
+  animation: taskBtnShine 0.9s ease;
+}
+@keyframes taskBtnShine {
+  0%   { left: -75%; }
+  100% { left: 125%; }
+}
+
+/* Иконка "+" */
+.add-task-btn i {
+  font-size: 1rem;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2;
+}
+
+/* Наведение — подъём и поворот иконки */
+.add-task-btn:not(:disabled):hover {
+  transform: translateY(-3px) scale(1.04);
+  filter: brightness(1.08);
+  box-shadow: 0 8px 26px var(--accent-glow);
+}
+.add-task-btn:not(:disabled):hover i {
+  transform: rotate(90deg) scale(1.25);
+}
+
+/* Клик — лёгкий «шлепок» */
+.add-task-btn:not(:disabled):active {
+  transform: translateY(-1px) scale(0.97);
+  transition: transform 0.08s ease;
+}
+
+/* Фокус с клавиатуры */
+.add-task-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 6px 20px var(--accent-glow);
+}
+
+/* Задизейбленное состояние */
+.add-task-btn:disabled {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+  animation: none;
+}
+.add-task-btn:disabled i {
+  transform: none;
+}
+
+/* Небольшая задержка появления на странице */
+.add-task-btn {
+  animation-name: taskBtnPulse;
+}
