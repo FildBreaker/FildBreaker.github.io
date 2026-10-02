@@ -10,13 +10,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css?v=3">
   <link rel="icon" href="data/icon.ico?v=3">
+  <script src="page-animations.js?v=3"></script>
+  <script src="card-tilt.js?v=3"></script>
+  <script src="drag-sort.js?v=3"></script>
   <script type="module" src="firebase-config.js?v=3"></script>
   <script type="module" src="dataManager.js?v=3"></script>
   <script type="module" src="rich-editor.js?v=3"></script>
   <script type="module" src="theme.js?v=3"></script>
   <script type="module" src="app-settings.js?v=3"></script>
-  <script src="page-animations.js?v=3"></script>
-  <script src="card-tilt.js?v=3"></script>
 </head>
 <body>
 <div class="app-grid">
@@ -139,6 +140,7 @@
     resources.forEach(res => {
       const card = document.createElement('div');
       card.className = 'resource-card';
+      card.dataset.id = res.id;
       card.dataset.category = res.category;
       const icon = res.icon || 'fa-file';
       card.innerHTML = `
@@ -307,6 +309,18 @@
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
 
   loadResources();
+
+  const resourcesGrid = document.getElementById('resourcesGrid');
+  window.enableDragSort(resourcesGrid, {
+    itemSelector: '.resource-card',
+    onReorder: async (newIds) => {
+      const map = new Map(resources.map(r => [r.id, r]));
+      resources = newIds.map(id => map.get(id)).filter(Boolean);
+      await saveResources();
+      renderResources();
+      showToast('Порядок сохранён');
+    }
+  });
 </script>
 </body>
 </html>
