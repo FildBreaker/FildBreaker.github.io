@@ -36,17 +36,7 @@
   --radius: 28px;
 }
 
-/* Разные стартовые градиенты для светлых и тёмных тем.
-   Сработает мгновенно, до загрузки картинки. */
-html[data-theme^="light-"] {
-  --bg-image-css: linear-gradient(135deg, #fdf6e3, #f5e6ca, #ecd4b0);
-}
-html[data-theme^="dark-"],
-html:not([data-theme]) {
-  --bg-image-css: linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f);
-}
-
-/* Дополнительно — пока тема не определена, overlay слабее */
+/* Пока тема не определена — overlay слабее, чтобы градиент дышал */
 html:not([data-theme]) body {
   --bg-overlay: rgba(0, 0, 0, 0.45);
 }
@@ -368,7 +358,7 @@ html:not([data-theme]) body {
 }
 
 /* ============================================================
-   БАЗОВЫЕ СТИЛИ (без изменений, используют переменные)
+   БАЗОВЫЕ СТИЛИ
    ============================================================ */
 * {
   margin: 0;
@@ -386,10 +376,10 @@ body {
 }
 
 /* ============================================================
-   ФОН: 3 слоя — градиент (instant) → картинка (fade) → overlay
+   ФОН: 3 слоя — градиент → картинка (fade) → overlay
    ============================================================ */
 
-/* Слой 1: градиент-подложка — мгновенный, без сети */
+/* Слой 1: градиент-подложка — мгновенный */
 body::before {
   content: "";
   position: fixed;
@@ -402,7 +392,7 @@ body::before {
   will-change: transform;
 }
 
-/* Слой 2: картинка — плавно проявляется через opacity */
+/* Слой 2: картинка — плавно проявляется */
 #bgImageLayer {
   position: fixed;
   inset: 0;
@@ -431,7 +421,7 @@ body::after {
 }
 
 /* ============================================================
-   Стартовые градиенты — мгновенно, до загрузки картинки
+   Стартовые градиенты для каждой темы — мгновенно, до картинки
    ============================================================ */
 html:not([data-theme]),
 html[data-theme="dark-gold"]   { --bg-image-css: linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f); }
@@ -445,11 +435,9 @@ html[data-theme="light-green"] { --bg-image-css: linear-gradient(135deg, #e8f5e8
 html[data-theme="light-purple"]{ --bg-image-css: linear-gradient(135deg, #f0e8f5, #e0d0ec, #d0b8e3); }
 html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8, #ecd0d0, #e3b8b8); }
 
-/* Пока тема не определена — overlay слабее, чтобы градиент дышал */
-html:not([data-theme]) body {
-  --bg-overlay: rgba(0, 0, 0, 0.45);
-}
-
+/* ============================================================
+   СЕТКА СТРАНИЦЫ
+   ============================================================ */
 .app-grid {
   position: relative;
   z-index: 0;
@@ -703,7 +691,7 @@ html:not([data-theme]) body {
   color: var(--text-secondary);
 }
 
-/* ===== КАРТОЧКИ (унифицированные) ===== */
+/* ===== КАРТОЧКИ ===== */
 .teachers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -796,7 +784,8 @@ html:not([data-theme]) body {
   position: relative;
 }
 
-.exam-card::before {
+/* Золотая полоска сверху (через ::after, чтобы не конфликтовать с tilt) */
+.exam-card::after {
   content: '';
   position: absolute;
   top: 0;
@@ -805,6 +794,8 @@ html:not([data-theme]) body {
   height: 6px;
   background: linear-gradient(90deg, var(--accent), #f5d742);
   border-radius: var(--radius) var(--radius) 0 0;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* Ресурсы */
@@ -1163,7 +1154,7 @@ html:not([data-theme]) body {
 }
 .remove-link-btn:hover { background: #c0392b; }
 
-/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ ===== */
+/* ===== КНОПКИ ТЕМ ===== */
 .theme-option {
   display: flex;
   align-items: center;
@@ -1338,7 +1329,8 @@ html:not([data-theme]) body {
     padding: 20px;
   }
 }
-/* ===== КНОПКИ-ПЕРЕКЛЮЧАТЕЛИ ТИПА ЗАНЯТИЯ (в модалке расписания) ===== */
+
+/* ===== КНОПКИ ТИПА ЗАНЯТИЯ (расписание) ===== */
 .type-toggle {
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
@@ -1376,60 +1368,47 @@ html:not([data-theme]) body {
   color: var(--accent);
 }
 
-.type-toggle.active i {
-  color: var(--accent);
-}
-/* ===== КАСТОМНЫЙ СКРОЛЛ ДЛЯ МОДАЛОК ===== */
+/* ===== КАСТОМНЫЙ СКРОЛЛ МОДАЛОК ===== */
 .modal-content::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 .modal-content::-webkit-scrollbar-track {
   background: var(--bg-hover);
   border-radius: 10px;
 }
-
 .modal-content::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 10px;
   transition: background 0.2s;
 }
-
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: var(--btn-primary-hover);
 }
-
-/* Для Firefox */
 .modal-content {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-hover);
 }
 
-/* Для контейнера с опциями тем (если понадобится) */
 #themeOptions::-webkit-scrollbar {
   width: 5px;
 }
-
 #themeOptions::-webkit-scrollbar-track {
   background: var(--bg-hover);
   border-radius: 10px;
 }
-
 #themeOptions::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 10px;
 }
-
 #themeOptions {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-hover);
 }
-/* ============================================================
-   УНИВЕРСАЛЬНАЯ ПОДСВЕТКА ДЛЯ ВСЕХ ИНТЕРАКТИВНЫХ ЭЛЕМЕНТОВ
-   ============================================================ */
 
-/* Кнопки действий в карточках (редактировать, удалить) */
+/* ============================================================
+   УНИВЕРСАЛЬНАЯ ПОДСВЕТКА ИНТЕРАКТИВНЫХ ЭЛЕМЕНТОВ
+   ============================================================ */
 .edit-resource, .delete-resource,
 .edit-exam, .delete-exam,
 .edit-teacher, .delete-teacher,
@@ -1466,7 +1445,6 @@ html:not([data-theme]) body {
   transform: scale(1.05);
 }
 
-/* Ссылки в карточках (ресурсы, экзамены) */
 .card-link, .res-link, .event-link {
   transition: all 0.2s ease;
   text-decoration: none;
@@ -1480,7 +1458,6 @@ html:not([data-theme]) body {
   transform: translateX(3px);
 }
 
-/* Элементы списка предметов в домашке */
 .subject-item {
   display: flex;
   justify-content: space-between;
@@ -1492,109 +1469,91 @@ html:not([data-theme]) body {
   background: var(--bg-hover);
   border: 1px solid transparent;
 }
-
 .subject-item:hover {
   background: var(--bg-active);
   border-color: var(--accent);
   transform: translateX(3px);
 }
-
 .subject-item.active {
   background: var(--bg-active);
   border-color: var(--accent);
   color: var(--text-color);
 }
-
 .subject-name {
   font-weight: 500;
   color: var(--text-secondary);
   transition: color 0.2s;
 }
-
 .subject-item:hover .subject-name,
 .subject-item.active .subject-name {
   color: var(--text-color);
 }
 
-/* Кнопки пагинации */
 .pagination .page {
   transition: all 0.2s ease;
   cursor: pointer;
 }
-
 .pagination .page:hover {
   background: var(--bg-active);
   color: var(--text-color);
   transform: translateY(-2px);
 }
-
 .pagination .page.active {
   background: var(--accent);
   color: var(--badge-color);
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-/* Кнопки типа занятия в расписании (уже есть, но добавим усиление) */
 .type-toggle {
   transition: all 0.2s ease;
 }
-
 .type-toggle:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-
 .type-toggle.active {
   box-shadow: 0 4px 16px var(--accent-glow);
 }
 
-/* Кнопки в модалках (добавить ссылку, удалить ссылку) */
 .add-link-btn, .remove-link-btn {
   transition: all 0.2s ease;
 }
-
 .add-link-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px var(--accent-glow);
 }
-
 .remove-link-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
-/* Поля ввода (фокус уже есть, добавим легкую тень) */
 .modal-content input:focus,
 .modal-content textarea:focus,
 .modal-content select:focus {
   box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Кнопки в сайдбаре (настройки) уже имеют hover, добавим дополнительную тень */
 #settingsContainer .nav-btn:hover {
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-/* Общие ссылки */
 a {
   transition: all 0.2s ease;
 }
-
 a:hover {
   color: var(--link-hover);
 }
 
-/* Иконки в карточках ресурсов при наведении на карточку */
 .resource-card:hover .card-icon i {
   transform: scale(1.2);
   transition: transform 0.3s ease;
 }
 
-/* Кнопка "Сбросить" в расписании */
 .reset-btn:hover {
   box-shadow: 0 4px 20px var(--accent-glow);
   transform: scale(1.05) translateY(-2px);
 }
+
 /* ============================================================
    RICH-TEXT РЕДАКТОР
    ============================================================ */
@@ -1681,7 +1640,6 @@ a:hover {
 .rich-display strong, .rich-display b { font-weight: 700; }
 .rich-display em, .rich-display i { font-style: italic; }
 
-/* Текст задания — сохраняем переносы строк и отступы */
 .task-desc {
   white-space: pre-wrap;
   word-break: break-word;
@@ -1753,8 +1711,9 @@ a:hover {
   0%   { background-position: 0% center; }
   100% { background-position: 200% center; }
 }
+
 /* ============================================================
-   КНОПКА "ДОБАВИТЬ ЗАДАНИЕ" — стиль + анимации
+   КНОПКА "ДОБАВИТЬ ЗАДАНИЕ"
    ============================================================ */
 .add-task-btn {
   position: relative;
@@ -1776,7 +1735,6 @@ a:hover {
   isolation: isolate;
 }
 
-/* Мягкое пульсирующее свечение вокруг кнопки */
 .add-task-btn:not(:disabled) {
   animation: taskBtnPulse 2.4s ease-in-out infinite;
 }
@@ -1785,7 +1743,6 @@ a:hover {
   50%      { box-shadow: 0 4px 24px var(--accent-glow), 0 0 32px var(--accent-glow); }
 }
 
-/* Блик, пробегающий по кнопке */
 .add-task-btn::before {
   content: "";
   position: absolute;
@@ -1806,14 +1763,12 @@ a:hover {
   100% { left: 125%; }
 }
 
-/* Иконка "+" */
 .add-task-btn i {
   font-size: 1rem;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 2;
 }
 
-/* Наведение — подъём и поворот иконки */
 .add-task-btn:not(:disabled):hover {
   transform: translateY(-3px) scale(1.04);
   filter: brightness(1.08);
@@ -1823,19 +1778,16 @@ a:hover {
   transform: rotate(90deg) scale(1.25);
 }
 
-/* Клик — лёгкий «шлепок» */
 .add-task-btn:not(:disabled):active {
   transform: translateY(-1px) scale(0.97);
   transition: transform 0.08s ease;
 }
 
-/* Фокус с клавиатуры */
 .add-task-btn:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-glow), 0 6px 20px var(--accent-glow);
 }
 
-/* Задизейбленное состояние */
 .add-task-btn:disabled {
   background: var(--bg-hover);
   color: var(--text-muted);
@@ -1848,10 +1800,6 @@ a:hover {
   transform: none;
 }
 
-/* Небольшая задержка появления на странице */
-.add-task-btn {
-  animation-name: taskBtnPulse;
-}
 /* ============================================================
    НЕОБЫЧНОЕ ПОЯВЛЕНИЕ ЭЛЕМЕНТОВ ПРИ ЗАГРУЗКЕ
    ============================================================ */
@@ -1885,21 +1833,17 @@ a:hover {
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Шапка — падает сверху с наклоном */
 .site-header {
   animation: paHeaderDrop 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
   transform-origin: top center;
 }
-/* Сайдбар — выезжает слева */
 .sidebar {
   animation: paSidebarSlide 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both !important;
   transform-origin: left center;
 }
-/* Футер — снизу */
 .site-footer {
   animation: paFooterRise 0.6s ease 0.5s both !important;
 }
-/* Основные блоки контента — «всплывают» */
 .main-content > * {
   animation: paContentRise 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
 }
@@ -1910,7 +1854,6 @@ a:hover {
 .main-content > *:nth-child(5) { animation-delay: 0.52s !important; }
 .main-content > *:nth-child(n+6) { animation-delay: 0.6s !important; }
 
-/* Карточки в гридах — каскад с чередованием сторон */
 .teachers-grid > *,
 .exams-grid > *,
 .resources-grid > *,
@@ -1930,7 +1873,6 @@ a:hover {
   animation-name: paCardRight;
 }
 
-/* Уважаем reduce-motion */
 @media (prefers-reduced-motion: reduce) {
   .site-header, .sidebar, .site-footer,
   .main-content > *,
@@ -1945,7 +1887,7 @@ a:hover {
 }
 
 /* ============================================================
-   СКЕЛЕТОНЫ (заглушки во время загрузки)
+   СКЕЛЕТОНЫ
    ============================================================ */
 .skeleton {
   position: relative;
@@ -2012,8 +1954,9 @@ a:hover {
   margin-bottom: 12px;
   box-shadow: var(--shadow);
 }
+
 /* ============================================================
-   КОНТЕЙНЕРЫ СПИСКОВ КАРТОЧЕК (отступы между элементами)
+   КОНТЕЙНЕРЫ СПИСКОВ
    ============================================================ */
 .tasks-container,
 .content-container {
@@ -2023,17 +1966,14 @@ a:hover {
   margin-top: 4px;
 }
 
-/* На всякий случай — если какой-то контейнер ещё не покрыт */
 .tasks-container > *,
 .content-container > * {
   margin: 0;
 }
 
-
 /* ============================================================
-   3D-TILT + СВЕТОВОЙ ФОНАРИК (v5)
+   3D-TILT + СВЕТОВОЙ ФОНАРИК
    ============================================================ */
-
 .teacher-card,
 .exam-card,
 .resource-card,
@@ -2058,8 +1998,6 @@ a:hover {
   backface-visibility: hidden;
 }
 
-/* Пока идёт слежение за мышью — отключаем плавный transition,
-   чтобы карточка слушалась курсора без лага */
 .teacher-card.tilt-active,
 .exam-card.tilt-active,
 .resource-card.tilt-active,
@@ -2073,9 +2011,8 @@ a:hover {
     border-color 0.5s ease;
 }
 
-/* Световое пятно — «фонарик» под курсором */
+/* Световое пятно — «фонарик» под курсором (для ВСЕХ карточек, кроме exam) */
 .teacher-card::before,
-.exam-card::before,
 .resource-card::before,
 .task-card::before,
 .poll-card::before,
@@ -2098,7 +2035,26 @@ a:hover {
   mix-blend-mode: screen;
 }
 
-/* В светлых темах — наоборот, затемняем (multiply) */
+/* Для .exam-card — то же, но с другим селектором ::before мы уже заняли под фонарик */
+.exam-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      180px 180px at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--accent) 32%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent) 35%,
+      transparent 70%
+    );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: screen;
+}
+
+/* Светлые темы — multiply */
 .theme-light-gold .teacher-card::before,
 .theme-light-gold .exam-card::before,
 .theme-light-gold .resource-card::before,
@@ -2147,7 +2103,6 @@ a:hover {
   opacity: 1;
 }
 
-/* На hover — общая тень и подсветка границы */
 .teacher-card:hover,
 .exam-card:hover,
 .resource-card:hover,
@@ -2161,7 +2116,6 @@ a:hover {
     0 0 32px -6px var(--accent-glow);
 }
 
-/* Контент карточки приподнимается в 3D над фоном */
 .teacher-card > *,
 .exam-card > *,
 .resource-card > *,
@@ -2254,7 +2208,6 @@ a:hover {
   color: var(--accent);
 }
 
-/* Убираем крестик очистки в WebKit, если он мешает */
 .search-box input::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
@@ -2275,7 +2228,6 @@ a:hover {
   border: 1px solid var(--border-color);
 }
 
-/* Кастомный скролл для пикера */
 .icon-picker::-webkit-scrollbar {
   width: 6px;
 }
@@ -2338,10 +2290,8 @@ a:hover {
 }
 
 /* ============================================================
-   КНОПКИ ВЫБОРА ЦВЕТА В RICH-РЕДАКТОРЕ (в стиле Google Docs)
+   КНОПКИ ВЫБОРА ЦВЕТА В RICH-РЕДАКТОРЕ
    ============================================================ */
-
-/* Кнопка с иконкой сверху и цветной полоской снизу */
 .rich-toolbar .rich-color-btn {
   position: relative;
   display: inline-flex;
@@ -2367,7 +2317,6 @@ a:hover {
   line-height: 1;
 }
 
-/* Тонкая цветная полоска под иконкой */
 .rich-toolbar .rich-color-swatch {
   display: block;
   width: 16px;
@@ -2389,16 +2338,6 @@ a:hover {
   transform: translateY(0);
 }
 
-/* Скрытый нативный input */
-.rich-color-input-hidden {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  pointer-events: none;
-  border: none;
-  padding: 0;
-}
 /* ============================================================
    КАСТОМНЫЙ COLOR PICKER
    ============================================================ */
@@ -2517,6 +2456,11 @@ a:hover {
 .drag-sort-container > [data-id]:active { cursor: grabbing; }
 .drag-sort-container.drag-active > [data-id] { cursor: grabbing; }
 
+/* Когда long-press сработал — отключаем pan-y, чтобы drag не убивался скроллом */
+.drag-sort-container > [data-id].drag-ready {
+  touch-action: none;
+}
+
 .drag-placeholder {
   border: 2px dashed var(--accent);
   border-radius: var(--radius);
@@ -2553,7 +2497,7 @@ body.drag-in-progress * {
 .drag-sort-container .subject-item.dragging-source { opacity: 0.22 !important; }
 
 /* ============================================================
-   ОПТИМИЗАЦИЯ РЕНДЕРА (без визуальных изменений)
+   ОПТИМИЗАЦИЯ РЕНДЕРА
    ============================================================ */
 .teacher-card,
 .exam-card,
