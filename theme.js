@@ -114,6 +114,16 @@ function testImageUrl(url) {
   });
 }
 
+function testImageUrl(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+    setTimeout(() => resolve(false), 6000);
+  });
+}
+
 async function findWorkingBg(themeName, startIndex = 0) {
   const list = THEME_BG_LIST[themeName] || [];
   for (let i = 0; i < list.length; i++) {
@@ -128,16 +138,45 @@ async function findWorkingBg(themeName, startIndex = 0) {
   return null;
 }
 
+// Создаёт слой картинки, если его ещё нет
+let bgLayer = null;
+function ensureBgLayer() {
+  if (bgLayer && bgLayer.isConnected) return bgLayer;
+  bgLayer = document.createElement('div');
+  bgLayer.id = 'bgImageLayer';
+  document.body.appendChild(bgLayer);
+  return bgLayer;
+}
+
 async function setBackgroundForTheme(themeName, startIndex = 0) {
+  const layer = ensureBgLayer();
+
+  // Фаза 1: если картинка уже видна — плавно гасим (fade-out)
+  if (layer.classList.contains('visible')) {
+    layer.classList.remove('visible');
+    await new Promise(r => setTimeout(r, 550)); // половина transition
+  }
+
   const result = await findWorkingBg(themeName, startIndex);
+
   if (result) {
     document.documentElement.style.setProperty('--bg-image-url', `url("${result.url}")`);
-    document.documentElement.style.setProperty('--bg-image-css', 'none');
     currentBgIndex = result.index;
+
+    // Ждём, пока браузер реально загрузит картинку в кэш
+    await new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = result.url;
+    });
+
+    // И только теперь — плавный fade-in
+    requestAnimationFrame(() => layer.classList.add('visible'));
   } else {
+    // Все URL мертвы — картинку не показываем, остаётся градиент
     document.documentElement.style.setProperty('--bg-image-url', 'none');
-    document.documentElement.style.setProperty('--bg-image-css', THEME_BG_FALLBACK[themeName] || THEME_BG_FALLBACK['dark-gold']);
-    currentBgIndex = 0;
+    layer.classList.remove('visible');
   }
 }
 
