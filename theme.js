@@ -13,58 +13,66 @@ export const THEMES = {
   'light-red':   '☀️ Светлая красная'
 };
 
-// Уникальные фоны для каждой темы
 const THEME_BG_LIST = {
+  // 🌙 Тёмная золотая — звёздное небо с тёплым светом
   'dark-gold': [
-    'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=50&fm=webp'
   ],
+  // 🌙 Тёмная синяя — глубокое озеро в горах
   'dark-blue': [
-    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&q=50&fm=webp'
   ],
+  // 🌙 Тёмная зелёная — еловый лес в тумане
   'dark-green': [
-    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&q=50&fm=webp'
   ],
+  // 🌙 Тёмная фиолетовая — туманность и космос
   'dark-purple': [
-    'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&q=50&fm=webp'
   ],
+  // 🌙 Тёмная красная — тлеющие угли / закат
   'dark-red': [
-    'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=50&fm=webp'
   ],
+  // ☀️ Светлая золотая — светлый мрамор с золотыми прожилками
   'light-gold': [
-    'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=50&fm=webp'
   ],
+  // ☀️ Светлая синяя — светлое небо с облаками
   'light-blue': [
-    'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=50&fm=webp'
   ],
+  // ☀️ Светлая зелёная — весенний лес в лёгкой дымке
   'light-green': [
-    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=50&fm=webp'
   ],
+  // ☀️ Светлая фиолетовая — поле лаванды
   'light-purple': [
-    'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=50&fm=webp'
   ],
+  // ☀️ Светлая красная — розовые и красные цветы
   'light-red': [
-    'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1280&q=60&fm=webp',
-    'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1280&q=60&fm=webp'
+    'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=800&q=50&fm=webp',
+    'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=50&fm=webp'
   ]
 };
 
