@@ -2509,3 +2509,56 @@ body.drag-in-progress * {
   content-visibility: auto;
   contain-intrinsic-size: auto 220px;
 }
+
+/* ============================================================
+   ПЛАВНЫЙ ПЕРЕХОД МЕЖДУ ТЕМАМИ
+   ============================================================ */
+
+/* Слой градиента (двойная буферизация для плавного перехода) */
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  filter: blur(10px);
+  -webkit-filter: blur(10px);
+  transform: scale(1.05);
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  will-change: opacity;
+}
+.bg-gradient.active {
+  opacity: 1;
+}
+.bg-gradient.bg-b {
+  z-index: -3;
+}
+
+/* Плавный переход цветов при смене темы.
+   Вешается на body на 650 мс и снимается. */
+body.theme-transitioning,
+body.theme-transitioning *:not(.bg-gradient):not(#bgImageLayer) {
+  transition:
+    background-color 0.6s ease,
+    color 0.5s ease,
+    border-color 0.6s ease,
+    box-shadow 0.6s ease,
+    fill 0.5s ease,
+    stroke 0.5s ease !important;
+}
+
+/* Картинка фона тоже пусть меняется чуть медленнее при смене темы */
+body.theme-transitioning #bgImageLayer {
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Уважаем reduce-motion */
+@media (prefers-reduced-motion: reduce) {
+  body.theme-transitioning,
+  body.theme-transitioning * {
+    transition: none !important;
+  }
+  .bg-gradient {
+    transition: none !important;
+  }
+}
