@@ -10,14 +10,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css?v=3">
   <link rel="icon" href="data/icon.ico?v=3">
-  <script type="module" src="firebase-config.js?v=3"></script>
-  <script type="module" src="dataManager.js?v=3"></script>
-  <script type="module" src="theme.js?v=3"></script>
-  <script type="module" src="app-settings.js?v=3"></script>
   <script src="page-animations.js?v=3"></script>
   <script src="card-tilt.js?v=3"></script>
+  <script src="drag-sort.js?v=3"></script>
+  <script type="module" src="firebase-config.js?v=3"></script>
+  <script type="module" src="dataManager.js?v=3"></script>
+  <script type="module" src="rich-editor.js?v=3"></script>
+  <script type="module" src="theme.js?v=3"></script>
+  <script type="module" src="app-settings.js?v=3"></script>
 </head>
-<body> 
+<body>
 <div class="app-grid">
   <header class="site-header">
     <div class="logo"><h1><i class="fas fa-chalkboard-teacher"></i> Б-31ЛЕС</h1></div>
@@ -40,7 +42,7 @@
       <button class="nav-btn" id="btnResources"><i class="fas fa-link"></i> Ресурсы</button>
       <button class="nav-btn" id="btnHomework"><i class="fas fa-book-open"></i> Домашка</button>
     </div>
-    <div class="sidebar-note"><i class="fas fa-users"></i><p>Преподовательский состав</p></div>
+    <div class="sidebar-note"><i class="fas fa-users"></i><p>Преподавательский состав</p></div>
   </aside>
 
   <main class="main-content">
@@ -54,11 +56,10 @@
   </main>
 
   <footer class="site-footer">
-    <p>© 2026 Б-31ЛЕС · Работает и то стабильнее ЭИОСа, когда заходят 10 человек</p>
+    <p>© 2026 Б-31ЛЕС · Работает стабильнее ЭИОСа</p>
   </footer>
 </div>
 
-<!-- Модалка редактирования преподавателя -->
 <div id="teacherModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeTeacherModal">&times;</span>
@@ -87,51 +88,36 @@
 
   async function loadTeachers() {
     const saved = await dataManager.load('teachers');
-    if (saved && Array.isArray(saved)) {
-      teachers = saved;
-    } else {
-      // Начальные данные
+    if (saved && Array.isArray(saved)) teachers = saved;
+    else {
       teachers = [
-        {
-          id: '1',
-          name: 'Гайвас Алексей Алексеевич',
-          position: 'кафедра садоводства, лесного хозяйства и защиты растений',
-          degree: 'Кандидат сельскохозяйственных наук, доцент',
-          degree2: 'Предмет: Энтомология',
-          phone: '(3812) 65-27-63, 13-42',
-          email: 'aa.gayvas@omgau.org',
-          photo: 'data/Teachers/Gaivas.jpg'
-        },
-        {
-          id: '2',
-          name: 'Иванова Елена Васильевна',
-          position: 'кафедра лесоводства и лесопаркового хозяйства',
-          degree: 'Доктор биологических наук, профессор',
-          degree2: 'Предмет: Лесоводство',
-          phone: '(3812) 65-27-64',
-          email: 'ev.ivanova@omgau.org',
-          photo: 'data/Teachers/Ivanova.jpg'
-        }
+        { id: '1', name: 'Гайвас Алексей Алексеевич', position: 'кафедра садоводства, лесного хозяйства и защиты растений', degree: 'Кандидат сельскохозяйственных наук, доцент', degree2: 'Предмет: Энтомология', phone: '(3812) 65-27-63, 13-42', email: 'aa.gayvas@omgau.org', photo: 'data/Teachers/Gaivas.jpg' },
+        { id: '2', name: 'Иванова Елена Васильевна', position: 'кафедра лесоводства и лесопаркового хозяйства', degree: 'Доктор биологических наук, профессор', degree2: 'Предмет: Лесоводство', phone: '(3812) 65-27-64', email: 'ev.ivanova@omgau.org', photo: 'data/Teachers/Ivanova.jpg' }
       ];
       await dataManager.save('teachers', teachers);
     }
     renderTeachers();
   }
+  async function saveTeachers() { await dataManager.save('teachers', teachers); }
 
-  async function saveTeachers() {
-    await dataManager.save('teachers', teachers);
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   function renderTeachers() {
     const container = document.getElementById('teachersGridContainer');
     if (!teachers.length) {
-      container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>Нет преподавателей. Нажмите "Добавить преподавателя".</p></div>`;
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>Нет преподавателей.</p></div>`;
       return;
     }
     container.innerHTML = '';
     teachers.forEach(teacher => {
       const card = document.createElement('div');
       card.className = 'teacher-card';
+      card.dataset.id = teacher.id;
       card.innerHTML = `
         <div class="card-photo">
           <img src="${teacher.photo || 'https://via.placeholder.com/130x130?text=Нет+фото'}" alt="${teacher.name}" loading="lazy">
@@ -157,14 +143,6 @@
     });
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // --- Модалка ---
   const modal = document.getElementById('teacherModal');
   const modalTitle = document.getElementById('teacherModalTitle');
   const form = document.getElementById('teacherForm');
@@ -181,7 +159,7 @@
     if (id) {
       const teacher = teachers.find(t => t.id === id);
       if (!teacher) return;
-      modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать преподавателя';
+      modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать';
       nameInput.value = teacher.name || '';
       posInput.value = teacher.position || '';
       degreeInput.value = teacher.degree || '';
@@ -190,22 +168,12 @@
       emailInput.value = teacher.email || '';
       photoInput.value = teacher.photo || '';
     } else {
-      modalTitle.innerHTML = '<i class="fas fa-plus"></i> Добавить преподавателя';
-      nameInput.value = '';
-      posInput.value = '';
-      degreeInput.value = '';
-      deg2Input.value = '';
-      phoneInput.value = '';
-      emailInput.value = '';
-      photoInput.value = '';
+      modalTitle.innerHTML = '<i class="fas fa-plus"></i> Добавить';
+      nameInput.value = posInput.value = degreeInput.value = deg2Input.value = phoneInput.value = emailInput.value = photoInput.value = '';
     }
     modal.style.display = 'flex';
   }
-
-  function closeTeacherModal() {
-    modal.style.display = 'none';
-    editTeacherId = null;
-  }
+  function closeTeacherModal() { modal.style.display = 'none'; editTeacherId = null; }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -216,16 +184,11 @@
     const phone = phoneInput.value.trim();
     const email = emailInput.value.trim();
     const photo = photoInput.value.trim();
-    if (!name || !position || !degree || !degree2 || !phone || !email) {
-      alert('Заполните все обязательные поля');
-      return;
-    }
+    if (!name || !position || !degree || !degree2 || !phone || !email) { alert('Заполните все поля'); return; }
     const teacherData = { name, position, degree, degree2, phone, email, photo };
     if (editTeacherId) {
       const idx = teachers.findIndex(t => t.id === editTeacherId);
-      if (idx !== -1) {
-        teachers[idx] = { ...teachers[idx], ...teacherData };
-      }
+      if (idx !== -1) teachers[idx] = { ...teachers[idx], ...teacherData };
     } else {
       teachers.push({ id: Date.now().toString(), ...teacherData });
     }
@@ -246,7 +209,6 @@
   window.addEventListener('click', (e) => { if (e.target === modal) closeTeacherModal(); });
   document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
 
-  // --- Кнопки сайдбара ---
   const showToast = (msg) => {
     const t = document.createElement('div');
     t.innerText = msg;
@@ -260,6 +222,19 @@
   document.getElementById('btnHomework')?.addEventListener('click', () => window.location.href='homework.html');
 
   loadTeachers();
+
+  // Drag-and-drop сортировка
+  const teachersGrid = document.getElementById('teachersGridContainer');
+  window.enableDragSort(teachersGrid, {
+    itemSelector: '.teacher-card',
+    onReorder: async (newIds) => {
+      const map = new Map(teachers.map(t => [t.id, t]));
+      teachers = newIds.map(id => map.get(id)).filter(Boolean);
+      await saveTeachers();
+      renderTeachers();
+      showToast('Порядок сохранён');
+    }
+  });
 </script>
 </body>
 </html>
