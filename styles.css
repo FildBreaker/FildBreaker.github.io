@@ -2004,15 +2004,11 @@ a:hover {
 .content-container > * {
   margin: 0;
 }
-/* ============================================================
-   ПЛАВНАЯ ПОДСВЕТКА КАРТОЧЕК (v3 — оптимизированная)
-   Анимируются только transform + opacity (GPU)
-   ============================================================ */
 
-@keyframes floatAura {
-  0%, 100% { transform: translate3d(-4%, -3%, 0) scale(1);    opacity: 0.10; }
-  50%      { transform: translate3d( 4%,  3%, 0) scale(1.18); opacity: 0.22; }
-}
+
+/* ============================================================
+   3D-TILT + СВЕТОВОЙ ФОНАРИК (v5)
+   ============================================================ */
 
 .teacher-card,
 .exam-card,
@@ -2024,15 +2020,36 @@ a:hover {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border-color);
-  contain: layout paint style;             /* изолируем перерисовку внутри карточки */
+  transform:
+    perspective(var(--per, 900px))
+    rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg))
+    translateZ(0);
+  transform-style: preserve-3d;
   transition:
-    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s ease;
+  will-change: transform;
   backface-visibility: hidden;
-  transform: translateZ(0);                /* включает GPU-слой заранее */
 }
 
-/* Единственный псевдоэлемент — мягкая аура */
+/* Пока идёт слежение за мышью — отключаем плавный transition,
+   чтобы карточка слушалась курсора без лага */
+.teacher-card.tilt-active,
+.exam-card.tilt-active,
+.resource-card.tilt-active,
+.task-card.tilt-active,
+.poll-card.tilt-active,
+.event-card.tilt-active,
+.test-card.tilt-active {
+  transition:
+    transform 0.08s linear,
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s ease;
+}
+
+/* Световое пятно — «фонарик» под курсором */
 .teacher-card::before,
 .exam-card::before,
 .resource-card::before,
@@ -2042,22 +2059,85 @@ a:hover {
 .test-card::before {
   content: "";
   position: absolute;
-  inset: -30%;                              /* шире карточки, чтобы волна красиво выходила */
-  background: radial-gradient(
-    circle at 50% 50%,
-    var(--accent-glow) 0%,
-    transparent 55%
-  );
-  filter: blur(32px);
-  opacity: 0.10;
+  inset: 0;
+  background:
+    radial-gradient(
+      180px 180px at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--accent) 32%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent) 35%,
+      transparent 70%
+    );
+  opacity: 0;
+  transition: opacity 0.35s ease;
   pointer-events: none;
   z-index: 0;
-  will-change: transform, opacity;
-  animation: floatAura 14s ease-in-out infinite;
-  transform: translate3d(0, 0, 0);
+  mix-blend-mode: screen;
 }
 
-/* Контент карточки — выше ауры */
+/* В светлых темах — наоборот, затемняем (multiply) */
+.theme-light-gold .teacher-card::before,
+.theme-light-gold .exam-card::before,
+.theme-light-gold .resource-card::before,
+.theme-light-gold .task-card::before,
+.theme-light-gold .poll-card::before,
+.theme-light-gold .event-card::before,
+.theme-light-gold .test-card::before,
+.theme-light-blue .teacher-card::before,
+.theme-light-blue .exam-card::before,
+.theme-light-blue .resource-card::before,
+.theme-light-blue .task-card::before,
+.theme-light-blue .poll-card::before,
+.theme-light-blue .event-card::before,
+.theme-light-blue .test-card::before,
+.theme-light-green .teacher-card::before,
+.theme-light-green .exam-card::before,
+.theme-light-green .resource-card::before,
+.theme-light-green .task-card::before,
+.theme-light-green .poll-card::before,
+.theme-light-green .event-card::before,
+.theme-light-green .test-card::before,
+.theme-light-purple .teacher-card::before,
+.theme-light-purple .exam-card::before,
+.theme-light-purple .resource-card::before,
+.theme-light-purple .task-card::before,
+.theme-light-purple .poll-card::before,
+.theme-light-purple .event-card::before,
+.theme-light-purple .test-card::before,
+.theme-light-red .teacher-card::before,
+.theme-light-red .exam-card::before,
+.theme-light-red .resource-card::before,
+.theme-light-red .task-card::before,
+.theme-light-red .poll-card::before,
+.theme-light-red .event-card::before,
+.theme-light-red .test-card::before {
+  mix-blend-mode: multiply;
+  background:
+    radial-gradient(
+      200px 200px at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+      transparent 70%
+    );
+}
+
+.tilt-active::before {
+  opacity: 1;
+}
+
+/* На hover — общая тень и подсветка границы */
+.teacher-card:hover,
+.exam-card:hover,
+.resource-card:hover,
+.task-card:hover,
+.poll-card:hover,
+.event-card:hover,
+.test-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border-color));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.30),
+    0 0 32px -6px var(--accent-glow);
+}
+
+/* Контент карточки приподнимается в 3D над фоном */
 .teacher-card > *,
 .exam-card > *,
 .resource-card > *,
@@ -2067,102 +2147,26 @@ a:hover {
 .test-card > * {
   position: relative;
   z-index: 1;
+  transform: translateZ(20px);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Hover — плавное усиление, без рывков */
-.teacher-card:hover,
-.exam-card:hover,
-.resource-card:hover,
-.task-card:hover,
-.poll-card:hover,
-.event-card:hover,
-.test-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.26),
-    0 0 28px -8px var(--accent-glow);
-}
-
-.teacher-card:hover::before,
-.exam-card:hover::before,
-.resource-card:hover::before,
-.task-card:hover::before,
-.poll-card:hover::before,
-.event-card:hover::before,
-.test-card:hover::before {
-  animation-duration: 6s;                   /* при hover — быстрее, но всё ещё плавно */
-  opacity: 0.28;
-}
-
-/* Светлые темы — тени мягче */
-.theme-light-gold .teacher-card:hover,
-.theme-light-gold .exam-card:hover,
-.theme-light-gold .resource-card:hover,
-.theme-light-gold .task-card:hover,
-.theme-light-gold .poll-card:hover,
-.theme-light-gold .event-card:hover,
-.theme-light-gold .test-card:hover,
-.theme-light-blue .teacher-card:hover,
-.theme-light-blue .exam-card:hover,
-.theme-light-blue .resource-card:hover,
-.theme-light-blue .task-card:hover,
-.theme-light-blue .poll-card:hover,
-.theme-light-blue .event-card:hover,
-.theme-light-blue .test-card:hover,
-.theme-light-green .teacher-card:hover,
-.theme-light-green .exam-card:hover,
-.theme-light-green .resource-card:hover,
-.theme-light-green .task-card:hover,
-.theme-light-green .poll-card:hover,
-.theme-light-green .event-card:hover,
-.theme-light-green .test-card:hover,
-.theme-light-purple .teacher-card:hover,
-.theme-light-purple .exam-card:hover,
-.theme-light-purple .resource-card:hover,
-.theme-light-purple .task-card:hover,
-.theme-light-purple .poll-card:hover,
-.theme-light-purple .event-card:hover,
-.theme-light-purple .test-card:hover,
-.theme-light-red .teacher-card:hover,
-.theme-light-red .exam-card:hover,
-.theme-light-red .resource-card:hover,
-.theme-light-red .task-card:hover,
-.theme-light-red .poll-card:hover,
-.theme-light-red .event-card:hover,
-.theme-light-red .test-card:hover {
-  box-shadow:
-    0 14px 28px rgba(0, 0, 0, 0.10),
-    0 0 24px -8px var(--accent-glow);
-}
-
-/* Reduce motion — отключаем */
 @media (prefers-reduced-motion: reduce) {
-  .teacher-card::before,
-  .exam-card::before,
-  .resource-card::before,
-  .task-card::before,
-  .poll-card::before,
-  .event-card::before,
-  .test-card::before {
-    animation: none;
-    opacity: 0.12;
-  }
   .teacher-card,
   .exam-card,
   .resource-card,
   .task-card,
   .poll-card,
   .event-card,
-  .test-card {
-    transition: none;
-  }
-  .teacher-card:hover,
-  .exam-card:hover,
-  .resource-card:hover,
-  .task-card:hover,
-  .poll-card:hover,
-  .event-card:hover,
-  .test-card:hover {
-    transform: none;
+  .test-card,
+  .teacher-card > *,
+  .exam-card > *,
+  .resource-card > *,
+  .task-card > *,
+  .poll-card > *,
+  .event-card > *,
+  .test-card > * {
+    transform: none !important;
+    transition: none !important;
   }
 }
