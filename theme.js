@@ -13,7 +13,7 @@ export const THEMES = {
   'light-red':   '☀️ Светлая красная'
 };
 
-// Фоны: оптимизированные под blur (w=800, q=50, webp) — вес в 4–5 раз меньше
+// Фоны: оптимизированные под blur (w=800, q=50, webp)
 const THEME_BG_LIST = {
   'dark-gold': [
     'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=50&fm=webp',
@@ -98,12 +98,73 @@ let themeModal = null;
 let currentBgIndex = 0;
 const bgUrlCache = {};
 
+// Флаг: идёт ли первая инициализация (без анимации)
+let firstThemeApply = true;
+
+// Какой из двух слоёв градиента сейчас активен
+let activeGradientLayer = 'A';
+
 // ===== Утилита: читаем актуальную тему из DOM =====
 function readThemeFromDOM() {
   const cls = [...document.body.classList].find(c => c.startsWith('theme-'));
   return cls ? cls.replace('theme-', '') : null;
 }
 
+// ===== Двойная буферизация градиента (для плавного перехода) =====
+function ensureGradientLayers() {
+  if (!document.getElementById('bgGradientA')) {
+    const a = document.createElement('div');
+    a.id = 'bgGradientA';
+    a.className = 'bg-gradient active';
+    const css = getComputedStyle(document.documentElement)
+      .getPropertyValue('--bg-image-css').trim();
+    a.style.background = css || THEME_BG_FALLBACK[currentTheme];
+    document.body.insertBefore(a, document.body.firstChild);
+  }
+  if (!document.getElementById('bgGradientB')) {
+    const b = document.createElement('div');
+    b.id = 'bgGradientB';
+    b.className = 'bg-gradient bg-b';
+    document.body.insertBefore(b, document.body.firstChild);
+  }
+}
+
+function switchGradientTo(cssGradient) {
+  ensureGradientLayers();
+  const a = document.getElementById('bgGradientA');
+  const b = document.getElementById('bgGradientB');
+  if (!a || !b) return;
+
+  const current = activeGradientLayer === 'A' ? a : b;
+  const next    = activeGradientLayer === 'A' ? b : a;
+
+  next.style.background = cssGradient;
+  // Форсируем reflow, чтобы transition сработал
+  void next.offsetWidth;
+  requestAnimationFrame(() => {
+    next.classList.add('active');
+    current.classList.remove('active');
+    activeGradientLayer = activeGradientLayer === 'A' ? 'B' : 'A';
+  });
+}
+
+// ===== Получить градиент для темы =====
+function getThemeGradient(themeName) {
+  // Создаём временный элемент с нужной темой и читаем CSS-переменную
+  const tmp = document.createElement('div');
+  tmp.setAttribute('data-theme', themeName);
+  tmp.style.position = 'absolute';
+  tmp.style.visibility = 'hidden';
+  tmp.style.pointerEvents = 'none';
+  document.documentElement.appendChild(tmp);
+  const val = getComputedStyle(tmp).getPropertyValue('--bg-image-css').trim();
+  document.documentElement.removeChild(tmp);
+
+  if (val && val !== 'none') return val;
+  return THEME_BG_FALLBACK[themeName] || THEME_BG_FALLBACK['dark-gold'];
+}
+
+// ===== Проверка доступности картинки =====
 function testImageUrl(url) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -114,6 +175,7 @@ function testImageUrl(url) {
   });
 }
 
+// ===== Поиск рабочего фона =====
 async function findWorkingBg(themeName, startIndex = 0) {
   const list = THEME_BG_LIST[themeName] || [];
   for (let i = 0; i < list.length; i++) {
@@ -128,7 +190,7 @@ async function findWorkingBg(themeName, startIndex = 0) {
   return null;
 }
 
-// Создаёт слой картинки, если его ещё нет
+// ===== Слой картинки =====
 let bgLayer = null;
 function ensureBgLayer() {
   if (bgLayer && bgLayer.isConnected) return bgLayer;
@@ -141,7 +203,7 @@ function ensureBgLayer() {
 async function setBackgroundForTheme(themeName, startIndex = 0) {
   const layer = ensureBgLayer();
 
-  // Фаза 1: если картинка уже видна — плавно гасим (fade-out)
+  // Фаза 1: если картинка уже видна — плавно гасим
   if (layer.classList.contains('visible')) {
     layer.classList.remove('visible');
     await new Promise(r => setTimeout(r, 550));
@@ -161,18 +223,19 @@ async function setBackgroundForTheme(themeName, startIndex = 0) {
       img.src = result.url;
     });
 
-    // И только теперь — плавный fade-in
+    // Плавный fade-in
     requestAnimationFrame(() => layer.classList.add('visible'));
   } else {
-    // Все URL мертвы — картинку не показываем, остаётся градиент
     document.documentElement.style.setProperty('--bg-image-url', 'none');
     layer.classList.remove('visible');
   }
 }
 
+// ===== Применение темы =====
 export function applyTheme(themeName) {
   if (!themeName || !THEMES[themeName]) themeName = 'dark-gold';
 
+  // Меняем классы темы
   document.body.className = document.body.className
     .split(' ')
     .filter(c => !c.startsWith('theme-'))
@@ -185,13 +248,36 @@ export function applyTheme(themeName) {
   currentTheme = themeName;
   try { localStorage.setItem('b21-theme', themeName); } catch (e) {}
 
+  // Плавный переход — только если это НЕ первая инициализация
+  if (!firstThemeApply) {
+    document.body.classList.add('theme-transitioning');
+    clearTimeout(window.__themeTransitionTimer);
+    window.__themeTransitionTimer = setTimeout(() => {
+      document.body.classList.remove('theme-transitioning');
+    }, 700);
+  }
+
+  // Обновляем градиент-подложку
+  const gradient = getThemeGradient(themeName);
+  if (firstThemeApply) {
+    ensureGradientLayers();
+    const a = document.getElementById('bgGradientA');
+    if (a) a.style.background = gradient;
+  } else {
+    switchGradientTo(gradient);
+  }
+
+  // Меняем картинку
   setBackgroundForTheme(themeName, 0);
+
+  firstThemeApply = false;
 
   if (themeModal && themeModal.style.display === 'flex') {
     renderThemeOptions();
   }
 }
 
+// ===== Смена фоновой картинки вручную =====
 export async function cycleBackground() {
   const list = THEME_BG_LIST[currentTheme] || [];
   if (!list.length) return;
@@ -199,6 +285,7 @@ export async function cycleBackground() {
   await setBackgroundForTheme(currentTheme, nextIndex);
 }
 
+// ===== Загрузка темы при старте =====
 export async function loadTheme() {
   const localTheme = localStorage.getItem('b21-theme');
   if (localTheme && THEMES[localTheme]) applyTheme(localTheme);
@@ -213,6 +300,7 @@ export async function loadTheme() {
   } catch (e) { console.warn('Не удалось загрузить тему:', e); }
 }
 
+// ===== Сохранение темы =====
 export async function saveTheme(themeName) {
   if (!THEMES[themeName]) return;
   applyTheme(themeName);
@@ -220,6 +308,7 @@ export async function saveTheme(themeName) {
   catch (e) { console.warn('Не удалось сохранить тему:', e); }
 }
 
+// ===== Модалка выбора темы =====
 function createThemeModal() {
   if (document.getElementById('themeModal')) return;
   const modal = document.createElement('div');
@@ -295,9 +384,11 @@ export function closeThemeModal() {
   if (themeModal) themeModal.style.display = 'none';
 }
 
+// ===== Глобальные функции для HTML =====
 window.openThemeModal = openThemeModal;
 window.closeThemeModal = closeThemeModal;
 window.saveTheme = saveTheme;
 window.cycleBackground = cycleBackground;
 
+// ===== Автозагрузка =====
 document.addEventListener('DOMContentLoaded', loadTheme);
