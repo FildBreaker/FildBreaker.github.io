@@ -90,10 +90,46 @@
   let editTaskId = null;
   let taskEditor = null;
 
+  // ===== НОРМАЛИЗАЦИЯ ДАННЫХ (чиним массив/объект от Firebase) =====
+  function toArray(val) {
+    if (Array.isArray(val)) return val;
+    if (val && typeof val === 'object') {
+      // Firebase мог вернуть объект с числовыми ключами
+      return Object.keys(val).sort((a,b) => Number(a) - Number(b)).map(k => val[k]);
+    }
+    return [];
+  }
+
+  function normalizeHomework(raw) {
+    if (!raw || typeof raw !== 'object') return { subjects: [] };
+    const subjectsRaw = toArray(raw.subjects);
+    const subjects = subjectsRaw.map(subj => {
+      if (!subj || typeof subj !== 'object') return null;
+      const tasksRaw = toArray(subj.tasks);
+      const tasks = tasksRaw.map(t => {
+        if (!t || typeof t !== 'object') return null;
+        return {
+          id: t.id || String(Date.now() + Math.random()),
+          desc: t.desc || '',
+          links: toArray(t.links),
+          tags: t.tags || ''
+        };
+      }).filter(Boolean);
+      return {
+        id: subj.id || String(Date.now() + Math.random()),
+        name: subj.name || 'Без названия',
+        tasks
+      };
+    }).filter(Boolean);
+    return { subjects };
+  }
+
   async function loadData() {
     const saved = await dataManager.load('homework');
-    if (saved && saved.subjects) homeworkData = saved;
-    else {
+    homeworkData = normalizeHomework(saved);
+
+    // Если вообще пусто — начальные данные
+    if (homeworkData.subjects.length === 0 && !saved) {
       homeworkData = {
         subjects: [
           { id: 'subj1', name: 'Лесоводство', tasks: [{ id: 'task1', desc: 'Прочитать главы 3-5 учебника.', links: [{ url: '#', title: 'Скачать учебник' }], tags: 'конспект, теория' }] },
@@ -102,6 +138,7 @@
       };
       await dataManager.save('homework', homeworkData);
     }
+
     renderSubjects();
     const activeId = sessionStorage.getItem('activeSubjectId');
     if (activeId && homeworkData.subjects.find(s => s.id === activeId)) selectSubject(activeId);
@@ -142,6 +179,7 @@
     renderSubjects();
     const subject = homeworkData.subjects.find(s => s.id === subjectId);
     if (subject) {
+      if (!Array.isArray(subject.tasks)) subject.tasks = [];
       document.getElementById('currentSubjectTitle').innerHTML = `<i class="fas fa-book-open"></i> ${escapeHtml(subject.name)}`;
       renderTasks(subject.tasks);
     } else clearTasksView();
@@ -192,6 +230,7 @@
   async function addSubject(name) {
     if (!name.trim()) return;
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
+    if (!Array.isArray(homeworkData.subjects)) homeworkData.subjects = [];
     homeworkData.subjects.push({ id: newId, name: name.trim(), tasks: [] });
     await saveData();
     renderSubjects();
@@ -220,17 +259,26 @@
     }
     renderSubjects();
   }
+
   async function addTask(subjectId, taskData) {
     const subject = homeworkData.subjects.find(s => s.id === subjectId);
-    if (!subject) { console.error('[addTask] subject not found:', subjectId); return; }
+    if (!subject) { alert('Предмет не найден, попробуйте перезагрузить страницу'); return; }
+    if (!Array.isArray(subject.tasks)) subject.tasks = [];
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
-    subject.tasks.push({ id: newId, desc: taskData.desc || '', links: taskData.links || [], tags: taskData.tags || '' });
+    subject.tasks.push({
+      id: newId,
+      desc: taskData.desc || '',
+      links: taskData.links || [],
+      tags: taskData.tags || ''
+    });
     await saveData();
     if (currentSubjectId === subjectId) renderTasks(subject.tasks);
   }
+
   async function updateTask(subjectId, taskId, taskData) {
     const subject = homeworkData.subjects.find(s => s.id === subjectId);
     if (!subject) return;
+    if (!Array.isArray(subject.tasks)) subject.tasks = [];
     const task = subject.tasks.find(t => t.id === taskId);
     if (task) {
       task.desc = taskData.desc;
@@ -240,10 +288,12 @@
       if (currentSubjectId === subjectId) renderTasks(subject.tasks);
     }
   }
+
   async function deleteTask(taskId) {
     if (!currentSubjectId) return;
     const subject = homeworkData.subjects.find(s => s.id === currentSubjectId);
     if (!subject) return;
+    if (!Array.isArray(subject.tasks)) subject.tasks = [];
     const idx = subject.tasks.findIndex(t => t.id === taskId);
     if (idx === -1) return;
     subject.tasks.splice(idx, 1);
@@ -310,6 +360,7 @@
     if (!currentSubjectId) { alert('Сначала выберите предмет'); return; }
     const subject = homeworkData.subjects.find(s => s.id === currentSubjectId);
     if (!subject) return;
+    if (!Array.isArray(subject.tasks)) subject.tasks = [];
     editTaskId = taskId;
     const task = taskId ? subject.tasks.find(t => t.id === taskId) : null;
     const initialHtml = task ? (task.desc || '') : '';
@@ -340,30 +391,18 @@
 
   async function saveTaskFromModal() {
     try {
-      console.log('[SaveTask] handler called');
-      console.log('[SaveTask] editTaskId =', editTaskId, ', currentSubjectId =', currentSubjectId);
       if (!currentSubjectId) { alert('Не выбран предмет'); return; }
-
       const descHtml = taskEditor ? taskEditor.getContent() : '';
       const descText = taskEditor ? taskEditor.getText().trim() : '';
-      console.log('[SaveTask] descText length:', descText.length, 'html length:', descHtml.length);
-
       if (!descText) { alert('Введите описание задания'); return; }
-
       const links = collectLinks();
       const tags = taskTags.value.trim();
       const taskData = { desc: sanitizeHtml(descHtml), links, tags };
-      console.log('[SaveTask] taskData ready:', taskData);
 
-      if (editTaskId) {
-        await updateTask(currentSubjectId, editTaskId, taskData);
-        console.log('[SaveTask] updated');
-      } else {
-        await addTask(currentSubjectId, taskData);
-        console.log('[SaveTask] added');
-      }
+      if (editTaskId) await updateTask(currentSubjectId, editTaskId, taskData);
+      else await addTask(currentSubjectId, taskData);
+
       closeTaskModal();
-      console.log('[SaveTask] modal closed');
     } catch (err) {
       console.error('[SaveTask] ERROR:', err);
       alert('Ошибка сохранения: ' + (err && err.message ? err.message : err));
@@ -377,20 +416,11 @@
   document.getElementById('saveSubjectBtn').addEventListener('click', saveSubjectFromModal);
   document.getElementById('closeTaskModal').addEventListener('click', closeTaskModal);
   document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
-
-  const saveBtn = document.getElementById('saveTaskBtn');
-  console.log('[Init] saveTaskBtn found:', !!saveBtn);
-  if (saveBtn) {
-    saveBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('[SaveTask] click event received');
-      saveTaskFromModal();
-    });
-  } else {
-    console.error('[Init] saveTaskBtn NOT FOUND');
-  }
-
+  document.getElementById('saveTaskBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    saveTaskFromModal();
+  });
   addLinkBtn.addEventListener('click', () => addLinkGroup('', ''));
 
   window.addEventListener('click', (e) => {
