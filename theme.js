@@ -183,24 +183,24 @@ async function setBackgroundForTheme(themeName, startIndex = 0) {
 export function applyTheme(themeName) {
   if (!themeName || !THEMES[themeName]) themeName = 'dark-gold';
 
-  // Убираем старые классы тем
   document.body.className = document.body.className
     .split(' ')
     .filter(c => !c.startsWith('theme-'))
     .join(' ');
   document.body.classList.add(`theme-${themeName}`);
 
+  // Дублируем тему на <html> — CSS мгновенно применяет нужный градиент
+  document.documentElement.setAttribute('data-theme', themeName);
+
   currentTheme = themeName;
   try { localStorage.setItem('b21-theme', themeName); } catch (e) {}
 
   setBackgroundForTheme(themeName, 0);
 
-  // Если модалка открыта — перерисуем её с актуальным состоянием
   if (themeModal && themeModal.style.display === 'flex') {
     renderThemeOptions();
   }
 }
-
 export async function cycleBackground() {
   const list = THEME_BG_LIST[currentTheme] || [];
   if (!list.length) return;
