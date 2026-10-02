@@ -2312,3 +2312,66 @@ a:hover {
 .icon-option i {
   pointer-events: none;
 }
+
+/* ============================================================
+   КНОПКИ ВЫБОРА ЦВЕТА В RICH-РЕДАКТОРЕ (в стиле Google Docs)
+   ============================================================ */
+
+/* Кнопка с иконкой сверху и цветной полоской снизу */
+.rich-toolbar .rich-color-btn {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 4px 8px 3px;
+  min-width: 34px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.rich-toolbar .rich-color-btn i {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+/* Тонкая цветная полоска под иконкой */
+.rich-toolbar .rich-color-swatch {
+  display: block;
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  margin-top: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.15s ease;
+}
+
+.rich-toolbar .rich-color-btn:hover {
+  background: var(--bg-active);
+  color: var(--text-color);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.rich-toolbar .rich-color-btn:active {
+  transform: translateY(0);
+}
+
+/* Скрытый нативный input */
+.rich-color-input-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  border: none;
+  padding: 0;
+}
