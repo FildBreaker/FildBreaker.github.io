@@ -2,7 +2,9 @@
    ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (будут переопределены темами)
    ============================================================ */
 :root {
-  --bg-image-url: url("https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80");
+  /* Фон по умолчанию — только градиент (грузится мгновенно) */
+  --bg-image-url: none;
+  --bg-image-css: linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f);
   --bg-overlay: rgba(0, 0, 0, 0.65);
   --primary-bg: #22223b;
   --header-bg: #4a4e69;
@@ -32,6 +34,21 @@
   --badge-bg: var(--accent);
   --badge-color: #1e293b;
   --radius: 28px;
+}
+
+/* Разные стартовые градиенты для светлых и тёмных тем.
+   Сработает мгновенно, до загрузки картинки. */
+html[data-theme^="light-"] {
+  --bg-image-css: linear-gradient(135deg, #fdf6e3, #f5e6ca, #ecd4b0);
+}
+html[data-theme^="dark-"],
+html:not([data-theme]) {
+  --bg-image-css: linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f);
+}
+
+/* Дополнительно — пока тема не определена, overlay слабее */
+html:not([data-theme]) body {
+  --bg-overlay: rgba(0, 0, 0, 0.45);
 }
 
 /* ============================================================
