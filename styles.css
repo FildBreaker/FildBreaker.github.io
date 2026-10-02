@@ -1828,3 +1828,163 @@ a:hover {
 .add-task-btn {
   animation-name: taskBtnPulse;
 }
+/* ============================================================
+   НЕОБЫЧНОЕ ПОЯВЛЕНИЕ ЭЛЕМЕНТОВ ПРИ ЗАГРУЗКЕ
+   ============================================================ */
+@keyframes paHeaderDrop {
+  0%   { opacity: 0; transform: translateY(-40px) rotateX(-25deg) scale(0.94); }
+  55%  { opacity: 1; transform: translateY(8px) rotateX(5deg) scale(1.015); }
+  100% { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+}
+@keyframes paSidebarSlide {
+  0%   { opacity: 0; transform: translateX(-70px) rotateY(14deg) skewX(3deg); }
+  60%  { opacity: 1; transform: translateX(6px) rotateY(-3deg) skewX(-1deg); }
+  100% { opacity: 1; transform: translateX(0) rotateY(0) skewX(0); }
+}
+@keyframes paContentRise {
+  0%   { opacity: 0; transform: translateY(36px) scale(0.96); filter: blur(6px); }
+  55%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes paCardLeft {
+  0%   { opacity: 0; transform: translateX(-50px) rotate(-4deg) scale(0.88); filter: blur(4px); }
+  55%  { opacity: 1; filter: blur(0); transform: translateX(6px) rotate(1.5deg) scale(1.02); }
+  100% { opacity: 1; transform: translateX(0) rotate(0) scale(1); filter: blur(0); }
+}
+@keyframes paCardRight {
+  0%   { opacity: 0; transform: translateX(50px) rotate(4deg) scale(0.88); filter: blur(4px); }
+  55%  { opacity: 1; filter: blur(0); transform: translateX(-6px) rotate(-1.5deg) scale(1.02); }
+  100% { opacity: 1; transform: translateX(0) rotate(0) scale(1); filter: blur(0); }
+}
+@keyframes paFooterRise {
+  0%   { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Шапка — падает сверху с наклоном */
+.site-header {
+  animation: paHeaderDrop 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+  transform-origin: top center;
+}
+/* Сайдбар — выезжает слева */
+.sidebar {
+  animation: paSidebarSlide 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both !important;
+  transform-origin: left center;
+}
+/* Футер — снизу */
+.site-footer {
+  animation: paFooterRise 0.6s ease 0.5s both !important;
+}
+/* Основные блоки контента — «всплывают» */
+.main-content > * {
+  animation: paContentRise 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+}
+.main-content > *:nth-child(1) { animation-delay: 0.12s !important; }
+.main-content > *:nth-child(2) { animation-delay: 0.22s !important; }
+.main-content > *:nth-child(3) { animation-delay: 0.32s !important; }
+.main-content > *:nth-child(4) { animation-delay: 0.42s !important; }
+.main-content > *:nth-child(5) { animation-delay: 0.52s !important; }
+.main-content > *:nth-child(n+6) { animation-delay: 0.6s !important; }
+
+/* Карточки в гридах — каскад с чередованием сторон */
+.teachers-grid > *,
+.exams-grid > *,
+.resources-grid > *,
+.tasks-container > *,
+.content-container > *,
+.timers-container > * {
+  animation: paCardLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(0.2s + var(--i, 0) * 0.07s);
+  transform-origin: center;
+}
+.teachers-grid > *:nth-child(even),
+.exams-grid > *:nth-child(even),
+.resources-grid > *:nth-child(even),
+.tasks-container > *:nth-child(even),
+.content-container > *:nth-child(even),
+.timers-container > *:nth-child(even) {
+  animation-name: paCardRight;
+}
+
+/* Уважаем reduce-motion */
+@media (prefers-reduced-motion: reduce) {
+  .site-header, .sidebar, .site-footer,
+  .main-content > *,
+  .teachers-grid > *,
+  .exams-grid > *,
+  .resources-grid > *,
+  .tasks-container > *,
+  .content-container > *,
+  .timers-container > * {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   СКЕЛЕТОНЫ (заглушки во время загрузки)
+   ============================================================ */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-hover);
+  border-radius: 12px;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+.theme-light-gold .skeleton::after,
+.theme-light-blue .skeleton::after,
+.theme-light-green .skeleton::after,
+.theme-light-purple .skeleton::after,
+.theme-light-red .skeleton::after {
+  background: linear-gradient(100deg, transparent 20%, rgba(0,0,0,0.06) 50%, transparent 80%);
+}
+@keyframes skeletonShimmer {
+  100% { transform: translateX(100%); }
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.skeleton-img {
+  width: 100%;
+  height: 120px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+}
+.skeleton-img-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.skeleton-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.skeleton-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
