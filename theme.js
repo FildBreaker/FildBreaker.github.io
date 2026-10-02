@@ -15,11 +15,11 @@ export const THEMES = {
 
 // Уникальные фоны для каждой темы
 const THEME_BG = {
-  'dark-gold':   'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80',
+  'dark-gold':   'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80', 
   'dark-blue':   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80',
-  'dark-green':  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80',
+  'dark-green':  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80',
   'dark-purple': 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1920&q=80',
-  'dark-red':    'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80',
+  'dark-red':    'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80',
   'light-gold':  'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80',
   'light-blue':  'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=1920&q=80',
   'light-green': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80',
