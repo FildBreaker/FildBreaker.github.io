@@ -2,9 +2,6 @@
 import { dataManager } from './dataManager.js';
 import { createRichEditor, sanitizeHtml, escapeHtml as esc } from './rich-editor.js';
 
-// ============================================================
-// СОСТОЯНИЕ
-// ============================================================
 const state = {
   currentRoute: null,
   intervals: {},
@@ -18,9 +15,6 @@ const state = {
   }
 };
 
-// ============================================================
-// УТИЛИТЫ
-// ============================================================
 function toArray(val) {
   if (Array.isArray(val)) return val;
   if (val && typeof val === 'object') {
@@ -41,7 +35,6 @@ function closeModal(id) {
   const m = document.getElementById(id);
   if (m) m.style.display = 'none';
 }
-
 function openModal(id) {
   const m = document.getElementById(id);
   if (m) m.style.display = 'flex';
@@ -65,9 +58,6 @@ function setupModalGlobals() {
   });
 }
 
-// ============================================================
-// РОУТЕР
-// ============================================================
 const ROUTES = ['home', 'schedule', 'exam', 'resources', 'homework', 'extracurricular', 'teacher'];
 
 function parseRoute() {
@@ -103,22 +93,14 @@ function destroyRoute(route) {
 
 window.addEventListener('hashchange', navigate);
 
-// ============================================================
-// ОБЩИЕ ХЕЛПЕРЫ РЕНДЕРА
-// ============================================================
-function setSidebar(html) {
-  document.getElementById('sidebarDynamic').innerHTML = html;
-}
-function setMain(html) {
-  document.getElementById('mainContent').innerHTML = html;
-}
+function setSidebar(html) { document.getElementById('sidebarDynamic').innerHTML = html; }
+function setMain(html) { document.getElementById('mainContent').innerHTML = html; }
 function showSkeletonMain(kind, count) {
   if (window.showSkeleton) window.showSkeleton('mainContent', count || 3, kind || 'card');
 }
 function hideSkeletonMain() {
   if (window.hideSkeleton) window.hideSkeleton('mainContent');
 }
-
 function setSidebarNavHandlers() {
   document.querySelectorAll('#sidebarDynamic [data-nav]').forEach(btn => {
     btn.onclick = () => { location.hash = '#/' + btn.dataset.nav; };
@@ -401,67 +383,36 @@ async function saveScheduleEdit() {
 // ============================================================
 // ЭКЗАМЕНЫ
 // ============================================================
-function renderExams() {
-  const grid = document.getElementById('examsGrid');
-  if (!grid) return;
-  if (!Array.isArray(state.data.exams) || !state.data.exams.length) {
-    grid.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Нет экзаменов.</p></div>`;
-    return;
-  }
-  grid.innerHTML = '';
-  state.data.exams.forEach(rawExam => {
-    if (!rawExam || typeof rawExam !== 'object') return;
-    // Нормализация: гарантируем нужные поля
-    const exam = {
-      id: rawExam.id || Date.now().toString(),
-      subject: rawExam.subject || 'Без названия',
-      date: rawExam.date || '',
-      room: rawExam.room || '',
-      teacher: rawExam.teacher || '',
-      format: rawExam.format || '',
-      resources: Array.isArray(rawExam.resources) ? rawExam.resources : [],
-      method: rawExam.method || '',
-      notes: rawExam.notes || ''
-    };
+async function renderExam() {
+  setSidebar(`
+    <h3><i class="fas fa-compass"></i> Основное</h3>
+    <div class="nav-buttons">
+      <button class="nav-btn" data-nav="extracurricular"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
+      <button class="nav-btn" data-nav="teacher"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
+      <button class="nav-btn" data-nav="resources"><i class="fas fa-link"></i> Ресурсы</button>
+      <button class="nav-btn" data-nav="homework"><i class="fas fa-book-open"></i> Домашка</button>
+    </div>
+    <div class="sidebar-note"><i class="fas fa-info-circle"></i><p>Информация о экзаменах, на которую мы забьём болт.</p></div>
+  `);
+  setSidebarNavHandlers();
 
-    const card = document.createElement('div');
-    card.className = 'exam-card';
-    card.dataset.id = exam.id;
-    const icon = (exam.subject || '').includes('таксация') ? 'fa-tree' : 'fa-seedling';
-    card.innerHTML = `
-      <div class="card-header">
-        <div class="exam-icon"><i class="fas ${icon}"></i></div>
-        <div class="exam-title"><h3>${esc(exam.subject)}</h3><span class="exam-type"><i class="fas fa-check-circle"></i> Экзамен</span></div>
-        <div style="margin-left:auto; display:flex; gap:8px;">
-          <button class="edit-exam" data-id="${exam.id}" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fas fa-edit"></i></button>
-          <button class="delete-exam" data-id="${exam.id}" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
-        </div>
+  setMain(`
+    <div class="exams-hero">
+      <div class="hero-text"><h2><i class="fas fa-chalkboard"></i> Стенд экзаменов</h2></div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <span class="hero-badge"><i class="fas fa-calendar-alt"></i> Зимняя сессия 2026</span>
+        <button id="addExamBtn" class="reset-btn"><i class="fas fa-plus"></i> Добавить экзамен</button>
       </div>
-      <div class="card-details">
-        <div class="detail-row"><i class="fas fa-calendar-day"></i> <strong>Дата:</strong> ${esc(exam.date)}</div>
-        <div class="detail-row"><i class="fas fa-location-dot"></i> <strong>Ауд.:</strong> ${esc(exam.room)}</div>
-        <div class="detail-row"><i class="fas fa-user-graduate"></i> <strong>Преподаватель:</strong> ${esc(exam.teacher)}</div>
-        <div class="detail-row"><i class="fas fa-clock"></i> <strong>Формат:</strong> ${esc(exam.format)}</div>
-      </div>
-      ${exam.resources.length ? `
-        <div class="exam-resources">
-          <p class="resources-title"><i class="fas fa-link"></i> Ресурсы:</p>
-          <div class="resource-buttons">${exam.resources.map(r => `<a href="#" class="res-link"><i class="fas fa-file-pdf"></i> ${esc(r)}</a>`).join('')}</div>
-        </div>` : ''}
-      ${exam.method ? `<div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">${esc(exam.method)}</a></div>` : ''}
-      ${exam.notes ? `<div class="exam-notes rich-display">${sanitizeHtml(exam.notes)}</div>` : ''}
-    `;
-    card.querySelector('.edit-exam').onclick = (e) => { e.stopPropagation(); openExamModal(exam.id); };
-    card.querySelector('.delete-exam').onclick = (e) => { e.stopPropagation(); deleteExam(exam.id); };
-    grid.appendChild(card);
-  });
-}
+    </div>
+    <div class="exams-grid" id="examsGrid"></div>
+  `);
 
   showSkeletonMain('card', 2);
   if (!state.data.exams) {
     const saved = await dataManager.load('exams');
-    if (saved && Array.isArray(saved)) state.data.exams = saved;
-    else {
+    if (saved && Array.isArray(saved)) {
+      state.data.exams = saved.filter(x => x && typeof x === 'object');
+    } else {
       state.data.exams = [
         { id: '1', subject: 'Лесоводство и таксация', date: '17 июня 2025, 10:00', room: '202 (лесной факультет)', teacher: 'доцент Сидорова Е.В.', format: 'устный билет + практика', resources: ['Билеты', 'Wiki', 'Видео'], method: 'методичка.pdf' },
         { id: '2', subject: 'Лесная селекция', date: '19 июня 2025, 10:00', room: '305 (лесной факультет)', teacher: 'профессор Лебедев А.И.', format: 'тестирование + устно', resources: ['Лекции', 'Статьи'], method: 'селекция_методичка.pdf' }
@@ -493,16 +444,29 @@ function renderExams() {
 function renderExams() {
   const grid = document.getElementById('examsGrid');
   if (!grid) return;
-  if (!state.data.exams.length) {
+  if (!Array.isArray(state.data.exams) || !state.data.exams.length) {
     grid.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Нет экзаменов.</p></div>`;
     return;
   }
   grid.innerHTML = '';
-  state.data.exams.forEach(exam => {
+  state.data.exams.forEach(rawExam => {
+    if (!rawExam || typeof rawExam !== 'object') return;
+    const exam = {
+      id: rawExam.id || Date.now().toString() + Math.random().toString(36).substr(2, 4),
+      subject: rawExam.subject || 'Без названия',
+      date: rawExam.date || '',
+      room: rawExam.room || '',
+      teacher: rawExam.teacher || '',
+      format: rawExam.format || '',
+      resources: Array.isArray(rawExam.resources) ? rawExam.resources : [],
+      method: rawExam.method || '',
+      notes: rawExam.notes || ''
+    };
+
     const card = document.createElement('div');
     card.className = 'exam-card';
     card.dataset.id = exam.id;
-    const icon = exam.subject.includes('таксация') ? 'fa-tree' : 'fa-seedling';
+    const icon = (exam.subject || '').includes('таксация') ? 'fa-tree' : 'fa-seedling';
     card.innerHTML = `
       <div class="card-header">
         <div class="exam-icon"><i class="fas ${icon}"></i></div>
@@ -518,7 +482,7 @@ function renderExams() {
         <div class="detail-row"><i class="fas fa-user-graduate"></i> <strong>Преподаватель:</strong> ${esc(exam.teacher)}</div>
         <div class="detail-row"><i class="fas fa-clock"></i> <strong>Формат:</strong> ${esc(exam.format)}</div>
       </div>
-      ${exam.resources && exam.resources.length ? `
+      ${exam.resources.length ? `
         <div class="exam-resources">
           <p class="resources-title"><i class="fas fa-link"></i> Ресурсы:</p>
           <div class="resource-buttons">${exam.resources.map(r => `<a href="#" class="res-link"><i class="fas fa-file-pdf"></i> ${esc(r)}</a>`).join('')}</div>
@@ -619,7 +583,7 @@ async function renderResources() {
   showSkeletonMain('card', 3);
   if (!state.data.resources) {
     const saved = await dataManager.load('resources');
-    if (saved && Array.isArray(saved)) state.data.resources = saved;
+    if (saved && Array.isArray(saved)) state.data.resources = saved.filter(x => x && typeof x === 'object');
     else {
       state.data.resources = [
         { id: '1', title: 'Лесоводство. Полный курс', desc: 'Учебник PDF, 320 стр.', category: 'study', icon: 'fa-book-open', meta: 'PDF, 24 МБ', link: '#' },
@@ -1142,9 +1106,9 @@ async function renderExtracurricular() {
     const saved = await dataManager.load('extracurricular');
     if (saved) {
       state.data.extracurricular = {
-        events: saved.events || [],
-        polls: saved.polls || [],
-        tests: saved.tests || []
+        events: Array.isArray(saved.events) ? saved.events : [],
+        polls: Array.isArray(saved.polls) ? saved.polls : [],
+        tests: Array.isArray(saved.tests) ? saved.tests : []
       };
     } else {
       state.data.extracurricular = {
@@ -1522,7 +1486,7 @@ async function renderTeacher() {
   showSkeletonMain('card', 3);
   if (!state.data.teachers) {
     const saved = await dataManager.load('teachers');
-    if (saved && Array.isArray(saved)) state.data.teachers = saved;
+    if (saved && Array.isArray(saved)) state.data.teachers = saved.filter(x => x && typeof x === 'object');
     else {
       state.data.teachers = [
         { id: '1', name: 'Гайвас Алексей Алексеевич', position: 'кафедра садоводства, лесного хозяйства и защиты растений', degree: 'Кандидат сельскохозяйственных наук, доцент', degree2: 'Предмет: Энтомология', phone: '(3812) 65-27-63, 13-42', email: 'aa.gayvas@omgau.org', photo: 'data/Teachers/Gaivas.jpg' },
@@ -1633,9 +1597,6 @@ async function deleteTeacher(id) {
   renderTeachers();
 }
 
-// ============================================================
-// РЕЕСТР РЕНДЕРЕРОВ
-// ============================================================
 const RENDERERS = {
   home: renderHome,
   schedule: renderSchedule,
@@ -1646,9 +1607,6 @@ const RENDERERS = {
   teacher: renderTeacher
 };
 
-// ============================================================
-// ИНИЦИАЛИЗАЦИЯ
-// ============================================================
 function init() {
   setupModalGlobals();
   if (!location.hash) location.hash = '#/home';
