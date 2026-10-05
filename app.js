@@ -1648,9 +1648,15 @@ function exposeStagger() {
   // Простой способ: пере-вызвать через фейковое событие, если есть. Пока оставим null.
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
   setupModalGlobals();
   exposeStagger();
   if (!location.hash) location.hash = '#/home';
   navigate();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
