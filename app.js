@@ -609,7 +609,7 @@ async function renderResources() {
     }
   }
   hideSkeletonMain();
-  renderResources();
+  renderResourceCards();
 
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -630,14 +630,14 @@ async function renderResources() {
         const map = new Map(state.data.resources.map(r => [r.id, r]));
         state.data.resources = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('resources', state.data.resources);
-        renderResources();
+        renderResourceCards();
         showToast('Порядок сохранён');
       }
     });
   }
 }
 
-function renderResources() {
+function renderResourceCards() {
   const grid = document.getElementById('resourcesGrid');
   if (!grid) return;
   if (!state.data.resources.length) {
@@ -708,7 +708,7 @@ function setupResourceModal() {
       state.data.resources.push({ id: Date.now().toString(), ...resData });
     }
     await dataManager.save('resources', state.data.resources);
-    renderResources();
+    renderResourceCards();
     closeModal('resourceModal');
   });
   document.getElementById('clearIconBtn').addEventListener('click', () => {
@@ -769,9 +769,8 @@ async function deleteResource(id) {
   if (!confirm('Удалить ресурс?')) return;
   state.data.resources = state.data.resources.filter(r => r.id !== id);
   await dataManager.save('resources', state.data.resources);
-  renderResources();
+  renderResourceCards();
 }
-
 // ============================================================
 // ДОМАШКА
 // ============================================================
