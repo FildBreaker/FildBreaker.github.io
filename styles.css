@@ -2351,3 +2351,87 @@ input.rich-color-input-hidden,
   color: var(--badge-color, #1e293b);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
+
+/* ============================================================
+   КНОПКА "ДОБАВИТЬ ЗАДАНИЕ" + отступы заданий
+   ============================================================ */
+.add-task-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 40px;
+  background: linear-gradient(135deg, var(--accent), #f5d742);
+  color: var(--badge-color, #1e293b);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 4px 14px var(--accent-glow);
+  isolation: isolate;
+}
+.add-task-btn:not(:disabled) {
+  animation: taskBtnPulse 2.4s ease-in-out infinite;
+}
+@keyframes taskBtnPulse {
+  0%, 100% { box-shadow: 0 4px 14px var(--accent-glow); }
+  50%      { box-shadow: 0 4px 24px var(--accent-glow), 0 0 32px var(--accent-glow); }
+}
+.add-task-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-25deg);
+  z-index: 1;
+  pointer-events: none;
+}
+.add-task-btn:not(:disabled):hover::before { animation: taskBtnShine 0.9s ease; }
+@keyframes taskBtnShine { 0% { left: -75%; } 100% { left: 125%; } }
+.add-task-btn i { font-size: 1rem; transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 2; }
+.add-task-btn:not(:disabled):hover {
+  transform: translateY(-3px) scale(1.04);
+  filter: brightness(1.08);
+  box-shadow: 0 8px 26px var(--accent-glow);
+}
+.add-task-btn:not(:disabled):hover i { transform: rotate(90deg) scale(1.25); }
+.add-task-btn:not(:disabled):active { transform: translateY(-1px) scale(0.97); }
+.add-task-btn:disabled {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+  animation: none;
+}
+.add-task-btn:disabled i { transform: none; }
+
+/* Отступы между заданиями */
+.tasks-container,
+.content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 4px;
+}
+.tasks-container > *,
+.content-container > * { margin: 0; }
+
+/* Плавное появление содержимого при смене роута */
+.main-content.route-enter > * {
+  animation: paContentRise 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.main-content.route-enter > *:nth-child(1) { animation-delay: 0.04s; }
+.main-content.route-enter > *:nth-child(2) { animation-delay: 0.11s; }
+.main-content.route-enter > *:nth-child(3) { animation-delay: 0.18s; }
+.main-content.route-enter > *:nth-child(4) { animation-delay: 0.25s; }
+.main-content.route-enter > *:nth-child(n+5) { animation-delay: 0.32s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .main-content.route-enter > * { animation: none; }
+}
