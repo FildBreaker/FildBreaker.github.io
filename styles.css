@@ -2617,6 +2617,21 @@ body.theme-transitioning #bgImageLayer {
   cursor: pointer;                /* курсор на всём блоке */
 }
 
+.logo-fx-text {
+  display: inline;                /* буквы внутри идут как обычный текст */
+  background: linear-gradient(135deg, var(--accent), #f5d742);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.logo-fx-char {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+  transform-origin: center bottom;
+}
+
 .logo-fx-char {
   display: inline-block;
   will-change: transform, opacity, filter;
