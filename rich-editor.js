@@ -2,7 +2,7 @@
 // ============================================================
 // Единый Rich-Text редактор для всего сайта
 // ============================================================
-
+import { openColorPicker } from './color-picker.js';
 const ALLOWED_TAGS = ['B','I','U','S','BR','SPAN','P','DIV','STRONG','EM','FONT','MARK','SUB','SUP'];
 
 export function escapeHtml(str) {
