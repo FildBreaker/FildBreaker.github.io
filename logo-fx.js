@@ -33,26 +33,24 @@
     return a;
   }
 
-  function ensureLetters(h1) {
-    let fullText = '';
-    const existingChars = h1.querySelectorAll('.logo-fx-char');
-    if (existingChars.length) {
-      fullText = [...existingChars].map(c => c.textContent).join('');
-    } else {
-      [...h1.childNodes].forEach(node => {
-        if (node.nodeType === 3) fullText += node.textContent;
-      });
-      fullText = fullText.trim();
-    }
-    if (!fullText) fullText = 'Б-31ЛЕС';
+  // Разбиваем текст h1 на буквы ВНУТРИ обёртки .logo-fx-text — ОДИН раз
+  function splitLetters(h1) {
+    if (h1.querySelector('.logo-fx-text')) return;
 
     const icon = h1.querySelector('i');
+    let text = '';
+    [...h1.childNodes].forEach(n => {
+      if (n.nodeType === 3) text += n.textContent;
+    });
+    text = text.trim();
+    if (!text) text = 'Б-31ЛЕС';
+
     h1.innerHTML = '';
     if (icon) h1.appendChild(icon);
 
     const wrapper = document.createElement('span');
     wrapper.className = 'logo-fx-text';
-    [...fullText].forEach(ch => {
+    [...text].forEach(ch => {
       if (ch === ' ') {
         wrapper.appendChild(document.createTextNode(' '));
       } else {
@@ -63,18 +61,17 @@
       }
     });
     h1.appendChild(wrapper);
-    return wrapper.querySelectorAll('.logo-fx-char');
   }
 
-  function spawnParticles(el, count, colors) {
+  function spawnParticles(el, count, palette) {
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const palette = colors || ['✨','⭐','🌟','💫','🎉','⚡'];
+    const emojis = palette || ['✨','⭐','🌟','💫','🎉','⚡'];
     for (let i = 0; i < count; i++) {
       const p = document.createElement('span');
       p.className = 'logo-fx-particle';
-      p.textContent = palette[Math.floor(Math.random() * palette.length)];
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
       const angle = (Math.PI * 2 * i) / count + Math.random() * 0.6;
       const dist = 70 + Math.random() * 70;
       p.style.left = cx + 'px';
@@ -89,13 +86,12 @@
   }
 
   function playAnim(h1, animClass) {
-    console.log('[logo-fx] playing:', animClass);
+    [...LETTER_ANIMS, ...BLOCK_ANIMS].forEach(c => h1.classList.remove(c));
     h1.classList.add('logo-fx-clicked');
-    setTimeout(() => h1.classList.remove('logo-fx-clicked'), 250);
+    setTimeout(() => h1.classList.remove('logo-fx-clicked'), 220);
 
     if (LETTER_ANIMS.includes(animClass)) {
-      const letters = ensureLetters(h1);
-      LETTER_ANIMS.forEach(c => h1.classList.remove(c));
+      const letters = h1.querySelectorAll('.logo-fx-char');
       letters.forEach((sp, i) => sp.style.setProperty('--i', i));
       void h1.offsetWidth;
       h1.classList.add(animClass);
@@ -106,39 +102,42 @@
       if (animClass === 'logo-fx-letters-glitch') {
         spawnParticles(h1, 8, ['⚡','✖','▓','▒','░','█']);
       }
-      setTimeout(() => h1.classList.remove(animClass), 1200);
     } else {
-      BLOCK_ANIMS.forEach(c => h1.classList.remove(c));
       void h1.offsetWidth;
       h1.classList.add(animClass);
 
       if (animClass === 'logo-fx-shockwave') spawnParticles(h1, 18);
       if (animClass === 'logo-fx-fire') spawnParticles(h1, 12, ['🔥','✨','⚡','🌟']);
       if (animClass === 'logo-fx-neon') spawnParticles(h1, 6);
-
-      setTimeout(() => h1.classList.remove(animClass), 1200);
     }
+
+    setTimeout(() => {
+      h1.classList.remove(animClass);
+      h1.querySelectorAll('.logo-fx-char').forEach(sp => sp.style.removeProperty('--i'));
+    }, 1200);
   }
 
-  document.addEventListener('click', (e) => {
-    const logo = e.target.closest('.logo');
+  function init() {
+    const logo = document.querySelector('.logo');
     if (!logo) return;
     const h1 = logo.querySelector('h1');
     if (!h1) return;
-    const useLetters = Math.random() < 0.6;
-    const anim = useLetters ? pick(LETTER_ANIMS) : pick(BLOCK_ANIMS);
-    playAnim(h1, anim);
-  });
 
-  document.addEventListener('mouseover', (e) => {
-    const logo = e.target.closest('.logo');
-    if (!logo || logo.dataset.logoFx === '1') return;
-    logo.dataset.logoFx = '1';
+    splitLetters(h1);
     logo.style.cursor = 'pointer';
     logo.setAttribute('title', 'Тыкни меня 👆');
-    const h1 = logo.querySelector('h1');
-    if (h1) h1.classList.add('logo-fx-target');
-  });
+    h1.classList.add('logo-fx-target');
 
-  console.log('[logo-fx] initialized');
+    logo.addEventListener('click', () => {
+      const useLetters = Math.random() < 0.6;
+      const anim = useLetters ? pick(LETTER_ANIMS) : pick(BLOCK_ANIMS);
+      playAnim(h1, anim);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
