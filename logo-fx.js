@@ -35,33 +35,43 @@
   }
 
     function ensureLetters(h1) {
-    // Если уже обёрнуто — вернуть существующие буквы
-    const existing = h1.querySelector('.logo-fx-text');
-    if (existing) return existing.querySelectorAll('.logo-fx-char');
+    // 1. Собираем ВЕСЬ текст (откуда угодно: chars, wrapper или прямые текстовые узлы)
+    let fullText = '';
+    const existingChars = h1.querySelectorAll('.logo-fx-char');
+    if (existingChars.length) {
+      fullText = [...existingChars].map(c => c.textContent).join('');
+    } else {
+      // Берём текст из всех текстовых узлов внутри h1 (кроме иконки)
+      [...h1.childNodes].forEach(node => {
+        if (node.nodeType === 3) fullText += node.textContent;
+      });
+      fullText = fullText.trim();
+    }
 
-    // Создаём обёртку для текста (буквы будут внутри неё)
+    // 2. Если текста нет — ставим дефолт
+    if (!fullText) fullText = 'Б-31ЛЕС';
+
+    // 3. Полностью пересобираем h1: оставляем только <i>, добавляем wrapper с буквами
+    const icon = h1.querySelector('i');
+    h1.innerHTML = '';
+    if (icon) h1.appendChild(icon);
+
     const wrapper = document.createElement('span');
     wrapper.className = 'logo-fx-text';
-
-    // Пробегаем по всем дочерним узлам h1
-    [...h1.childNodes].forEach(node => {
-      if (node.nodeType === 3) {
-        // Текстовый узел — разбиваем на буквы
-        [...node.textContent].forEach(ch => {
-          if (ch === ' ') {
-            wrapper.appendChild(document.createTextNode(' '));
-          } else {
-            const sp = document.createElement('span');
-            sp.className = 'logo-fx-char';
-            sp.textContent = ch;
-            wrapper.appendChild(sp);
-          }
-        });
-      } else if (node.nodeType === 1 && node.tagName !== 'I') {
-        // Не-иконка (например, что-то уже в span) — переносим как есть
-        wrapper.appendChild(node.cloneNode(true));
+    [...fullText].forEach(ch => {
+      if (ch === ' ') {
+        wrapper.appendChild(document.createTextNode(' '));
+      } else {
+        const sp = document.createElement('span');
+        sp.className = 'logo-fx-char';
+        sp.textContent = ch;
+        wrapper.appendChild(sp);
       }
     });
+    h1.appendChild(wrapper);
+
+    return wrapper.querySelectorAll('.logo-fx-char');
+  }
 
     // Удаляем все старые узлы, кроме иконки <i>
     [...h1.childNodes].forEach(node => {
