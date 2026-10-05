@@ -1085,7 +1085,7 @@ async function renderExtracurricular() {
   setSidebar(`
     <h3><i class="fas fa-compass"></i> Разделы</h3>
     <div class="nav-sections">
-      <button class="section-btn active" data-section="events"><i class="fas fa-party-horn"></i> Мероприятия</button>
+      <button class="section-btn active" data-section="events"><i class="fas fa-bullhorn"></i> Мероприятия</button>
       <button class="section-btn" data-section="polls"><i class="fas fa-chart-simple"></i> Опросы</button>
       <button class="section-btn" data-section="tests"><i class="fas fa-puzzle-piece"></i> Тесты</button>
     </div>
@@ -1095,7 +1095,7 @@ async function renderExtracurricular() {
 
   setMain(`
     <div class="section-header" id="ecSectionHeader">
-      <h2><i class="fas fa-party-horn"></i> Мероприятия</h2>
+      <h2><i class="fas fa-bullhorn"></i> Мероприятия</h2>
       <p>Ближайшие события</p>
     </div>
     <div class="content-container" id="ecContentContainer"></div>
@@ -1178,7 +1178,7 @@ function renderEcCurrent() {
   if (!container) return;
   const d = state.data.extracurricular;
   if (ecState.currentSection === 'events') {
-    headerEl.innerHTML = `<h2><i class="fas fa-party-horn"></i> Мероприятия</h2><p>Ближайшие события и дни сурка</p>`;
+    headerEl.innerHTML = `<h2><i class="fas fa-bullhorn"></i> Мероприятия</h2><p>Ближайшие события и дни сурка</p>`;
     renderEcEvents(container, d.events);
   } else if (ecState.currentSection === 'polls') {
     headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение</p>`;
