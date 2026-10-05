@@ -2596,3 +2596,131 @@ body.theme-transitioning #bgImageLayer {
   box-shadow: 0 0 0 2px var(--accent);
   transform: scale(1.05);
 }
+
+/* ============================================================
+   ИНТЕРАКТИВНЫЙ ЛОГОТИП — АНИМАЦИИ
+   ============================================================ */
+.logo-fx-target {
+  user-select: none;
+  transform-origin: center center;
+  transition: filter 0.2s ease;
+  display: inline-block;
+}
+.logo-fx-target:hover {
+  filter: brightness(1.15) drop-shadow(0 0 12px var(--accent-glow));
+}
+
+@keyframes logoFxBounce {
+  0%   { transform: translateY(0) scale(1); }
+  20%  { transform: translateY(-14px) scale(1.06); }
+  40%  { transform: translateY(0) scale(0.96); }
+  55%  { transform: translateY(-6px) scale(1.03); }
+  70%  { transform: translateY(0) scale(0.98); }
+  85%  { transform: translateY(-2px) scale(1.01); }
+  100% { transform: translateY(0) scale(1); }
+}
+.logo-fx-bounce { animation: logoFxBounce 0.85s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes logoFxSpin {
+  0%   { transform: rotate(0) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.15); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.logo-fx-spin { animation: logoFxSpin 0.85s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes logoFxShake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px) rotate(-2deg); }
+  30% { transform: translateX(6px) rotate(2deg); }
+  45% { transform: translateX(-5px) rotate(-1.5deg); }
+  60% { transform: translateX(5px) rotate(1.5deg); }
+  75% { transform: translateX(-3px) rotate(-1deg); }
+  90% { transform: translateX(3px) rotate(1deg); }
+}
+.logo-fx-shake { animation: logoFxShake 0.7s ease-in-out; }
+
+@keyframes logoFxRainbow {
+  0%   { filter: hue-rotate(0deg) saturate(1) brightness(1); }
+  50%  { filter: hue-rotate(180deg) saturate(2.2) brightness(1.3); }
+  100% { filter: hue-rotate(360deg) saturate(1) brightness(1); }
+}
+.logo-fx-rainbow { animation: logoFxRainbow 1.4s linear; }
+
+@keyframes logoFxPop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.35) rotate(-3deg); }
+  55%  { transform: scale(0.9) rotate(2deg); }
+  75%  { transform: scale(1.1) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.logo-fx-pop { animation: logoFxPop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes logoFxFlip {
+  0%   { transform: perspective(600px) rotateY(0); }
+  50%  { transform: perspective(600px) rotateY(180deg) scale(1.1); }
+  100% { transform: perspective(600px) rotateY(360deg); }
+}
+.logo-fx-flip { animation: logoFxFlip 0.9s ease-in-out; }
+
+@keyframes logoFxWiggle {
+  0%, 100% { transform: rotate(0) scale(1); }
+  20% { transform: rotate(-8deg) scale(1.05); }
+  40% { transform: rotate(8deg) scale(1.05); }
+  60% { transform: rotate(-5deg) scale(1.02); }
+  80% { transform: rotate(5deg) scale(1.02); }
+}
+.logo-fx-wiggle { animation: logoFxWiggle 0.75s ease-in-out; }
+
+@keyframes logoFxGlow {
+  0%   { filter: drop-shadow(0 0 0 var(--accent)) brightness(1); }
+  30%  { filter: drop-shadow(0 0 22px var(--accent)) brightness(1.4); }
+  60%  { filter: drop-shadow(0 0 4px var(--accent)) brightness(1.1); }
+  100% { filter: drop-shadow(0 0 0 var(--accent)) brightness(1); }
+}
+.logo-fx-glow { animation: logoFxGlow 0.9s ease-in-out; }
+
+@keyframes logoFxDrunk {
+  0%   { transform: translate(0,0) rotate(0); }
+  20%  { transform: translate(-6px, 4px) rotate(-3deg); }
+  40%  { transform: translate(7px, -3px) rotate(3deg); }
+  60%  { transform: translate(-4px, 3px) rotate(-2deg); }
+  80%  { transform: translate(3px, -2px) rotate(1.5deg); }
+  100% { transform: translate(0,0) rotate(0); }
+}
+.logo-fx-drunk { animation: logoFxDrunk 1s ease-in-out; }
+
+/* Частицы (эмодзи), разлетающиеся при анимации */
+.logo-fx-particle {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent-glow), 0 0 16px var(--accent-glow);
+  animation: logoFxParticleFly 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform: translate(-50%, -50%);
+}
+@keyframes logoFxParticleFly {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(
+      calc(-50% + var(--dx, 0px)),
+      calc(-50% + var(--dy, 0px))
+    ) scale(0.6) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-fx-bounce, .logo-fx-spin, .logo-fx-shake, .logo-fx-rainbow,
+  .logo-fx-pop, .logo-fx-flip, .logo-fx-wiggle, .logo-fx-glow, .logo-fx-drunk {
+    animation: none !important;
+  }
+  .logo-fx-particle { display: none; }
+}
