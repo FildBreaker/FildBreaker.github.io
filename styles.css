@@ -2435,3 +2435,15 @@ input.rich-color-input-hidden,
 @media (prefers-reduced-motion: reduce) {
   .main-content.route-enter > * { animation: none; }
 }
+
+body.theme-transitioning,
+body.theme-transitioning *:not(.bg-gradient):not(#bgImageLayer) {
+  transition:
+    background-color 0.6s ease,
+    color 0.5s ease,
+    border-color 0.6s ease,
+    box-shadow 0.6s ease !important;
+}
+body.theme-transitioning #bgImageLayer {
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
