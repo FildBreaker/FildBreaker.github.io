@@ -401,29 +401,61 @@ async function saveScheduleEdit() {
 // ============================================================
 // ЭКЗАМЕНЫ
 // ============================================================
-async function renderExam() {
-  setSidebar(`
-    <h3><i class="fas fa-compass"></i> Основное</h3>
-    <div class="nav-buttons">
-      <button class="nav-btn" data-nav="extracurricular"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
-      <button class="nav-btn" data-nav="teacher"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
-      <button class="nav-btn" data-nav="resources"><i class="fas fa-link"></i> Ресурсы</button>
-      <button class="nav-btn" data-nav="homework"><i class="fas fa-book-open"></i> Домашка</button>
-    </div>
-    <div class="sidebar-note"><i class="fas fa-info-circle"></i><p>Информация о экзаменах, на которую мы забьём болт.</p></div>
-  `);
-  setSidebarNavHandlers();
+function renderExams() {
+  const grid = document.getElementById('examsGrid');
+  if (!grid) return;
+  if (!Array.isArray(state.data.exams) || !state.data.exams.length) {
+    grid.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Нет экзаменов.</p></div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  state.data.exams.forEach(rawExam => {
+    if (!rawExam || typeof rawExam !== 'object') return;
+    // Нормализация: гарантируем нужные поля
+    const exam = {
+      id: rawExam.id || Date.now().toString(),
+      subject: rawExam.subject || 'Без названия',
+      date: rawExam.date || '',
+      room: rawExam.room || '',
+      teacher: rawExam.teacher || '',
+      format: rawExam.format || '',
+      resources: Array.isArray(rawExam.resources) ? rawExam.resources : [],
+      method: rawExam.method || '',
+      notes: rawExam.notes || ''
+    };
 
-  setMain(`
-    <div class="exams-hero">
-      <div class="hero-text"><h2><i class="fas fa-chalkboard"></i> Стенд экзаменов</h2></div>
-      <div style="display:flex; gap:12px; align-items:center;">
-        <span class="hero-badge"><i class="fas fa-calendar-alt"></i> Зимняя сессия 2026</span>
-        <button id="addExamBtn" class="reset-btn"><i class="fas fa-plus"></i> Добавить экзамен</button>
+    const card = document.createElement('div');
+    card.className = 'exam-card';
+    card.dataset.id = exam.id;
+    const icon = (exam.subject || '').includes('таксация') ? 'fa-tree' : 'fa-seedling';
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="exam-icon"><i class="fas ${icon}"></i></div>
+        <div class="exam-title"><h3>${esc(exam.subject)}</h3><span class="exam-type"><i class="fas fa-check-circle"></i> Экзамен</span></div>
+        <div style="margin-left:auto; display:flex; gap:8px;">
+          <button class="edit-exam" data-id="${exam.id}" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fas fa-edit"></i></button>
+          <button class="delete-exam" data-id="${exam.id}" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+        </div>
       </div>
-    </div>
-    <div class="exams-grid" id="examsGrid"></div>
-  `);
+      <div class="card-details">
+        <div class="detail-row"><i class="fas fa-calendar-day"></i> <strong>Дата:</strong> ${esc(exam.date)}</div>
+        <div class="detail-row"><i class="fas fa-location-dot"></i> <strong>Ауд.:</strong> ${esc(exam.room)}</div>
+        <div class="detail-row"><i class="fas fa-user-graduate"></i> <strong>Преподаватель:</strong> ${esc(exam.teacher)}</div>
+        <div class="detail-row"><i class="fas fa-clock"></i> <strong>Формат:</strong> ${esc(exam.format)}</div>
+      </div>
+      ${exam.resources.length ? `
+        <div class="exam-resources">
+          <p class="resources-title"><i class="fas fa-link"></i> Ресурсы:</p>
+          <div class="resource-buttons">${exam.resources.map(r => `<a href="#" class="res-link"><i class="fas fa-file-pdf"></i> ${esc(r)}</a>`).join('')}</div>
+        </div>` : ''}
+      ${exam.method ? `<div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">${esc(exam.method)}</a></div>` : ''}
+      ${exam.notes ? `<div class="exam-notes rich-display">${sanitizeHtml(exam.notes)}</div>` : ''}
+    `;
+    card.querySelector('.edit-exam').onclick = (e) => { e.stopPropagation(); openExamModal(exam.id); };
+    card.querySelector('.delete-exam').onclick = (e) => { e.stopPropagation(); deleteExam(exam.id); };
+    grid.appendChild(card);
+  });
+}
 
   showSkeletonMain('card', 2);
   if (!state.data.exams) {
