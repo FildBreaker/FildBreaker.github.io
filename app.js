@@ -68,6 +68,16 @@ function parseRoute() {
 async function navigate() {
   const route = parseRoute();
   if (state.currentRoute === route) return;
+
+  const mc = document.getElementById('mainContent');
+
+  // Фаза выхода — если уже что-то отрисовано
+  if (state.currentRoute && mc) {
+    mc.classList.add('route-exit');
+    await new Promise(r => setTimeout(r, 180));
+    mc.classList.remove('route-exit');
+  }
+
   if (state.currentRoute) destroyRoute(state.currentRoute);
   state.currentRoute = route;
 
@@ -79,12 +89,12 @@ async function navigate() {
     const renderer = RENDERERS[route];
     if (renderer) await renderer();
 
-    // Запускаем анимацию появления mainContent
-    const mc = document.getElementById('mainContent');
+    // Фаза входа
     if (mc) {
       mc.classList.remove('route-enter');
       void mc.offsetWidth;
       mc.classList.add('route-enter');
+      setTimeout(() => mc.classList.remove('route-enter'), 520);
     }
 
     if (window.setStagger) window.setStagger();
