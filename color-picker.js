@@ -1,17 +1,10 @@
 // color-picker.js
-// Стилизованный выбор цвета — заменяет нативный input[type=color]
-
 const PRESETS = [
-  // Акцентные
   '#ffb347', '#f5d742', '#4a8cff', '#4caf50', '#ab47bc', '#e74c3c',
-  // Пастельные
   '#ffd8a8', '#fff3b0', '#a8c8ff', '#b8e3cc', '#d0b8e3', '#f5b0b0',
-  // Тёмные
   '#7a3a00', '#8a6b00', '#1a3a6a', '#1a5a2a', '#5a1a7a', '#8a1a1a',
-  // Нейтральные
   '#000000', '#444444', '#888888', '#cccccc', '#f0f0f0', '#ffffff'
 ];
-
 const RECENT_KEY = 'b31les_recent_colors';
 const MAX_RECENT = 6;
 
@@ -24,7 +17,6 @@ function getRecent() {
     return raw ? JSON.parse(raw) : [];
   } catch { return []; }
 }
-
 function addRecent(color) {
   try {
     let list = getRecent().filter(c => c.toLowerCase() !== color.toLowerCase());
@@ -33,11 +25,7 @@ function addRecent(color) {
     localStorage.setItem(RECENT_KEY, JSON.stringify(list));
   } catch {}
 }
-
-function isValidHex(v) {
-  return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v);
-}
-
+function isValidHex(v) { return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v); }
 function normalizeHex(v) {
   v = String(v).trim();
   if (!v.startsWith('#')) v = '#' + v;
@@ -50,7 +38,6 @@ function normalizeHex(v) {
 export function openColorPicker({ anchorEl, initial = '#ffffff', onPick }) {
   closeColorPicker();
   if (!anchorEl) return;
-
   const safeInitial = isValidHex(initial) ? normalizeHex(initial) : '#ffffff';
 
   const pop = document.createElement('div');
@@ -85,7 +72,6 @@ export function openColorPicker({ anchorEl, initial = '#ffffff', onPick }) {
     selected = normalizeHex(color);
     preview.style.background = selected;
     hexInput.value = selected;
-    // Подсветка активного свотча
     pop.querySelectorAll('.cp-swatch').forEach(s => {
       s.classList.toggle('active', (s.dataset.color || '').toLowerCase() === selected);
     });
@@ -96,7 +82,6 @@ export function openColorPicker({ anchorEl, initial = '#ffffff', onPick }) {
     }
   }
 
-  // Пресеты
   PRESETS.forEach(c => {
     const sw = document.createElement('button');
     sw.type = 'button';
@@ -109,7 +94,6 @@ export function openColorPicker({ anchorEl, initial = '#ffffff', onPick }) {
     presetsBox.appendChild(sw);
   });
 
-  // Недавние
   const recents = getRecent();
   if (recents.length) {
     recentSection.style.display = '';
@@ -125,7 +109,6 @@ export function openColorPicker({ anchorEl, initial = '#ffffff', onPick }) {
     });
   }
 
-  // Hex-инпут
   hexInput.addEventListener('input', () => {
     let v = hexInput.value.trim();
     if (!v.startsWith('#')) v = '#' + v;
@@ -144,12 +127,10 @@ export function openColorPicker({ anchorEl, initial = '#ffffff', onPick }) {
     }
   });
 
-  // Позиционирование рядом с кнопкой
   const rect = anchorEl.getBoundingClientRect();
   const popRect = pop.getBoundingClientRect();
   let left = rect.left + window.scrollX;
-  let top  = rect.bottom + window.scrollY + 8;
-
+  let top = rect.bottom + window.scrollY + 8;
   if (left + popRect.width > window.scrollX + window.innerWidth - 8) {
     left = window.scrollX + window.innerWidth - popRect.width - 8;
   }
@@ -159,9 +140,8 @@ export function openColorPicker({ anchorEl, initial = '#ffffff', onPick }) {
     if (top < window.scrollY + 8) top = rect.bottom + window.scrollY + 8;
   }
   pop.style.left = left + 'px';
-  pop.style.top  = top  + 'px';
+  pop.style.top = top + 'px';
 
-  // Закрытие по клику вне и Escape
   const onDocClick = (e) => {
     if (!pop.contains(e.target) && !anchorEl.contains(e.target)) closeColorPicker();
   };
