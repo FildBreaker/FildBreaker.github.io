@@ -71,8 +71,11 @@
   <div class="modal-content" style="max-width:400px;">
     <span class="close-modal" data-close="homeDateModal">&times;</span>
     <h3 id="homeDateModalTitle"><i class="fas fa-calendar-alt"></i> Установить дату</h3>
-    <label for="homeDatePicker">Выберите дату и время:</label>
-    <input type="datetime-local" id="homeDatePicker" style="width:100%; margin-top:8px;">
+    <label>Выберите дату и время:</label>
+    <button type="button" id="homeDatePickerBtn" class="date-picker-trigger">
+      <i class="fas fa-calendar-alt"></i>
+      <span id="homeDatePickerText">--.--.---- --:--</span>
+    </button>
     <div class="modal-buttons" style="margin-top:20px;">
       <button id="homeDateSaveBtn" class="save-btn">Сохранить</button>
       <button id="homeDateCancelBtn" class="cancel-btn" data-close="homeDateModal">Отмена</button>
