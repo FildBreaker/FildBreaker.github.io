@@ -2604,12 +2604,20 @@ body.theme-transitioning #bgImageLayer {
   user-select: none;
   transform-origin: center center;
   transition: filter 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  display: inline-block;      /* было inline-flex + gap — из-за него была разрядка */
 }
 .logo-fx-target:hover {
   filter: brightness(1.15) drop-shadow(0 0 14px var(--accent-glow));
+}
+.logo-fx-target > i {
+  margin-right: 10px;         /* отступ иконки от первой буквы */
+}
+
+/* Буква-спан */
+.logo-fx-char {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+  transform-origin: center bottom;
 }
 
 /* Отклик на клик */
