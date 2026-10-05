@@ -2,9 +2,7 @@
    ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (будут переопределены темами)
    ============================================================ */
 :root {
-  /* Фон по умолчанию — только градиент (грузится мгновенно) */
-  --bg-image-url: none;
-  --bg-image-css: linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f);
+  --bg-image-url: url("https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80");
   --bg-overlay: rgba(0, 0, 0, 0.65);
   --primary-bg: #22223b;
   --header-bg: #4a4e69;
@@ -34,11 +32,6 @@
   --badge-bg: var(--accent);
   --badge-color: #1e293b;
   --radius: 28px;
-}
-
-/* Пока тема не определена — overlay слабее, чтобы градиент дышал */
-html:not([data-theme]) body {
-  --bg-overlay: rgba(0, 0, 0, 0.45);
 }
 
 /* ============================================================
@@ -358,7 +351,7 @@ html:not([data-theme]) body {
 }
 
 /* ============================================================
-   БАЗОВЫЕ СТИЛИ
+   БАЗОВЫЕ СТИЛИ (без изменений, используют переменные)
    ============================================================ */
 * {
   margin: 0;
@@ -375,42 +368,18 @@ body {
   scroll-behavior: smooth;
 }
 
-/* ============================================================
-   ФОН: 3 слоя — градиент → картинка (fade) → overlay
-   ============================================================ */
-
-/* Слой 1: градиент-подложка — мгновенный */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -3;
-  background: var(--bg-image-css, linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f));
+  z-index: -1;
+  background: var(--bg-image-url) center/cover no-repeat;
   filter: blur(10px);
   -webkit-filter: blur(10px);
   transform: scale(1.05);
   will-change: transform;
 }
 
-/* Слой 2: картинка — плавно проявляется */
-#bgImageLayer {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background: var(--bg-image-url, none) center/cover no-repeat;
-  filter: blur(10px);
-  -webkit-filter: blur(10px);
-  transform: scale(1.05);
-  opacity: 0;
-  transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity;
-  pointer-events: none;
-}
-#bgImageLayer.visible {
-  opacity: 1;
-}
-
-/* Слой 3: затемнение для читаемости */
 body::after {
   content: "";
   position: fixed;
@@ -420,24 +389,6 @@ body::after {
   pointer-events: none;
 }
 
-/* ============================================================
-   Стартовые градиенты для каждой темы — мгновенно, до картинки
-   ============================================================ */
-html:not([data-theme]),
-html[data-theme="dark-gold"]   { --bg-image-css: linear-gradient(135deg, #1a1a2e, #2d1f0e, #3d2b1f); }
-html[data-theme="dark-blue"]   { --bg-image-css: linear-gradient(135deg, #0a1628, #1a2a4a, #1f3a6a); }
-html[data-theme="dark-green"]  { --bg-image-css: linear-gradient(135deg, #0a1f0a, #1a3a1a, #2a5a2a); }
-html[data-theme="dark-purple"] { --bg-image-css: linear-gradient(135deg, #1a0a2a, #2a1a4a, #3a2a6a); }
-html[data-theme="dark-red"]    { --bg-image-css: linear-gradient(135deg, #2a0a0a, #4a1a1a, #6a2a2a); }
-html[data-theme="light-gold"]  { --bg-image-css: linear-gradient(135deg, #fdf6e3, #f5e6ca, #ecd4b0); }
-html[data-theme="light-blue"]  { --bg-image-css: linear-gradient(135deg, #e8f0fe, #d0e0f5, #b8d0ec); }
-html[data-theme="light-green"] { --bg-image-css: linear-gradient(135deg, #e8f5e8, #d0ecda, #b8e3cc); }
-html[data-theme="light-purple"]{ --bg-image-css: linear-gradient(135deg, #f0e8f5, #e0d0ec, #d0b8e3); }
-html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8, #ecd0d0, #e3b8b8); }
-
-/* ============================================================
-   СЕТКА СТРАНИЦЫ
-   ============================================================ */
 .app-grid {
   position: relative;
   z-index: 0;
@@ -691,7 +642,7 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
   color: var(--text-secondary);
 }
 
-/* ===== КАРТОЧКИ ===== */
+/* ===== КАРТОЧКИ (унифицированные) ===== */
 .teachers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -784,8 +735,7 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
   position: relative;
 }
 
-/* Золотая полоска сверху (через ::after, чтобы не конфликтовать с tilt) */
-.exam-card::after {
+.exam-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -794,8 +744,6 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
   height: 6px;
   background: linear-gradient(90deg, var(--accent), #f5d742);
   border-radius: var(--radius) var(--radius) 0 0;
-  z-index: 2;
-  pointer-events: none;
 }
 
 /* Ресурсы */
@@ -1154,7 +1102,7 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
 }
 .remove-link-btn:hover { background: #c0392b; }
 
-/* ===== КНОПКИ ТЕМ ===== */
+/* ===== СТИЛИ ДЛЯ КНОПОК ТЕМ ===== */
 .theme-option {
   display: flex;
   align-items: center;
@@ -1329,8 +1277,7 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
     padding: 20px;
   }
 }
-
-/* ===== КНОПКИ ТИПА ЗАНЯТИЯ (расписание) ===== */
+/* ===== КНОПКИ-ПЕРЕКЛЮЧАТЕЛИ ТИПА ЗАНЯТИЯ (в модалке расписания) ===== */
 .type-toggle {
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
@@ -1368,47 +1315,60 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
   color: var(--accent);
 }
 
-/* ===== КАСТОМНЫЙ СКРОЛЛ МОДАЛОК ===== */
+.type-toggle.active i {
+  color: var(--accent);
+}
+/* ===== КАСТОМНЫЙ СКРОЛЛ ДЛЯ МОДАЛОК ===== */
 .modal-content::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 .modal-content::-webkit-scrollbar-track {
   background: var(--bg-hover);
   border-radius: 10px;
 }
+
 .modal-content::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 10px;
   transition: background 0.2s;
 }
+
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: var(--btn-primary-hover);
 }
+
+/* Для Firefox */
 .modal-content {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-hover);
 }
 
+/* Для контейнера с опциями тем (если понадобится) */
 #themeOptions::-webkit-scrollbar {
   width: 5px;
 }
+
 #themeOptions::-webkit-scrollbar-track {
   background: var(--bg-hover);
   border-radius: 10px;
 }
+
 #themeOptions::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 10px;
 }
+
 #themeOptions {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-hover);
 }
-
 /* ============================================================
-   УНИВЕРСАЛЬНАЯ ПОДСВЕТКА ИНТЕРАКТИВНЫХ ЭЛЕМЕНТОВ
+   УНИВЕРСАЛЬНАЯ ПОДСВЕТКА ДЛЯ ВСЕХ ИНТЕРАКТИВНЫХ ЭЛЕМЕНТОВ
    ============================================================ */
+
+/* Кнопки действий в карточках (редактировать, удалить) */
 .edit-resource, .delete-resource,
 .edit-exam, .delete-exam,
 .edit-teacher, .delete-teacher,
@@ -1445,6 +1405,7 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
   transform: scale(1.05);
 }
 
+/* Ссылки в карточках (ресурсы, экзамены) */
 .card-link, .res-link, .event-link {
   transition: all 0.2s ease;
   text-decoration: none;
@@ -1458,6 +1419,7 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
   transform: translateX(3px);
 }
 
+/* Элементы списка предметов в домашке */
 .subject-item {
   display: flex;
   justify-content: space-between;
@@ -1469,91 +1431,109 @@ html[data-theme="light-red"]   { --bg-image-css: linear-gradient(135deg, #f5e8e8
   background: var(--bg-hover);
   border: 1px solid transparent;
 }
+
 .subject-item:hover {
   background: var(--bg-active);
   border-color: var(--accent);
   transform: translateX(3px);
 }
+
 .subject-item.active {
   background: var(--bg-active);
   border-color: var(--accent);
   color: var(--text-color);
 }
+
 .subject-name {
   font-weight: 500;
   color: var(--text-secondary);
   transition: color 0.2s;
 }
+
 .subject-item:hover .subject-name,
 .subject-item.active .subject-name {
   color: var(--text-color);
 }
 
+/* Кнопки пагинации */
 .pagination .page {
   transition: all 0.2s ease;
   cursor: pointer;
 }
+
 .pagination .page:hover {
   background: var(--bg-active);
   color: var(--text-color);
   transform: translateY(-2px);
 }
+
 .pagination .page.active {
   background: var(--accent);
   color: var(--badge-color);
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
+/* Кнопки типа занятия в расписании (уже есть, но добавим усиление) */
 .type-toggle {
   transition: all 0.2s ease;
 }
+
 .type-toggle:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+
 .type-toggle.active {
   box-shadow: 0 4px 16px var(--accent-glow);
 }
 
+/* Кнопки в модалках (добавить ссылку, удалить ссылку) */
 .add-link-btn, .remove-link-btn {
   transition: all 0.2s ease;
 }
+
 .add-link-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px var(--accent-glow);
 }
+
 .remove-link-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
+/* Поля ввода (фокус уже есть, добавим легкую тень) */
 .modal-content input:focus,
 .modal-content textarea:focus,
 .modal-content select:focus {
   box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 12px rgba(0,0,0,0.1);
 }
 
+/* Кнопки в сайдбаре (настройки) уже имеют hover, добавим дополнительную тень */
 #settingsContainer .nav-btn:hover {
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
+/* Общие ссылки */
 a {
   transition: all 0.2s ease;
 }
+
 a:hover {
   color: var(--link-hover);
 }
 
+/* Иконки в карточках ресурсов при наведении на карточку */
 .resource-card:hover .card-icon i {
   transform: scale(1.2);
   transition: transform 0.3s ease;
 }
 
+/* Кнопка "Сбросить" в расписании */
 .reset-btn:hover {
   box-shadow: 0 4px 20px var(--accent-glow);
   transform: scale(1.05) translateY(-2px);
 }
-
 /* ============================================================
    RICH-TEXT РЕДАКТОР
    ============================================================ */
@@ -1613,6 +1593,43 @@ a:hover {
   margin: 0 3px;
 }
 
+.rich-color-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.rich-color-picker:hover {
+  background: var(--bg-active);
+  color: var(--text-color);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.rich-color-picker input[type="color"] {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.rich-color-picker input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.rich-color-picker input[type="color"]::-webkit-color-swatch {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+.rich-color-picker input[type="color"]::-moz-color-swatch {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
 .rich-content {
   padding: 12px 16px;
   color: var(--text-color);
@@ -1640,6 +1657,7 @@ a:hover {
 .rich-display strong, .rich-display b { font-weight: 700; }
 .rich-display em, .rich-display i { font-style: italic; }
 
+/* Текст задания — сохраняем переносы строк и отступы */
 .task-desc {
   white-space: pre-wrap;
   word-break: break-word;
@@ -1713,1020 +1731,17 @@ a:hover {
 }
 
 /* ============================================================
-   КНОПКА "ДОБАВИТЬ ЗАДАНИЕ"
+   SPA: динамическая часть сайдбара
    ============================================================ */
-.add-task-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 22px;
-  border: none;
-  border-radius: 40px;
-  background: linear-gradient(135deg, var(--accent), #f5d742);
-  color: var(--badge-color, #1e293b);
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: 0 4px 14px var(--accent-glow);
-  isolation: isolate;
-}
-
-.add-task-btn:not(:disabled) {
-  animation: taskBtnPulse 2.4s ease-in-out infinite;
-}
-@keyframes taskBtnPulse {
-  0%, 100% { box-shadow: 0 4px 14px var(--accent-glow); }
-  50%      { box-shadow: 0 4px 24px var(--accent-glow), 0 0 32px var(--accent-glow); }
-}
-
-.add-task-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -75%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.45), transparent);
-  transform: skewX(-25deg);
-  z-index: 1;
-  pointer-events: none;
-}
-.add-task-btn:not(:disabled):hover::before {
-  animation: taskBtnShine 0.9s ease;
-}
-@keyframes taskBtnShine {
-  0%   { left: -75%; }
-  100% { left: 125%; }
-}
-
-.add-task-btn i {
-  font-size: 1rem;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  z-index: 2;
-}
-
-.add-task-btn:not(:disabled):hover {
-  transform: translateY(-3px) scale(1.04);
-  filter: brightness(1.08);
-  box-shadow: 0 8px 26px var(--accent-glow);
-}
-.add-task-btn:not(:disabled):hover i {
-  transform: rotate(90deg) scale(1.25);
-}
-
-.add-task-btn:not(:disabled):active {
-  transform: translateY(-1px) scale(0.97);
-  transition: transform 0.08s ease;
-}
-
-.add-task-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--accent-glow), 0 6px 20px var(--accent-glow);
-}
-
-.add-task-btn:disabled {
-  background: var(--bg-hover);
-  color: var(--text-muted);
-  cursor: not-allowed;
-  box-shadow: none;
-  opacity: 0.7;
-  animation: none;
-}
-.add-task-btn:disabled i {
-  transform: none;
-}
-
-/* ============================================================
-   НЕОБЫЧНОЕ ПОЯВЛЕНИЕ ЭЛЕМЕНТОВ ПРИ ЗАГРУЗКЕ
-   ============================================================ */
-@keyframes paHeaderDrop {
-  0%   { opacity: 0; transform: translateY(-40px) rotateX(-25deg) scale(0.94); }
-  55%  { opacity: 1; transform: translateY(8px) rotateX(5deg) scale(1.015); }
-  100% { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
-}
-@keyframes paSidebarSlide {
-  0%   { opacity: 0; transform: translateX(-70px) rotateY(14deg) skewX(3deg); }
-  60%  { opacity: 1; transform: translateX(6px) rotateY(-3deg) skewX(-1deg); }
-  100% { opacity: 1; transform: translateX(0) rotateY(0) skewX(0); }
-}
-@keyframes paContentRise {
-  0%   { opacity: 0; transform: translateY(36px) scale(0.96); filter: blur(6px); }
-  55%  { opacity: 1; filter: blur(0); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-@keyframes paCardLeft {
-  0%   { opacity: 0; transform: translateX(-50px) rotate(-4deg) scale(0.88); filter: blur(4px); }
-  55%  { opacity: 1; filter: blur(0); transform: translateX(6px) rotate(1.5deg) scale(1.02); }
-  100% { opacity: 1; transform: translateX(0) rotate(0) scale(1); filter: blur(0); }
-}
-@keyframes paCardRight {
-  0%   { opacity: 0; transform: translateX(50px) rotate(4deg) scale(0.88); filter: blur(4px); }
-  55%  { opacity: 1; filter: blur(0); transform: translateX(-6px) rotate(-1.5deg) scale(1.02); }
-  100% { opacity: 1; transform: translateX(0) rotate(0) scale(1); filter: blur(0); }
-}
-@keyframes paFooterRise {
-  0%   { opacity: 0; transform: translateY(24px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.site-header {
-  animation: paHeaderDrop 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
-  transform-origin: top center;
-}
-.sidebar {
-  animation: paSidebarSlide 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both !important;
-  transform-origin: left center;
-}
-.site-footer {
-  animation: paFooterRise 0.6s ease 0.5s both !important;
-}
-.main-content > * {
-  animation: paContentRise 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
-}
-.main-content > *:nth-child(1) { animation-delay: 0.12s !important; }
-.main-content > *:nth-child(2) { animation-delay: 0.22s !important; }
-.main-content > *:nth-child(3) { animation-delay: 0.32s !important; }
-.main-content > *:nth-child(4) { animation-delay: 0.42s !important; }
-.main-content > *:nth-child(5) { animation-delay: 0.52s !important; }
-.main-content > *:nth-child(n+6) { animation-delay: 0.6s !important; }
-
-.teachers-grid > *,
-.exams-grid > *,
-.resources-grid > *,
-.tasks-container > *,
-.content-container > *,
-.timers-container > * {
-  animation: paCardLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: calc(0.2s + var(--i, 0) * 0.07s);
-  transform-origin: center;
-}
-.teachers-grid > *:nth-child(even),
-.exams-grid > *:nth-child(even),
-.resources-grid > *:nth-child(even),
-.tasks-container > *:nth-child(even),
-.content-container > *:nth-child(even),
-.timers-container > *:nth-child(even) {
-  animation-name: paCardRight;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-header, .sidebar, .site-footer,
-  .main-content > *,
-  .teachers-grid > *,
-  .exams-grid > *,
-  .resources-grid > *,
-  .tasks-container > *,
-  .content-container > *,
-  .timers-container > * {
-    animation: none !important;
-  }
-}
-
-/* ============================================================
-   СКЕЛЕТОНЫ
-   ============================================================ */
-.skeleton {
-  position: relative;
-  overflow: hidden;
-  background: var(--bg-hover);
-  border-radius: 12px;
-}
-.skeleton::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    100deg,
-    transparent 20%,
-    rgba(255, 255, 255, 0.08) 50%,
-    transparent 80%
-  );
-  transform: translateX(-100%);
-  animation: skeletonShimmer 1.4s ease-in-out infinite;
-}
-.theme-light-gold .skeleton::after,
-.theme-light-blue .skeleton::after,
-.theme-light-green .skeleton::after,
-.theme-light-purple .skeleton::after,
-.theme-light-red .skeleton::after {
-  background: linear-gradient(100deg, transparent 20%, rgba(0,0,0,0.06) 50%, transparent 80%);
-}
-@keyframes skeletonShimmer {
-  100% { transform: translateX(100%); }
-}
-
-.skeleton-line {
-  height: 12px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-}
-.skeleton-img {
-  width: 100%;
-  height: 120px;
-  border-radius: 16px;
-  margin-bottom: 12px;
-}
-.skeleton-img-sm {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.skeleton-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow);
-}
-.skeleton-row {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-
-/* ============================================================
-   КОНТЕЙНЕРЫ СПИСКОВ
-   ============================================================ */
-.tasks-container,
-.content-container {
+#sidebarDynamic {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 4px;
 }
-
-.tasks-container > *,
-.content-container > * {
-  margin: 0;
+#sidebarDynamic > h3 {
+  margin-top: 0;
 }
-
-/* ============================================================
-   3D-TILT + СВЕТОВОЙ ФОНАРИК
-   ============================================================ */
-.teacher-card,
-.exam-card,
-.resource-card,
-.task-card,
-.poll-card,
-.event-card,
-.test-card {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  transform:
-    perspective(var(--per, 900px))
-    rotateX(var(--rx, 0deg))
-    rotateY(var(--ry, 0deg))
-    translateZ(0);
-  transform-style: preserve-3d;
-  transition:
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.5s ease;
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-.teacher-card.tilt-active,
-.exam-card.tilt-active,
-.resource-card.tilt-active,
-.task-card.tilt-active,
-.poll-card.tilt-active,
-.event-card.tilt-active,
-.test-card.tilt-active {
-  transition:
-    transform 0.08s linear,
-    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.5s ease;
-}
-
-/* Световое пятно — «фонарик» под курсором (для ВСЕХ карточек, кроме exam) */
-.teacher-card::before,
-.resource-card::before,
-.task-card::before,
-.poll-card::before,
-.event-card::before,
-.test-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      180px 180px at var(--mx, 50%) var(--my, 50%),
-      color-mix(in srgb, var(--accent) 32%, transparent) 0%,
-      color-mix(in srgb, var(--accent) 10%, transparent) 35%,
-      transparent 70%
-    );
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  pointer-events: none;
-  z-index: 0;
-  mix-blend-mode: screen;
-}
-
-/* Для .exam-card — то же, но с другим селектором ::before мы уже заняли под фонарик */
-.exam-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      180px 180px at var(--mx, 50%) var(--my, 50%),
-      color-mix(in srgb, var(--accent) 32%, transparent) 0%,
-      color-mix(in srgb, var(--accent) 10%, transparent) 35%,
-      transparent 70%
-    );
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  pointer-events: none;
-  z-index: 0;
-  mix-blend-mode: screen;
-}
-
-/* Светлые темы — multiply */
-.theme-light-gold .teacher-card::before,
-.theme-light-gold .exam-card::before,
-.theme-light-gold .resource-card::before,
-.theme-light-gold .task-card::before,
-.theme-light-gold .poll-card::before,
-.theme-light-gold .event-card::before,
-.theme-light-gold .test-card::before,
-.theme-light-blue .teacher-card::before,
-.theme-light-blue .exam-card::before,
-.theme-light-blue .resource-card::before,
-.theme-light-blue .task-card::before,
-.theme-light-blue .poll-card::before,
-.theme-light-blue .event-card::before,
-.theme-light-blue .test-card::before,
-.theme-light-green .teacher-card::before,
-.theme-light-green .exam-card::before,
-.theme-light-green .resource-card::before,
-.theme-light-green .task-card::before,
-.theme-light-green .poll-card::before,
-.theme-light-green .event-card::before,
-.theme-light-green .test-card::before,
-.theme-light-purple .teacher-card::before,
-.theme-light-purple .exam-card::before,
-.theme-light-purple .resource-card::before,
-.theme-light-purple .task-card::before,
-.theme-light-purple .poll-card::before,
-.theme-light-purple .event-card::before,
-.theme-light-purple .test-card::before,
-.theme-light-red .teacher-card::before,
-.theme-light-red .exam-card::before,
-.theme-light-red .resource-card::before,
-.theme-light-red .task-card::before,
-.theme-light-red .poll-card::before,
-.theme-light-red .event-card::before,
-.theme-light-red .test-card::before {
-  mix-blend-mode: multiply;
-  background:
-    radial-gradient(
-      200px 200px at var(--mx, 50%) var(--my, 50%),
-      color-mix(in srgb, var(--accent) 22%, transparent) 0%,
-      transparent 70%
-    );
-}
-
-.tilt-active::before {
-  opacity: 1;
-}
-
-.teacher-card:hover,
-.exam-card:hover,
-.resource-card:hover,
-.task-card:hover,
-.poll-card:hover,
-.event-card:hover,
-.test-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border-color));
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.30),
-    0 0 32px -6px var(--accent-glow);
-}
-
-.teacher-card > *,
-.exam-card > *,
-.resource-card > *,
-.task-card > *,
-.poll-card > *,
-.event-card > *,
-.test-card > * {
-  position: relative;
-  z-index: 1;
-  transform: translateZ(20px);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .teacher-card,
-  .exam-card,
-  .resource-card,
-  .task-card,
-  .poll-card,
-  .event-card,
-  .test-card,
-  .teacher-card > *,
-  .exam-card > *,
-  .resource-card > *,
-  .task-card > *,
-  .poll-card > *,
-  .event-card > *,
-  .test-card > * {
-    transform: none !important;
-    transition: none !important;
-  }
-}
-
-/* ============================================================
-   ПОИСК НА СТРАНИЦЕ РЕСУРСОВ
-   ============================================================ */
-.hero-search {
-  display: flex;
-  align-items: center;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
-  border-radius: 40px;
-  background: var(--bg-hover);
-  border: 1px solid var(--border-color);
-  transition: all 0.25s ease;
-  min-width: 220px;
-}
-
-.search-box i {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  transition: color 0.25s ease;
-  flex-shrink: 0;
-}
-
-.search-box input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text-color);
-  font-family: inherit;
-  font-size: 0.95rem;
-  padding: 0;
-  min-width: 0;
-}
-
-.search-box input::placeholder {
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.search-box:hover {
-  background: var(--bg-active);
-  border-color: color-mix(in srgb, var(--accent) 40%, var(--border-color));
-}
-
-.search-box:focus-within {
-  background: var(--bg-active);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.search-box:focus-within i {
-  color: var(--accent);
-}
-
-.search-box input::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-}
-
-/* ============================================================
-   ВЫБОР ИКОНОК В МОДАЛКЕ РЕСУРСА
-   ============================================================ */
-.icon-picker {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
-  gap: 8px;
-  margin: 8px 0 12px 0;
-  max-height: 190px;
-  overflow-y: auto;
-  padding: 12px;
-  background: var(--bg-hover);
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-}
-
-.icon-picker::-webkit-scrollbar {
-  width: 6px;
-}
-.icon-picker::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 10px;
-}
-.icon-picker::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 10px;
-  opacity: 0.6;
-}
-.icon-picker {
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) transparent;
-}
-
-.icon-option {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: inherit;
-  padding: 0;
-  line-height: 1;
-}
-
-.icon-option:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-3px) scale(1.08);
-  background: var(--bg-active);
-  box-shadow: 0 6px 16px -4px var(--accent-glow);
-}
-
-.icon-option.active {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--badge-color, #1e293b);
-  box-shadow:
-    0 0 0 3px var(--accent-glow),
-    0 6px 16px -4px var(--accent-glow);
-  transform: scale(1.05);
-}
-
-.icon-option.active:hover {
-  transform: scale(1.10);
-}
-
-.icon-option i {
-  pointer-events: none;
-}
-
-/* ============================================================
-   КНОПКИ ВЫБОРА ЦВЕТА В RICH-РЕДАКТОРЕ
-   ============================================================ */
-.rich-toolbar .rich-color-btn {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 4px 8px 3px;
-  min-width: 34px;
-  height: 32px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-family: inherit;
-  line-height: 1;
-  transition: all 0.15s ease;
-}
-
-.rich-toolbar .rich-color-btn i {
-  font-size: 0.85rem;
-  line-height: 1;
-}
-
-.rich-toolbar .rich-color-swatch {
-  display: block;
-  width: 16px;
-  height: 3px;
-  border-radius: 2px;
-  margin-top: 2px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.15s ease;
-}
-
-.rich-toolbar .rich-color-btn:hover {
-  background: var(--bg-active);
-  color: var(--text-color);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-
-.rich-toolbar .rich-color-btn:active {
-  transform: translateY(0);
-}
-
-/* ============================================================
-   КАСТОМНЫЙ COLOR PICKER
-   ============================================================ */
-.color-picker-popover {
-  position: absolute;
-  z-index: 5000;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 14px;
-  min-width: 250px;
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.4),
-    0 0 0 1px var(--accent-glow);
-  animation: cpFadeIn 0.18s cubic-bezier(0.22, 1, 0.36, 1);
-  backdrop-filter: blur(8px);
-}
-
-@keyframes cpFadeIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0)   scale(1); }
-}
-
-.color-picker-popover .cp-header {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.color-picker-popover .cp-preview {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
-  transition: background 0.15s ease;
-}
-
-.color-picker-popover .cp-hex {
-  flex: 1;
-  min-width: 0;
-  padding: 9px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
-  color: var(--text-color);
-  font-family: 'Courier New', ui-monospace, monospace;
-  font-size: 0.9rem;
-  text-transform: lowercase;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.color-picker-popover .cp-hex:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.color-picker-popover .cp-section {
-  margin-top: 10px;
-}
-.color-picker-popover .cp-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-.color-picker-popover .cp-presets,
-.color-picker-popover .cp-recents {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
-}
-
-.color-picker-popover .cp-swatch {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  padding: 0;
-  transition:
-    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
-  outline: none;
-}
-.color-picker-popover .cp-swatch:hover {
-  transform: scale(1.14);
-  border-color: var(--accent);
-  box-shadow:
-    0 0 0 2px var(--accent-glow),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-}
-.color-picker-popover .cp-swatch.active {
-  border-color: var(--accent);
-  box-shadow:
-    0 0 0 2px var(--accent),
-    0 0 14px var(--accent-glow);
-  transform: scale(1.05);
-}
-
-/* ============================================================
-   DRAG-AND-DROP СОРТИРОВКА
-   ============================================================ */
-.drag-sort-container > [data-id] {
-  cursor: grab;
-  touch-action: pan-y;
-  -webkit-tap-highlight-color: transparent;
-}
-.drag-sort-container > [data-id]:active { cursor: grabbing; }
-.drag-sort-container.drag-active > [data-id] { cursor: grabbing; }
-
-/* Когда long-press сработал — отключаем pan-y, чтобы drag не убивался скроллом */
-.drag-sort-container > [data-id].drag-ready {
-  touch-action: none;
-}
-
-.drag-placeholder {
-  border: 2px dashed var(--accent);
-  border-radius: var(--radius);
-  background: var(--bg-active);
-  opacity: 0.55;
-  pointer-events: none;
-  box-sizing: border-box;
-  transition: opacity 0.2s ease;
-}
-
-.dragging-source {
-  opacity: 0.22 !important;
-  filter: grayscale(0.7);
-}
-
-.drag-ghost {
-  border-radius: var(--radius);
-  box-shadow:
-    0 22px 44px rgba(0, 0, 0, 0.45),
-    0 0 0 1px var(--accent-glow),
-    0 0 32px -4px var(--accent-glow);
-  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
-  user-select: none;
-  will-change: left, top, transform;
-}
-
-body.drag-in-progress,
-body.drag-in-progress * {
-  cursor: grabbing !important;
-  user-select: none !important;
-}
-
-.drag-sort-container .subject-item[data-id] { cursor: grab; }
-.drag-sort-container .subject-item.dragging-source { opacity: 0.22 !important; }
-
-/* ============================================================
-   ОПТИМИЗАЦИЯ РЕНДЕРА
-   ============================================================ */
-.teacher-card,
-.exam-card,
-.resource-card,
-.task-card,
-.poll-card,
-.event-card,
-.test-card {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 220px;
-}
-
-/* ============================================================
-   ПЛАВНЫЙ ПЕРЕХОД МЕЖДУ ТЕМАМИ
-   ============================================================ */
-
-/* Слой градиента (двойная буферизация для плавного перехода) */
-.bg-gradient {
-  position: fixed;
-  inset: 0;
-  z-index: -4;
-  filter: blur(10px);
-  -webkit-filter: blur(10px);
-  transform: scale(1.05);
-  opacity: 0;
-  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  will-change: opacity;
-}
-.bg-gradient.active {
-  opacity: 1;
-}
-.bg-gradient.bg-b {
-  z-index: -3;
-}
-
-/* Плавный переход цветов при смене темы.
-   Вешается на body на 650 мс и снимается. */
-body.theme-transitioning,
-body.theme-transitioning *:not(.bg-gradient):not(#bgImageLayer) {
-  transition:
-    background-color 0.6s ease,
-    color 0.5s ease,
-    border-color 0.6s ease,
-    box-shadow 0.6s ease,
-    fill 0.5s ease,
-    stroke 0.5s ease !important;
-}
-
-/* Картинка фона тоже пусть меняется чуть медленнее при смене темы */
-body.theme-transitioning #bgImageLayer {
-  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* Уважаем reduce-motion */
-@media (prefers-reduced-motion: reduce) {
-  body.theme-transitioning,
-  body.theme-transitioning * {
-    transition: none !important;
-  }
-  .bg-gradient {
-    transition: none !important;
-  }
-}
-
-/* ============================================================
-   ИНТЕРАКТИВНЫЙ ЛОГОТИП — АНИМАЦИИ ПРИ КЛИКЕ
-   ============================================================ */
-
-.logo-fx-target {
-  user-select: none;
-  transform-origin: center center;
-  transition: filter 0.2s ease;
-}
-
-.logo-fx-target:hover {
-  filter: brightness(1.15) drop-shadow(0 0 12px var(--accent-glow));
-}
-
-/* Прыжок */
-@keyframes logoFxBounce {
-  0%   { transform: translateY(0) scale(1); }
-  20%  { transform: translateY(-14px) scale(1.06); }
-  40%  { transform: translateY(0) scale(0.96); }
-  55%  { transform: translateY(-6px) scale(1.03); }
-  70%  { transform: translateY(0) scale(0.98); }
-  85%  { transform: translateY(-2px) scale(1.01); }
-  100% { transform: translateY(0) scale(1); }
-}
-.logo-fx-bounce {
-  animation: logoFxBounce 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Вращение */
-@keyframes logoFxSpin {
-  0%   { transform: rotate(0) scale(1); }
-  50%  { transform: rotate(180deg) scale(1.15); }
-  100% { transform: rotate(360deg) scale(1); }
-}
-.logo-fx-spin {
-  animation: logoFxSpin 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Тряска */
-@keyframes logoFxShake {
-  0%, 100% { transform: translateX(0); }
-  15% { transform: translateX(-6px) rotate(-2deg); }
-  30% { transform: translateX(6px) rotate(2deg); }
-  45% { transform: translateX(-5px) rotate(-1.5deg); }
-  60% { transform: translateX(5px) rotate(1.5deg); }
-  75% { transform: translateX(-3px) rotate(-1deg); }
-  90% { transform: translateX(3px) rotate(1deg); }
-}
-.logo-fx-shake {
-  animation: logoFxShake 0.7s ease-in-out;
-}
-
-/* Радужная заливка */
-@keyframes logoFxRainbow {
-  0%   { filter: hue-rotate(0deg) saturate(1) brightness(1); }
-  50%  { filter: hue-rotate(180deg) saturate(2.2) brightness(1.3); }
-  100% { filter: hue-rotate(360deg) saturate(1) brightness(1); }
-}
-.logo-fx-rainbow {
-  animation: logoFxRainbow 1.4s linear;
-}
-
-/* Pop — резкий прыжок с увеличением */
-@keyframes logoFxPop {
-  0%   { transform: scale(1); }
-  30%  { transform: scale(1.35) rotate(-3deg); }
-  55%  { transform: scale(0.9) rotate(2deg); }
-  75%  { transform: scale(1.1) rotate(-1deg); }
-  100% { transform: scale(1) rotate(0); }
-}
-.logo-fx-pop {
-  animation: logoFxPop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Переворот по Y */
-@keyframes logoFxFlip {
-  0%   { transform: perspective(600px) rotateY(0); }
-  50%  { transform: perspective(600px) rotateY(180deg) scale(1.1); }
-  100% { transform: perspective(600px) rotateY(360deg); }
-}
-.logo-fx-flip {
-  animation: logoFxFlip 0.9s ease-in-out;
-}
-
-/* Виляние */
-@keyframes logoFxWiggle {
-  0%, 100% { transform: rotate(0) scale(1); }
-  20% { transform: rotate(-8deg) scale(1.05); }
-  40% { transform: rotate(8deg) scale(1.05); }
-  60% { transform: rotate(-5deg) scale(1.02); }
-  80% { transform: rotate(5deg) scale(1.02); }
-}
-.logo-fx-wiggle {
-  animation: logoFxWiggle 0.75s ease-in-out;
-}
-
-/* Свечение-пульсация */
-@keyframes logoFxGlow {
-  0%   { filter: drop-shadow(0 0 0 var(--accent)) brightness(1); }
-  30%  { filter: drop-shadow(0 0 22px var(--accent)) brightness(1.4); }
-  60%  { filter: drop-shadow(0 0 4px var(--accent)) brightness(1.1); }
-  100% { filter: drop-shadow(0 0 0 var(--accent)) brightness(1); }
-}
-.logo-fx-glow {
-  animation: logoFxGlow 0.9s ease-in-out;
-}
-
-/* Пьяный — плывёт в стороны */
-@keyframes logoFxDrunk {
-  0%   { transform: translate(0,0) rotate(0); }
-  20%  { transform: translate(-6px, 4px) rotate(-3deg); }
-  40%  { transform: translate(7px, -3px) rotate(3deg); }
-  60%  { transform: translate(-4px, 3px) rotate(-2deg); }
-  80%  { transform: translate(3px, -2px) rotate(1.5deg); }
-  100% { transform: translate(0,0) rotate(0); }
-}
-.logo-fx-drunk {
-  animation: logoFxDrunk 1s ease-in-out;
-}
-
-/* Летящие частицы (эмодзи) */
-.logo-fx-particle {
-  position: fixed;
-  z-index: 99999;
-  pointer-events: none;
-  color: var(--accent);
-  text-shadow: 0 0 8px var(--accent-glow), 0 0 16px var(--accent-glow);
-  animation: logoFxParticleFly 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  transform: translate(-50%, -50%);
-  will-change: transform, opacity;
-}
-
-@keyframes logoFxParticleFly {
-  0% {
-    transform: translate(-50%, -50%) scale(0.4);
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-  100% {
-    transform: translate(
-      calc(-50% + var(--dx, 0px)),
-      calc(-50% + var(--dy, 0px))
-    ) scale(0.6) rotate(180deg);
-    opacity: 0;
-  }
-}
-
-/* Уважаем reduce-motion */
-@media (prefers-reduced-motion: reduce) {
-  .logo-fx-bounce,
-  .logo-fx-spin,
-  .logo-fx-shake,
-  .logo-fx-rainbow,
-  .logo-fx-pop,
-  .logo-fx-flip,
-  .logo-fx-wiggle,
-  .logo-fx-glow,
-  .logo-fx-drunk {
-    animation: none !important;
-  }
-  .logo-fx-particle {
-    display: none;
-  }
+#sidebarDynamic:empty + #settingsContainer {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
 }

@@ -1,7 +1,6 @@
-// app-settings.js (без Service Worker)
+// app-settings.js
 import { dataManager } from './dataManager.js';
 
-// ===== ЭКСПОРТ ДАННЫХ =====
 export function exportData() {
   Promise.all([
     dataManager.load('schedule'),
@@ -23,7 +22,6 @@ export function exportData() {
   }).catch(console.error);
 }
 
-// ===== ИМПОРТ ДАННЫХ =====
 export function importData(file) {
   const reader = new FileReader();
   reader.onload = async (e) => {
@@ -43,55 +41,24 @@ export function importData(file) {
   reader.readAsText(file);
 }
 
-// ===== ДОБАВЛЕНИЕ КНОПОК В САЙДБАР =====
 export function initSidebarButtons() {
-  const sidebar = document.querySelector('.sidebar');
-  if (!sidebar) return;
-  if (document.getElementById('settingsContainer')) return;
+  const themeBtn = document.getElementById('settingsThemeBtn');
+  const exportBtn = document.getElementById('settingsExportBtn');
+  const importBtn = document.getElementById('settingsImportBtn');
+  const fileInput = document.getElementById('settingsImportInput');
 
-  const container = document.createElement('div');
-  container.id = 'settingsContainer';
-
-  // Кнопка "Тема"
-  const themeBtn = document.createElement('button');
-  themeBtn.className = 'nav-btn';
-  themeBtn.innerHTML = '<i class="fas fa-palette"></i> Тема оформления';
-  themeBtn.addEventListener('click', () => {
-    if (window.openThemeModal) {
-      window.openThemeModal();
-    } else {
-      alert('Модуль theme.js не загружен');
-    }
-  });
-  container.appendChild(themeBtn);
-
-  // Кнопка экспорта
-  const exportBtn = document.createElement('button');
-  exportBtn.className = 'nav-btn';
-  exportBtn.innerHTML = '<i class="fas fa-file-export"></i> Экспорт данных';
-  exportBtn.addEventListener('click', exportData);
-  container.appendChild(exportBtn);
-
-  // Кнопка импорта (скрытый input)
-  const importBtn = document.createElement('button');
-  importBtn.className = 'nav-btn';
-  importBtn.innerHTML = '<i class="fas fa-file-import"></i> Импорт данных';
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.accept = '.json';
-  fileInput.style.display = 'none';
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length) importData(e.target.files[0]);
-  });
-  importBtn.appendChild(fileInput);
-  importBtn.addEventListener('click', () => fileInput.click());
-  container.appendChild(importBtn);
-
-  sidebar.appendChild(container);
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      if (window.openThemeModal) window.openThemeModal();
+    });
+  }
+  if (exportBtn) exportBtn.addEventListener('click', exportData);
+  if (importBtn && fileInput) {
+    importBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) importData(e.target.files[0]);
+    });
+  }
 }
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
-document.addEventListener('DOMContentLoaded', () => {
-  initSidebarButtons();
-  // registerSW(); // <-- ОТКЛЮЧЕНО
-});
+document.addEventListener('DOMContentLoaded', initSidebarButtons);
