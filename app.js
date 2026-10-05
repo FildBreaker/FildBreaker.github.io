@@ -1,6 +1,7 @@
 // app.js — SPA для Б-31ЛЕС
 import { dataManager } from './dataManager.js';
 import { createRichEditor, sanitizeHtml, escapeHtml as esc } from './rich-editor.js';
+import { openDatePicker, formatDate } from './date-picker.js';
 
 const state = {
   currentRoute: null,
@@ -71,7 +72,7 @@ async function navigate() {
 
   const mc = document.getElementById('mainContent');
 
-  // Фаза выхода — если уже что-то отрисовано
+  // Фаза выхода
   if (state.currentRoute && mc) {
     mc.classList.add('route-exit');
     await new Promise(r => setTimeout(r, 180));
@@ -190,20 +191,20 @@ async function renderHome() {
   state.intervals.home = setInterval(updateAll, 1000);
 
   let activeTimer = null;
-  const datePicker = document.getElementById('homeDatePicker');
-  const title = document.getElementById('homeDateModalTitle');
+  let selectedDate = null;
+
+  function updateDatePickerText() {
+    const text = document.getElementById('homeDatePickerText');
+    if (!text) return;
+    text.textContent = formatDate(selectedDate);
+  }
 
   function openDateModal(type) {
     activeTimer = type;
     const target = type === 'exam' ? examTarget : gradTarget;
-    const dt = new Date(target);
-    const y = dt.getFullYear();
-    const m = String(dt.getMonth()+1).padStart(2,'0');
-    const d = String(dt.getDate()).padStart(2,'0');
-    const hh = String(dt.getHours()).padStart(2,'0');
-    const mm = String(dt.getMinutes()).padStart(2,'0');
-    datePicker.value = `${y}-${m}-${d}T${hh}:${mm}`;
-    title.innerHTML = type === 'exam'
+    selectedDate = new Date(target);
+    updateDatePickerText();
+    document.getElementById('homeDateModalTitle').innerHTML = type === 'exam'
       ? '<i class="fas fa-graduation-cap"></i> Дата экзаменов'
       : '<i class="fas fa-flag-checkered"></i> Дата окончания обучения';
     openModal('homeDateModal');
@@ -211,11 +212,21 @@ async function renderHome() {
 
   document.getElementById('setExamDateBtn').onclick = () => openDateModal('exam');
   document.getElementById('setGradDateBtn').onclick = () => openDateModal('grad');
+
+  document.getElementById('homeDatePickerBtn').onclick = () => {
+    openDatePicker({
+      anchorEl: document.getElementById('homeDatePickerBtn'),
+      initial: selectedDate,
+      onPick: (date) => {
+        selectedDate = date;
+        updateDatePickerText();
+      }
+    });
+  };
+
   document.getElementById('homeDateSaveBtn').onclick = () => {
-    if (!activeTimer) return;
-    const val = datePicker.value;
-    if (!val) { alert('Выберите дату'); return; }
-    const iso = new Date(val).toISOString();
+    if (!selectedDate) { alert('Выберите дату'); return; }
+    const iso = selectedDate.toISOString();
     if (activeTimer === 'exam') { examTarget = iso; localStorage.setItem('examTarget', iso); }
     else { gradTarget = iso; localStorage.setItem('gradTarget', iso); }
     updateAll();
