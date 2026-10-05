@@ -8,7 +8,6 @@ import { createRichEditor, sanitizeHtml, escapeHtml as esc } from './rich-editor
 const state = {
   currentRoute: null,
   intervals: {},
-  editors: {},
   data: {
     schedule: null,
     homework: null,
@@ -49,19 +48,16 @@ function openModal(id) {
 }
 
 function setupModalGlobals() {
-  // Клик по крестику и кнопкам "Отмена" с data-close
   document.addEventListener('click', (e) => {
     const closeEl = e.target.closest('[data-close]');
     if (closeEl) {
       const id = closeEl.dataset.close;
       if (id) closeModal(id);
     }
-    // Клик вне .modal-content внутри .modal — закрываем
     if (e.target.classList.contains('modal')) {
       e.target.style.display = 'none';
     }
   });
-  // Escape закрывает верхнюю модалку
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     const modals = [...document.querySelectorAll('.modal')].filter(m => m.style.display === 'flex');
@@ -85,16 +81,13 @@ async function navigate() {
   if (state.currentRoute) destroyRoute(state.currentRoute);
   state.currentRoute = route;
 
-  // Подсветка активной ссылки
   document.querySelectorAll('.nav-links a').forEach(a => {
     a.classList.toggle('active', a.dataset.route === route);
   });
 
-  // Рендер
   try {
     const renderer = RENDERERS[route];
     if (renderer) await renderer();
-    // Пере-применяем stagger после рендера
     if (window.setStagger) window.setStagger();
   } catch (err) {
     console.error(`[route:${route}] error:`, err);
@@ -102,7 +95,6 @@ async function navigate() {
 }
 
 function destroyRoute(route) {
-  // Убираем интервалы
   if (state.intervals[route]) {
     clearInterval(state.intervals[route]);
     state.intervals[route] = null;
@@ -112,7 +104,7 @@ function destroyRoute(route) {
 window.addEventListener('hashchange', navigate);
 
 // ============================================================
-// ОБЩИЙ РЕНДЕР КАРКАСА
+// ОБЩИЕ ХЕЛПЕРЫ РЕНДЕРА
 // ============================================================
 function setSidebar(html) {
   document.getElementById('sidebarDynamic').innerHTML = html;
@@ -120,14 +112,17 @@ function setSidebar(html) {
 function setMain(html) {
   document.getElementById('mainContent').innerHTML = html;
 }
-
 function showSkeletonMain(kind, count) {
-  if (window.showSkeleton) {
-    window.showSkeleton('mainContent', count || 3, kind || 'card');
-  }
+  if (window.showSkeleton) window.showSkeleton('mainContent', count || 3, kind || 'card');
 }
 function hideSkeletonMain() {
   if (window.hideSkeleton) window.hideSkeleton('mainContent');
+}
+
+function setSidebarNavHandlers() {
+  document.querySelectorAll('#sidebarDynamic [data-nav]').forEach(btn => {
+    btn.onclick = () => { location.hash = '#/' + btn.dataset.nav; };
+  });
 }
 
 // ============================================================
@@ -172,7 +167,6 @@ async function renderHome() {
     </div>
   `);
 
-  // Таймеры
   let examTarget = localStorage.getItem('examTarget') || '2026-06-15T10:00';
   let gradTarget = localStorage.getItem('gradTarget') || '2026-06-30T23:59';
 
@@ -194,9 +188,7 @@ async function renderHome() {
   updateAll();
   state.intervals.home = setInterval(updateAll, 1000);
 
-  // Модалка
   let activeTimer = null;
-  const dateModal = document.getElementById('homeDateModal');
   const datePicker = document.getElementById('homeDatePicker');
   const title = document.getElementById('homeDateModalTitle');
 
@@ -216,9 +208,9 @@ async function renderHome() {
     openModal('homeDateModal');
   }
 
-  document.getElementById('setExamDateBtn').addEventListener('click', () => openDateModal('exam'));
-  document.getElementById('setGradDateBtn').addEventListener('click', () => openDateModal('grad'));
-  document.getElementById('homeDateSaveBtn').addEventListener('click', () => {
+  document.getElementById('setExamDateBtn').onclick = () => openDateModal('exam');
+  document.getElementById('setGradDateBtn').onclick = () => openDateModal('grad');
+  document.getElementById('homeDateSaveBtn').onclick = () => {
     if (!activeTimer) return;
     const val = datePicker.value;
     if (!val) { alert('Выберите дату'); return; }
@@ -227,7 +219,7 @@ async function renderHome() {
     else { gradTarget = iso; localStorage.setItem('gradTarget', iso); }
     updateAll();
     closeModal('homeDateModal');
-  });
+  };
 }
 
 // ============================================================
@@ -284,14 +276,13 @@ async function renderSchedule() {
   }
   renderScheduleTable();
 
-  // Обработчики модалки
   setupScheduleModal();
-  document.getElementById('resetScheduleBtn').addEventListener('click', async () => {
+  document.getElementById('resetScheduleBtn').onclick = async () => {
     if (!confirm('Сбросить расписание к исходному?')) return;
     state.data.schedule = JSON.parse(JSON.stringify(defaultSchedule));
     await dataManager.save('schedule', state.data.schedule);
     renderScheduleTable();
-  });
+  };
 }
 
 function renderScheduleTable() {
@@ -328,7 +319,7 @@ function renderScheduleTable() {
       td.innerHTML = `<div class="cell-content"><div class="subject">${typeIcon}${subjectHtml}${roomHtml}</div>${dateHtml}${notesHtml}<div class="edit-icon"><i class="fas fa-pen"></i></div></div>`;
       td.dataset.day = day;
       td.dataset.pair = pair;
-      td.addEventListener('click', () => openScheduleEdit(day, pair));
+      td.onclick = () => openScheduleEdit(day, pair);
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
@@ -345,23 +336,22 @@ function renderScheduleTable() {
   }
 }
 
-let scheduleEdit = { day: null, pair: null, type: '', notesEditor: null };
+const scheduleEdit = { day: null, pair: null, type: '', notesEditor: null };
 
 function setupScheduleModal() {
   const typeBtns = ['scheduleTypeLecture', 'scheduleTypePractice', 'scheduleTypeNone'];
   typeBtns.forEach(id => {
     const btn = document.getElementById(id);
-    if (btn) btn.addEventListener('click', () => {
+    if (btn) btn.onclick = () => {
       scheduleEdit.type = btn.dataset.type;
       typeBtns.forEach(i => document.getElementById(i).classList.remove('active'));
       btn.classList.add('active');
-    });
+    };
   });
-  const form = document.getElementById('scheduleEditForm');
-  form.addEventListener('submit', async (e) => {
+  document.getElementById('scheduleEditForm').onsubmit = async (e) => {
     e.preventDefault();
     await saveScheduleEdit();
-  });
+  };
 }
 
 function openScheduleEdit(day, pair) {
@@ -450,7 +440,7 @@ async function renderExam() {
   hideSkeletonMain();
   renderExams();
 
-  document.getElementById('addExamBtn').addEventListener('click', () => openExamModal());
+  document.getElementById('addExamBtn').onclick = () => openExamModal();
   setupExamModal();
 
   const grid = document.getElementById('examsGrid');
@@ -504,17 +494,16 @@ function renderExams() {
       ${exam.method ? `<div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">${esc(exam.method)}</a></div>` : ''}
       ${exam.notes ? `<div class="exam-notes rich-display">${sanitizeHtml(exam.notes)}</div>` : ''}
     `;
-    card.querySelector('.edit-exam').addEventListener('click', (e) => { e.stopPropagation(); openExamModal(exam.id); });
-    card.querySelector('.delete-exam').addEventListener('click', (e) => { e.stopPropagation(); deleteExam(exam.id); });
+    card.querySelector('.edit-exam').onclick = (e) => { e.stopPropagation(); openExamModal(exam.id); };
+    card.querySelector('.delete-exam').onclick = (e) => { e.stopPropagation(); deleteExam(exam.id); };
     grid.appendChild(card);
   });
 }
 
-let examEdit = { id: null, notesEditor: null };
+const examEdit = { id: null, notesEditor: null };
 
 function setupExamModal() {
-  const form = document.getElementById('examForm');
-  form.addEventListener('submit', async (e) => {
+  document.getElementById('examForm').onsubmit = async (e) => {
     e.preventDefault();
     const subject = document.getElementById('examSubject').value.trim();
     const date = document.getElementById('examDate').value.trim();
@@ -536,7 +525,7 @@ function setupExamModal() {
     await dataManager.save('exams', state.data.exams);
     renderExams();
     closeModal('examModal');
-  });
+  };
 }
 
 function openExamModal(id = null) {
@@ -612,14 +601,14 @@ async function renderResources() {
   renderResourceCards();
 
   document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
       btn.classList.add('active-filter');
       applyResourceFilters();
-    });
+    };
   });
-  document.getElementById('searchInput').addEventListener('input', applyResourceFilters);
-  document.getElementById('addResourceBtn').addEventListener('click', () => openResourceModal());
+  document.getElementById('searchInput').oninput = applyResourceFilters;
+  document.getElementById('addResourceBtn').onclick = () => openResourceModal();
   setupResourceModal();
 
   const grid = document.getElementById('resourcesGrid');
@@ -666,8 +655,8 @@ function renderResourceCards() {
         </div>
       </div>
     `;
-    card.querySelector('.edit-resource').addEventListener('click', () => openResourceModal(res.id));
-    card.querySelector('.delete-resource').addEventListener('click', () => deleteResource(res.id));
+    card.querySelector('.edit-resource').onclick = () => openResourceModal(res.id);
+    card.querySelector('.delete-resource').onclick = () => deleteResource(res.id);
     grid.appendChild(card);
   });
   applyResourceFilters();
@@ -685,11 +674,10 @@ function applyResourceFilters() {
   });
 }
 
-let resourceEdit = { id: null, descEditor: null };
+const resourceEdit = { id: null, descEditor: null };
 
 function setupResourceModal() {
-  const form = document.getElementById('resourceForm');
-  form.addEventListener('submit', async (e) => {
+  document.getElementById('resourceForm').onsubmit = async (e) => {
     e.preventDefault();
     const title = document.getElementById('resourceTitle').value.trim();
     const category = document.getElementById('resourceCategory').value;
@@ -710,11 +698,11 @@ function setupResourceModal() {
     await dataManager.save('resources', state.data.resources);
     renderResourceCards();
     closeModal('resourceModal');
-  });
-  document.getElementById('clearIconBtn').addEventListener('click', () => {
+  };
+  document.getElementById('clearIconBtn').onclick = () => {
     document.getElementById('resourceIcon').value = '';
     renderIconPicker('');
-  });
+  };
 }
 
 function renderIconPicker(selectedIcon) {
@@ -726,11 +714,11 @@ function renderIconPicker(selectedIcon) {
     btn.className = `icon-option ${selectedIcon === icon ? 'active' : ''}`;
     btn.innerHTML = `<i class="fas ${icon}"></i>`;
     btn.title = icon;
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       container.querySelectorAll('.icon-option').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('resourceIcon').value = icon;
-    });
+    };
     container.appendChild(btn);
   });
 }
@@ -771,6 +759,7 @@ async function deleteResource(id) {
   await dataManager.save('resources', state.data.resources);
   renderResourceCards();
 }
+
 // ============================================================
 // ДОМАШКА
 // ============================================================
@@ -828,8 +817,8 @@ async function renderHomework() {
   else if (state.data.homework.subjects.length) selectSubject(state.data.homework.subjects[0].id);
   else clearTasksView();
 
-  document.getElementById('addSubjectBtn').addEventListener('click', () => openSubjectModal());
-  document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
+  document.getElementById('addSubjectBtn').onclick = () => openSubjectModal();
+  document.getElementById('addTaskBtn').onclick = () => openTaskModal();
   setupHomeworkModals();
 
   if (window.enableDragSort) {
@@ -863,16 +852,16 @@ function renderSubjects() {
         <button class="delete-subject" data-id="${subj.id}"><i class="fas fa-trash"></i></button>
       </div>
     `;
-    div.addEventListener('click', (e) => {
+    div.onclick = (e) => {
       if (e.target.closest('button')) return;
       selectSubject(subj.id);
-    });
-    div.querySelector('.edit-subject').addEventListener('click', (e) => { e.stopPropagation(); openSubjectModal(subj.id); });
-    div.querySelector('.delete-subject').addEventListener('click', async (e) => {
+    };
+    div.querySelector('.edit-subject').onclick = (e) => { e.stopPropagation(); openSubjectModal(subj.id); };
+    div.querySelector('.delete-subject').onclick = async (e) => {
       e.stopPropagation();
       if (!confirm(`Удалить предмет "${subj.name}"?`)) return;
       await deleteSubject(subj.id);
-    });
+    };
     container.appendChild(div);
   });
   const btn = document.getElementById('addTaskBtn');
@@ -888,7 +877,6 @@ function selectSubject(subjectId) {
     if (!Array.isArray(subject.tasks)) subject.tasks = [];
     document.getElementById('currentSubjectTitle').innerHTML = `<i class="fas fa-book-open"></i> ${esc(subject.name)}`;
     renderTasks(subject.tasks);
-    // Перезапускаем drag-sort на tasksContainer
     const tc = document.getElementById('tasksContainer');
     if (window.enableDragSort) {
       window.enableDragSort(tc, {
@@ -948,16 +936,16 @@ function renderTasks(tasks) {
         <button class="delete-task" data-id="${task.id}"><i class="fas fa-trash-alt"></i></button>
       </div>
     `;
-    card.querySelector('.edit-task').addEventListener('click', () => openTaskModal(task.id));
-    card.querySelector('.delete-task').addEventListener('click', () => deleteTask(task.id));
+    card.querySelector('.edit-task').onclick = () => openTaskModal(task.id);
+    card.querySelector('.delete-task').onclick = () => deleteTask(task.id);
     container.appendChild(card);
   });
 }
 
 function setupHomeworkModals() {
-  document.getElementById('saveSubjectBtn').addEventListener('click', saveSubjectFromModal);
-  document.getElementById('saveTaskBtn').addEventListener('click', (e) => { e.preventDefault(); saveTaskFromModal(); });
-  document.getElementById('addLinkBtn').addEventListener('click', () => addLinkGroup('', ''));
+  document.getElementById('saveSubjectBtn').onclick = saveSubjectFromModal;
+  document.getElementById('saveTaskBtn').onclick = (e) => { e.preventDefault(); saveTaskFromModal(); };
+  document.getElementById('addLinkBtn').onclick = () => addLinkGroup('', '');
 }
 
 function openSubjectModal(subjectId = null) {
@@ -980,7 +968,7 @@ async function saveSubjectFromModal() {
   if (!name) return alert('Введите название');
   if (homeworkState.editSubjectId) {
     const subj = state.data.homework.subjects.find(s => s.id === homeworkState.editSubjectId);
-    if (subj) { subj.name = name; }
+    if (subj) subj.name = name;
   } else {
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
     state.data.homework.subjects.push({ id: newId, name, tasks: [] });
@@ -1014,7 +1002,7 @@ function addLinkGroup(urlVal = '', titleVal = '') {
     <input type="text" class="link-title" placeholder="Название ссылки" value="${esc(titleVal)}">
     <button class="remove-link-btn" type="button"><i class="fas fa-trash-alt"></i></button>
   `;
-  group.querySelector('.remove-link-btn').addEventListener('click', () => group.remove());
+  group.querySelector('.remove-link-btn').onclick = () => group.remove();
   document.getElementById('linksContainer').appendChild(group);
 }
 
@@ -1154,14 +1142,14 @@ async function renderExtracurricular() {
   renderEcCurrent();
 
   document.querySelectorAll('.section-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       ecState.currentSection = btn.dataset.section;
       renderEcCurrent();
-    });
+    };
   });
-  document.getElementById('globalAddBtn').addEventListener('click', () => openEcEditModal(ecState.currentSection));
+  document.getElementById('globalAddBtn').onclick = () => openEcEditModal(ecState.currentSection);
   setupEcModals();
 
   if (window.enableDragSort) {
@@ -1224,8 +1212,8 @@ function renderEcEvents(container, events) {
       <div class="rich-display">${sanitizeHtml(ev.description)}</div>
       ${ev.link && ev.link !== '#' ? `<a href="${esc(ev.link)}" target="_blank" class="event-link">Подробнее <i class="fas fa-external-link-alt"></i></a>` : ''}
     `;
-    card.querySelector('.edit-event').addEventListener('click', () => openEcEditModal('events', ev.id));
-    card.querySelector('.delete-event').addEventListener('click', () => deleteEcItem('events', ev.id));
+    card.querySelector('.edit-event').onclick = () => openEcEditModal('events', ev.id);
+    card.querySelector('.delete-event').onclick = () => deleteEcItem('events', ev.id);
     container.appendChild(card);
   });
 }
@@ -1258,10 +1246,10 @@ function renderEcPolls(container, polls) {
     `;
     if (!userVoted) {
       card.querySelectorAll('.vote-btn').forEach(btn => {
-        btn.addEventListener('click', () => voteEcPoll(btn.dataset.poll, parseInt(btn.dataset.optidx)));
+        btn.onclick = () => voteEcPoll(btn.dataset.poll, parseInt(btn.dataset.optidx));
       });
     }
-    card.querySelector('.delete-poll').addEventListener('click', () => deleteEcItem('polls', poll.id));
+    card.querySelector('.delete-poll').onclick = () => deleteEcItem('polls', poll.id);
     container.appendChild(card);
   });
 }
@@ -1294,9 +1282,9 @@ function renderEcTests(container, tests) {
       </div>
       <p>Вопросов: ${test.questions.length}</p>
     `;
-    card.querySelector('.take-test').addEventListener('click', () => openEcTest(test.id));
-    card.querySelector('.edit-test').addEventListener('click', () => openEcEditModal('tests', test.id));
-    card.querySelector('.delete-test').addEventListener('click', () => deleteEcItem('tests', test.id));
+    card.querySelector('.take-test').onclick = () => openEcTest(test.id);
+    card.querySelector('.edit-test').onclick = () => openEcEditModal('tests', test.id);
+    card.querySelector('.delete-test').onclick = () => deleteEcItem('tests', test.id);
     container.appendChild(card);
   });
 }
@@ -1311,7 +1299,7 @@ async function deleteEcItem(section, id) {
 }
 
 function setupEcModals() {
-  document.getElementById('ecSaveModalBtn').addEventListener('click', saveEcModalItem);
+  document.getElementById('ecSaveModalBtn').onclick = saveEcModalItem;
 }
 
 function openEcEditModal(section, id = null) {
@@ -1358,7 +1346,6 @@ function openEcEditModal(section, id = null) {
       <button type="button" id="ecAddQuestionBtn" class="add-link-btn"><i class="fas fa-plus"></i> Добавить вопрос</button>
     `;
     let questions = id ? (d.tests.find(t => t.id === id)?.questions || []) : [];
-    ecState._draftQuestions = questions;
     const renderQE = () => {
       const c = document.getElementById('ecQuestionsEditor');
       c.innerHTML = '';
@@ -1375,15 +1362,15 @@ function openEcEditModal(section, id = null) {
           </select>
           <button class="remove-question-btn" type="button">Удалить</button>
         `;
-        qDiv.querySelector('.remove-question-btn').addEventListener('click', () => { questions.splice(idx, 1); renderQE(); });
+        qDiv.querySelector('.remove-question-btn').onclick = () => { questions.splice(idx, 1); renderQE(); };
         c.appendChild(qDiv);
       });
     };
     renderQE();
-    document.getElementById('ecAddQuestionBtn').addEventListener('click', () => {
+    document.getElementById('ecAddQuestionBtn').onclick = () => {
       questions.push({ text: 'Новый вопрос', options: ['Вариант 1', 'Вариант 2'], correctIndex: 0 });
       renderQE();
-    });
+    };
     if (id) document.getElementById('ecTestTitle').value = d.tests.find(t => t.id === id).title;
   }
   openModal('ecEditModal');
@@ -1515,7 +1502,7 @@ async function renderTeacher() {
   hideSkeletonMain();
   renderTeachers();
 
-  document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
+  document.getElementById('addTeacherBtn').onclick = () => openTeacherModal();
   setupTeacherModal();
 
   const grid = document.getElementById('teachersGridContainer');
@@ -1532,7 +1519,7 @@ async function renderTeacher() {
   }
 }
 
-let teacherEdit = { id: null };
+const teacherEdit = { id: null };
 
 function renderTeachers() {
   const container = document.getElementById('teachersGridContainer');
@@ -1563,14 +1550,14 @@ function renderTeachers() {
         </div>
       </div>
     `;
-    card.querySelector('.edit-teacher').addEventListener('click', () => openTeacherModal(teacher.id));
-    card.querySelector('.delete-teacher').addEventListener('click', () => deleteTeacher(teacher.id));
+    card.querySelector('.edit-teacher').onclick = () => openTeacherModal(teacher.id);
+    card.querySelector('.delete-teacher').onclick = () => deleteTeacher(teacher.id);
     container.appendChild(card);
   });
 }
 
 function setupTeacherModal() {
-  document.getElementById('teacherForm').addEventListener('submit', async (e) => {
+  document.getElementById('teacherForm').onsubmit = async (e) => {
     e.preventDefault();
     const name = document.getElementById('teacherName').value.trim();
     const position = document.getElementById('teacherPosition').value.trim();
@@ -1590,7 +1577,7 @@ function setupTeacherModal() {
     await dataManager.save('teachers', state.data.teachers);
     renderTeachers();
     closeModal('teacherModal');
-  });
+  };
 }
 
 function openTeacherModal(id = null) {
@@ -1615,17 +1602,6 @@ async function deleteTeacher(id) {
 }
 
 // ============================================================
-// ОБЩИЕ ОБРАБОТЧИКИ САЙДБАРА (быстрые ссылки)
-// ============================================================
-function setSidebarNavHandlers() {
-  document.querySelectorAll('#sidebarDynamic [data-nav]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      location.hash = '#/' + btn.dataset.nav;
-    });
-  });
-}
-
-// ============================================================
 // РЕЕСТР РЕНДЕРЕРОВ
 // ============================================================
 const RENDERERS = {
@@ -1641,15 +1617,8 @@ const RENDERERS = {
 // ============================================================
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================================
-function exposeStagger() {
-  // page-animations.js регистрирует функцию setStagger внутри IIFE, но не выставляет наружу.
-  // Пробуем восстановить из MutationObserver — если не получится, обойдёмся.
-  // Простой способ: пере-вызвать через фейковое событие, если есть. Пока оставим null.
-}
-
 function init() {
   setupModalGlobals();
-  exposeStagger();
   if (!location.hash) location.hash = '#/home';
   navigate();
 }
