@@ -1745,3 +1745,47 @@ a:hover {
   padding-top: 0;
   border-top: none;
 }
+
+/* ============================================================
+   SPA: динамическая часть сайдбара
+   ============================================================ */
+#sidebarDynamic {
+  display: flex;
+  flex-direction: column;
+}
+#sidebarDynamic > h3 {
+  margin-top: 0;
+}
+#sidebarDynamic:empty + #settingsContainer {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* ============================================================
+   Гарантия подхвата Font Awesome
+   ============================================================ */
+.icon-option i,
+.rich-toolbar i,
+.nav-links i,
+.nav-btn i,
+button i,
+a i {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free" !important;
+  font-weight: 900;
+  font-style: normal;
+}
+.icon-option i {
+  font-size: 1.1rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+/* ============================================================
+   Прячем нативные color-inputs (на всякий случай)
+   ============================================================ */
+input.rich-color-input-hidden,
+.rich-editor-wrapper input[type="color"]:not(.visible-color-input),
+.modal-content input.rich-color-input-hidden {
+  display: none !important;
+}
