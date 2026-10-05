@@ -1789,3 +1789,565 @@ input.rich-color-input-hidden,
 .modal-content input.rich-color-input-hidden {
   display: none !important;
 }
+
+/* ============================================================
+   ВНУТРЕННИЕ КОМПОНЕНТЫ КАРТОЧЕК
+   (были потеряны — восстанавливаем)
+   ============================================================ */
+
+/* --- Экзамены --- */
+.exam-card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+.exam-card .exam-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--bg-active);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.exam-card .exam-title { flex: 1; min-width: 0; }
+.exam-card .exam-title h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--text-color);
+  word-break: break-word;
+}
+.exam-card .exam-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--bg-hover);
+}
+.exam-card .card-details {
+  padding: 14px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.exam-card .detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.exam-card .detail-row i {
+  width: 16px;
+  color: var(--accent);
+  flex-shrink: 0;
+  text-align: center;
+}
+.exam-card .detail-row strong {
+  color: var(--text-color);
+  font-weight: 600;
+}
+.exam-card .exam-resources {
+  padding: 12px 22px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-hover);
+}
+.exam-card .resources-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.exam-card .resource-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.exam-card .res-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--bg-active);
+  color: var(--accent);
+  text-decoration: none;
+  transition: 0.2s;
+}
+.exam-card .res-link:hover {
+  background: var(--accent);
+  color: var(--badge-color);
+}
+.exam-card .card-footer-note {
+  padding: 12px 22px;
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.exam-card .card-footer-note a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.exam-card .card-footer-note a:hover { text-decoration: underline; }
+
+/* --- Ресурсы --- */
+.resource-card .card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--bg-active);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+.resource-card .card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.resource-card .card-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  word-break: break-word;
+}
+.resource-card .rich-display {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.resource-card .card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.resource-card .card-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.resource-card .card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.resource-card .card-link:hover {
+  color: var(--link-hover);
+  gap: 8px;
+}
+
+/* --- Домашка: задания --- */
+.task-card .task-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.task-card .task-desc {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+.task-card .task-links {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.task-card .task-links a {
+  color: var(--accent);
+  text-decoration: none;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--bg-active);
+  font-size: 0.78rem;
+  transition: 0.2s;
+}
+.task-card .task-links a:hover {
+  background: var(--accent);
+  color: var(--badge-color);
+}
+.task-card .task-tags {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.task-card .task-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.task-card .task-actions button {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+.task-card .task-actions button:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.08);
+}
+.task-card .task-actions .delete-task:hover {
+  background: rgba(231, 76, 60, 0.15);
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+/* --- Опросы --- */
+.poll-card .poll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.poll-card .poll-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.poll-card .poll-header h3 i { color: var(--accent); }
+.poll-card .delete-poll {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 40px;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+.poll-card .delete-poll:hover {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.12);
+}
+.poll-card .poll-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.poll-card .poll-option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.poll-card .option-text {
+  flex: 1;
+  min-width: 120px;
+  font-size: 0.88rem;
+  color: var(--text-color);
+}
+.poll-card .vote-btn {
+  padding: 6px 16px;
+  border-radius: 40px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-hover);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.poll-card .vote-btn:hover {
+  background: var(--accent);
+  color: var(--badge-color);
+  border-color: var(--accent);
+  transform: scale(1.03);
+}
+.poll-card .option-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  overflow: hidden;
+}
+.poll-card .bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #f5d742);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.poll-card .option-stats {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 100%;
+}
+.poll-card .poll-footer {
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* --- Мероприятия --- */
+.event-card .card-header-event {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.event-card .event-date {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.event-card .event-date i { color: var(--accent); }
+.event-card .event-actions {
+  display: flex;
+  gap: 6px;
+}
+.event-card .event-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 40px;
+  transition: 0.2s;
+}
+.event-card .event-actions .edit-event:hover {
+  color: var(--text-color);
+  background: var(--bg-hover);
+}
+.event-card .event-actions .delete-event:hover {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.12);
+}
+.event-card h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--text-color);
+}
+.event-card .rich-display {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.event-card .event-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.event-card .event-link:hover { color: var(--link-hover); }
+
+/* --- Тесты --- */
+.test-card .test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.test-card .test-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  word-break: break-word;
+}
+.test-card .test-header h3 i { color: var(--accent); }
+.test-card .test-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.test-card .test-actions button {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  border-radius: 40px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.test-card .test-actions button:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.test-card .take-test {
+  background: var(--accent);
+  color: var(--badge-color);
+  border-color: var(--accent);
+}
+.test-card .take-test:hover {
+  background: var(--btn-primary-hover);
+  color: #fff;
+  border-color: var(--btn-primary-hover);
+}
+.test-card p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* --- Редактор теста (в модалке) --- */
+.question-editor {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 14px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.question-editor .q-text,
+.question-editor .q-opt {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 40px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+.question-editor .q-text:focus,
+.question-editor .q-opt:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.question-editor .opt-row { margin-top: 6px; }
+.question-editor .q-correct {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 40px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+.question-editor .remove-question-btn {
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-top: 6px;
+  transition: 0.2s;
+}
+.question-editor .remove-question-btn:hover {
+  background: #e74c3c;
+  color: #fff;
+}
+
+/* --- Пикер иконок (на всякий случай, если потерялся) --- */
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 8px;
+  margin: 8px 0 12px;
+  max-height: 190px;
+  overflow-y: auto;
+  padding: 12px;
+  background: var(--bg-hover);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+.icon-option {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  padding: 0;
+}
+.icon-option:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-3px) scale(1.08);
+  background: var(--bg-active);
+}
+.icon-option.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
