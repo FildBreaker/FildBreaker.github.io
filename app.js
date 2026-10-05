@@ -78,6 +78,15 @@ async function navigate() {
   try {
     const renderer = RENDERERS[route];
     if (renderer) await renderer();
+
+    // Запускаем анимацию появления mainContent
+    const mc = document.getElementById('mainContent');
+    if (mc) {
+      mc.classList.remove('route-enter');
+      void mc.offsetWidth;
+      mc.classList.add('route-enter');
+    }
+
     if (window.setStagger) window.setStagger();
   } catch (err) {
     console.error(`[route:${route}] error:`, err);
