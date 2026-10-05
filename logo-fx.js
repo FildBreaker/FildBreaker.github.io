@@ -34,28 +34,43 @@
     return a;
   }
 
-  function ensureLetters(h1) {
-    if (h1.dataset.letters === '1') return h1.querySelectorAll('.logo-fx-char');
-    const nodes = [...h1.childNodes];
-    nodes.forEach(node => {
-      if (node.nodeType !== 3) return;
-      const text = node.textContent;
-      if (!text.trim()) return;
-      const frag = document.createDocumentFragment();
-      [...text].forEach(ch => {
-        if (ch === ' ') {
-          frag.appendChild(document.createTextNode(' '));
-        } else {
-          const sp = document.createElement('span');
-          sp.className = 'logo-fx-char';
-          sp.textContent = ch;
-          frag.appendChild(sp);
-        }
-      });
-      node.parentNode.replaceChild(frag, node);
+    function ensureLetters(h1) {
+    // Если уже обёрнуто — вернуть существующие буквы
+    const existing = h1.querySelector('.logo-fx-text');
+    if (existing) return existing.querySelectorAll('.logo-fx-char');
+
+    // Создаём обёртку для текста (буквы будут внутри неё)
+    const wrapper = document.createElement('span');
+    wrapper.className = 'logo-fx-text';
+
+    // Пробегаем по всем дочерним узлам h1
+    [...h1.childNodes].forEach(node => {
+      if (node.nodeType === 3) {
+        // Текстовый узел — разбиваем на буквы
+        [...node.textContent].forEach(ch => {
+          if (ch === ' ') {
+            wrapper.appendChild(document.createTextNode(' '));
+          } else {
+            const sp = document.createElement('span');
+            sp.className = 'logo-fx-char';
+            sp.textContent = ch;
+            wrapper.appendChild(sp);
+          }
+        });
+      } else if (node.nodeType === 1 && node.tagName !== 'I') {
+        // Не-иконка (например, что-то уже в span) — переносим как есть
+        wrapper.appendChild(node.cloneNode(true));
+      }
     });
-    h1.dataset.letters = '1';
-    return h1.querySelectorAll('.logo-fx-char');
+
+    // Удаляем все старые узлы, кроме иконки <i>
+    [...h1.childNodes].forEach(node => {
+      if (node.nodeType === 3) h1.removeChild(node);
+      else if (node.nodeType === 1 && node.tagName !== 'I') h1.removeChild(node);
+    });
+
+    h1.appendChild(wrapper);
+    return wrapper.querySelectorAll('.logo-fx-char');
   }
 
   function spawnParticles(el, count, colors) {
