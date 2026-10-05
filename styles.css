@@ -2699,3 +2699,234 @@ body.theme-transitioning #bgImageLayer {
   }
   .logo-fx-particle { display: none; }
 }
+/* ============================================================
+   КАСТОМНЫЙ DATE PICKER
+   ============================================================ */
+
+/* Триггер (кнопка, которая выглядит как инпут) */
+.date-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 18px;
+  margin-top: 8px;
+  border-radius: 40px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.date-picker-trigger i {
+  color: var(--accent);
+  font-size: 1rem;
+}
+.date-picker-trigger:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border-color));
+  background: var(--bg-active);
+}
+.date-picker-trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Попап */
+.date-picker-popover {
+  position: fixed;
+  z-index: 10000;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 16px;
+  min-width: 300px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--accent-glow);
+  animation: cpFadeIn 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  color: var(--text-color);
+}
+
+.dp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.dp-month-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+.dp-nav {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dp-nav:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dp-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.dp-weekdays span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 0;
+}
+
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.dp-day {
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.dp-day:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+}
+.dp-day-other {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+.dp-day-today {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+.dp-day-selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--badge-color, #1e293b);
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.dp-day-selected:hover {
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
+  transform: scale(1.08);
+}
+
+/* Часы / минуты */
+.dp-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-color);
+  margin-bottom: 10px;
+}
+.dp-time-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dp-time-nav {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+.dp-time-nav:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dp-time-value {
+  min-width: 44px;
+  text-align: center;
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.dp-time-sep {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 -2px;
+}
+
+/* Кнопки снизу */
+.dp-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.dp-btn {
+  padding: 7px 16px;
+  border-radius: 40px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+  border: 1px solid transparent;
+}
+.dp-btn-ghost {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+.dp-btn-ghost:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dp-btn-primary {
+  background: var(--accent);
+  color: var(--badge-color, #1e293b);
+}
+.dp-btn-primary:hover {
+  background: var(--btn-primary-hover);
+  color: #fff;
+  transform: scale(1.03);
+}
