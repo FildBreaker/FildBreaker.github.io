@@ -57,32 +57,20 @@
     }, 900);
   }
 
-  function attach() {
-    if (!document.body) return; // <-- защита
-    const target = document.querySelector('.logo h1') || document.querySelector('.logo');
+  // Делегирование: клик ловится на любом .logo h1 в любой момент
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('.logo h1');
     if (!target) return;
-    if (target.dataset.logoFx === '1') return;
+    playAnim(target, pickAnim());
+  });
+
+  // Добавляем курсор и подсказку на все .logo h1 (в т.ч. будущие)
+  document.addEventListener('mouseover', (e) => {
+    const target = e.target.closest('.logo h1');
+    if (!target || target.dataset.logoFx === '1') return;
     target.dataset.logoFx = '1';
     target.classList.add('logo-fx-target');
     target.style.cursor = 'pointer';
     target.setAttribute('title', 'Тыкни меня 👆');
-    target.addEventListener('click', () => playAnim(target, pickAnim()));
-  }
-
-  function boot() {
-    attach();
-    if (!document.body) return;
-    // MutationObserver только после того как body точно есть
-    try {
-      new MutationObserver(attach).observe(document.body, { childList: true, subtree: true });
-    } catch (e) {
-      // тихо игнорируем
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
+  });
 })();
