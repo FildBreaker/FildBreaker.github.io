@@ -2700,10 +2700,8 @@ body.theme-transitioning #bgImageLayer {
   .logo-fx-particle { display: none; }
 }
 /* ============================================================
-   КАСТОМНЫЙ DATE PICKER
+   КАСТОМНЫЙ DATE PICKER (компактный)
    ============================================================ */
-
-/* Триггер (кнопка, которая выглядит как инпут) */
 .date-picker-trigger {
   display: flex;
   align-items: center;
@@ -2721,10 +2719,7 @@ body.theme-transitioning #bgImageLayer {
   transition: all 0.2s ease;
   text-align: left;
 }
-.date-picker-trigger i {
-  color: var(--accent);
-  font-size: 1rem;
-}
+.date-picker-trigger i { color: var(--accent); font-size: 1rem; }
 .date-picker-trigger:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, var(--border-color));
   background: var(--bg-active);
@@ -2735,43 +2730,48 @@ body.theme-transitioning #bgImageLayer {
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-/* Попап */
 .date-picker-popover {
   position: fixed;
   z-index: 10000;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 16px;
-  min-width: 300px;
+  border-radius: 16px;
+  padding: 12px;
+  width: 280px;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--accent-glow);
   animation: cpFadeIn 0.18s cubic-bezier(0.22, 1, 0.36, 1);
   color: var(--text-color);
+}
+.date-picker-popover::-webkit-scrollbar { width: 5px; }
+.date-picker-popover::-webkit-scrollbar-thumb {
+  background: var(--accent); border-radius: 10px;
 }
 
 .dp-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 .dp-month-label {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-color);
 }
 .dp-nav {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 26px; height: 26px;
+  border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.75rem;
+  transition: 0.15s;
 }
 .dp-nav:hover {
   background: var(--bg-active);
@@ -2782,97 +2782,77 @@ body.theme-transitioning #bgImageLayer {
 .dp-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 6px;
+  gap: 2px;
+  margin-bottom: 4px;
 }
 .dp-weekdays span {
   text-align: center;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 4px 0;
+  letter-spacing: 0.02em;
+  padding: 2px 0;
 }
 
 .dp-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 14px;
+  gap: 2px;
+  margin-bottom: 10px;
 }
 
 .dp-day {
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
+  height: 28px;
+  border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-color);
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   cursor: pointer;
-  transition: 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  transition: 0.12s;
 }
 .dp-day:hover {
   background: var(--bg-active);
   border-color: var(--accent);
   color: var(--accent);
-  transform: scale(1.05);
 }
-.dp-day-other {
-  color: var(--text-muted);
-  opacity: 0.5;
-}
-.dp-day-today {
-  border-color: var(--accent);
-  color: var(--accent);
-  font-weight: 700;
-}
+.dp-day-other { color: var(--text-muted); opacity: 0.45; }
+.dp-day-today { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 .dp-day-selected {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--badge-color, #1e293b);
   font-weight: 700;
-  box-shadow: 0 0 0 2px var(--accent-glow);
-}
-.dp-day-selected:hover {
-  background: var(--accent);
-  color: var(--badge-color, #1e293b);
-  transform: scale(1.08);
 }
 
-/* Часы / минуты */
 .dp-time {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 0;
-  border-top: 1px solid var(--border-color);
-  margin-bottom: 10px;
-}
-.dp-time-row {
-  display: flex;
-  align-items: center;
   gap: 4px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-color);
+  margin-bottom: 8px;
 }
+.dp-time-row { display: flex; align-items: center; gap: 2px; }
 .dp-time-nav {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 24px; height: 24px;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
   background: var(--bg-hover);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: 0.15s;
+  font-size: 0.65rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  transition: 0.15s;
 }
 .dp-time-nav:hover {
   background: var(--bg-active);
@@ -2880,36 +2860,34 @@ body.theme-transitioning #bgImageLayer {
   color: var(--accent);
 }
 .dp-time-value {
-  min-width: 44px;
+  min-width: 34px;
   text-align: center;
   font-family: 'Courier New', ui-monospace, monospace;
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--accent);
-  letter-spacing: 0.05em;
 }
 .dp-time-sep {
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-muted);
-  margin: 0 -2px;
 }
 
-/* Кнопки снизу */
 .dp-actions {
   display: flex;
-  gap: 8px;
-  justify-content: flex-end;
+  gap: 6px;
+  justify-content: space-between;
 }
 .dp-btn {
-  padding: 7px 16px;
-  border-radius: 40px;
+  padding: 6px 10px;
+  border-radius: 30px;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: 0.15s;
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 .dp-btn-ghost {
   background: transparent;
@@ -2928,5 +2906,4 @@ body.theme-transitioning #bgImageLayer {
 .dp-btn-primary:hover {
   background: var(--btn-primary-hover);
   color: #fff;
-  transform: scale(1.03);
 }
