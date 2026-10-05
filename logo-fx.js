@@ -89,26 +89,24 @@
     setTimeout(() => el.classList.remove(cls), ms || 900);
   }
 
-  function playAnim(h1, animClass) {
+   function playAnim(h1, animClass) {
     if (busy) return;
     busy = true;
 
-    // Визуальный отклик на клик — мгновенный
     flashClass(h1, 'logo-fx-clicked', 250);
 
     if (LETTER_ANIMS.includes(animClass)) {
       const letters = ensureLetters(h1);
-      // Сброс предыдущих анимаций
-      letters.forEach(sp => {
-        LETTER_ANIMS.forEach(c => sp.classList.remove(c));
-        sp.style.removeProperty('--i');
-      });
-      // Расставляем --i каждому спану для каскада
+      // Сброс предыдущих
+      LETTER_ANIMS.forEach(c => h1.classList.remove(c));
+      letters.forEach(sp => sp.style.removeProperty('--i'));
+      // Каскадный индекс
       letters.forEach((sp, i) => sp.style.setProperty('--i', i));
-      void h1.offsetWidth;
-      letters.forEach(sp => sp.classList.add(animClass));
 
-      // Частицы для самых эффектных
+      void h1.offsetWidth;
+      // ВАЖНО: класс вешается на h1, а не на буквы
+      h1.classList.add(animClass);
+
       if (animClass === 'logo-fx-letters-explode' || animClass === 'logo-fx-letters-vortex') {
         spawnParticles(h1, 14);
       }
@@ -117,13 +115,25 @@
       }
 
       setTimeout(() => {
-        letters.forEach(sp => {
-          sp.classList.remove(animClass);
-          sp.style.removeProperty('--i');
-        });
+        h1.classList.remove(animClass);
+        letters.forEach(sp => sp.style.removeProperty('--i'));
         busy = false;
       }, 1100);
     } else {
+      BLOCK_ANIMS.forEach(c => h1.classList.remove(c));
+      void h1.offsetWidth;
+      h1.classList.add(animClass);
+
+      if (animClass === 'logo-fx-shockwave') spawnParticles(h1, 18);
+      if (animClass === 'logo-fx-fire') spawnParticles(h1, 12, ['🔥','✨','⚡','🌟']);
+      if (animClass === 'logo-fx-neon') spawnParticles(h1, 6);
+
+      setTimeout(() => {
+        h1.classList.remove(animClass);
+        busy = false;
+      }, 1100);
+    }
+  }
       // Анимация на весь блок
       BLOCK_ANIMS.forEach(c => h1.classList.remove(c));
       void h1.offsetWidth;
