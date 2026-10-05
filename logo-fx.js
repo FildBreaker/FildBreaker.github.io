@@ -21,7 +21,6 @@
     'logo-fx-fire'
   ];
 
-  let busy = false;
   let lastAnim = '';
 
   function pick(list) {
@@ -34,24 +33,19 @@
     return a;
   }
 
-    function ensureLetters(h1) {
-    // 1. Собираем ВЕСЬ текст (откуда угодно: chars, wrapper или прямые текстовые узлы)
+  function ensureLetters(h1) {
     let fullText = '';
     const existingChars = h1.querySelectorAll('.logo-fx-char');
     if (existingChars.length) {
       fullText = [...existingChars].map(c => c.textContent).join('');
     } else {
-      // Берём текст из всех текстовых узлов внутри h1 (кроме иконки)
       [...h1.childNodes].forEach(node => {
         if (node.nodeType === 3) fullText += node.textContent;
       });
       fullText = fullText.trim();
     }
-
-    // 2. Если текста нет — ставим дефолт
     if (!fullText) fullText = 'Б-31ЛЕС';
 
-    // 3. Полностью пересобираем h1: оставляем только <i>, добавляем wrapper с буквами
     const icon = h1.querySelector('i');
     h1.innerHTML = '';
     if (icon) h1.appendChild(icon);
@@ -68,17 +62,6 @@
         wrapper.appendChild(sp);
       }
     });
-    h1.appendChild(wrapper);
-
-    return wrapper.querySelectorAll('.logo-fx-char');
-  }
-
-    // Удаляем все старые узлы, кроме иконки <i>
-    [...h1.childNodes].forEach(node => {
-      if (node.nodeType === 3) h1.removeChild(node);
-      else if (node.nodeType === 1 && node.tagName !== 'I') h1.removeChild(node);
-    });
-
     h1.appendChild(wrapper);
     return wrapper.querySelectorAll('.logo-fx-char');
   }
@@ -105,60 +88,38 @@
     }
   }
 
-  function flashClass(el, cls, ms) {
-    el.classList.add(cls);
-    setTimeout(() => el.classList.remove(cls), ms || 900);
-  }
-
   function playAnim(h1, animClass) {
-    if (busy) return;
-    busy = true;
+    console.log('[logo-fx] playing:', animClass);
+    h1.classList.add('logo-fx-clicked');
+    setTimeout(() => h1.classList.remove('logo-fx-clicked'), 250);
 
-    try {
-      flashClass(h1, 'logo-fx-clicked', 250);
+    if (LETTER_ANIMS.includes(animClass)) {
+      const letters = ensureLetters(h1);
+      LETTER_ANIMS.forEach(c => h1.classList.remove(c));
+      letters.forEach((sp, i) => sp.style.setProperty('--i', i));
+      void h1.offsetWidth;
+      h1.classList.add(animClass);
 
-      if (LETTER_ANIMS.includes(animClass)) {
-        const letters = ensureLetters(h1);
-        LETTER_ANIMS.forEach(c => h1.classList.remove(c));
-        letters.forEach(sp => sp.style.removeProperty('--i'));
-        letters.forEach((sp, i) => sp.style.setProperty('--i', i));
-        void h1.offsetWidth;
-        h1.classList.add(animClass);
-
-        if (animClass === 'logo-fx-letters-explode' || animClass === 'logo-fx-letters-vortex') {
-          spawnParticles(h1, 14);
-        }
-        if (animClass === 'logo-fx-letters-glitch') {
-          spawnParticles(h1, 8, ['⚡','✖','▓','▒','░','█']);
-        }
-
-        setTimeout(() => {
-          h1.classList.remove(animClass);
-          letters.forEach(sp => sp.style.removeProperty('--i'));
-          busy = false;
-        }, 1100);
-      } else {
-        BLOCK_ANIMS.forEach(c => h1.classList.remove(c));
-        void h1.offsetWidth;
-        h1.classList.add(animClass);
-
-        if (animClass === 'logo-fx-shockwave') spawnParticles(h1, 18);
-        if (animClass === 'logo-fx-fire') spawnParticles(h1, 12, ['🔥','✨','⚡','🌟']);
-        if (animClass === 'logo-fx-neon') spawnParticles(h1, 6);
-
-        setTimeout(() => {
-          h1.classList.remove(animClass);
-          busy = false;
-        }, 1100);
+      if (animClass === 'logo-fx-letters-explode' || animClass === 'logo-fx-letters-vortex') {
+        spawnParticles(h1, 14);
       }
-    } catch (err) {
-      console.error('[logo-fx] error:', err);
-      busy = false; // в любом случае разблокируем
+      if (animClass === 'logo-fx-letters-glitch') {
+        spawnParticles(h1, 8, ['⚡','✖','▓','▒','░','█']);
+      }
+      setTimeout(() => h1.classList.remove(animClass), 1200);
+    } else {
+      BLOCK_ANIMS.forEach(c => h1.classList.remove(c));
+      void h1.offsetWidth;
+      h1.classList.add(animClass);
+
+      if (animClass === 'logo-fx-shockwave') spawnParticles(h1, 18);
+      if (animClass === 'logo-fx-fire') spawnParticles(h1, 12, ['🔥','✨','⚡','🌟']);
+      if (animClass === 'logo-fx-neon') spawnParticles(h1, 6);
+
+      setTimeout(() => h1.classList.remove(animClass), 1200);
     }
   }
 
-  // Ловим клик на ВСЁМ блоке .logo — так надёжнее,
-  // даже если клик пришёлся на иконку или на span-букву.
   document.addEventListener('click', (e) => {
     const logo = e.target.closest('.logo');
     if (!logo) return;
@@ -169,7 +130,6 @@
     playAnim(h1, anim);
   });
 
-  // Меняем курсор на pointer на всём блоке .logo
   document.addEventListener('mouseover', (e) => {
     const logo = e.target.closest('.logo');
     if (!logo || logo.dataset.logoFx === '1') return;
@@ -180,6 +140,5 @@
     if (h1) h1.classList.add('logo-fx-target');
   });
 
-  // Диагностика — открой F12, кликни на лого, увидишь лог
-  console.log('[logo-fx] initialized, click on logo to test');
+  console.log('[logo-fx] initialized');
 })();
