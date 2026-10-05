@@ -1,9 +1,7 @@
 // page-animations.js
-// Автоматический стиггеринг + скелетоны для всего сайта
 (function () {
   'use strict';
 
-  // ===== 1. Устанавливаем --i у детей гридов для каскадной анимации =====
   function setStagger(root) {
     root = root || document;
     const selectors = [
@@ -18,12 +16,14 @@
     });
   }
 
-  // ===== 2. Запуск при готовности DOM =====
   function boot() {
     setStagger();
     document.body.classList.add('page-loaded');
-    // Следим за изменениями (React-подобное поведение для ванильного JS)
-    const mo = new MutationObserver(() => setStagger());
+    let debounceTimer = null;
+    const mo = new MutationObserver(() => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => setStagger(), 120);
+    });
     mo.observe(document.body, { childList: true, subtree: true });
   }
 
@@ -33,7 +33,6 @@
     boot();
   }
 
-  // ===== 3. Публичные функции скелетонов =====
   window.showSkeleton = function (container, count, kind) {
     if (typeof container === 'string') container = document.querySelector(container);
     if (!container) return;
@@ -76,4 +75,7 @@
     if (!container) return;
     delete container.dataset.skeleton;
   };
+
+  // Экспортируем setStagger, чтобы app.js мог вызвать после рендера роута
+  window.setStagger = setStagger;
 })();
