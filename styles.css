@@ -4253,7 +4253,7 @@ a i,
 
 /* ============================================================
    ВОЛНЫ НА ФОНЕ
-   Два слоя полупрозрачных волн, плывущих через весь экран
+   Два слоя, мягко затухающие сверху и снизу
    ============================================================ */
 
 #bgWaves {
@@ -4262,7 +4262,24 @@ a i,
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  opacity: 0.22;
+  opacity: 0.18;
+
+  /* Мягкое затухание по всей высоте экрана —
+     убирает жёсткие обрезания сверху и снизу */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
 }
 
 #bgWaves::before,
@@ -4271,37 +4288,40 @@ a i,
   position: absolute;
   left: -100%;
   width: 300%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in srgb, var(--accent) 60%, transparent) 20%,
-    var(--accent) 50%,
-    color-mix(in srgb, var(--accent) 60%, transparent) 80%,
-    transparent 100%
+  height: 70%;
+
+  /* Мягкий градиент самого гребня — от прозрачного к плотному */
+  background: radial-gradient(
+    ellipse 60% 100% at 50% 50%,
+    color-mix(in srgb, var(--accent) 55%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 30%, transparent) 40%,
+    transparent 75%
   );
+
+  /* Форма волны через SVG-маску */
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0,100 Q300,40 600,100 T1200,100 V200 H0 Z' fill='white'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0,100 Q300,40 600,100 T1200,100 V200 H0 Z' fill='white'/%3E%3C/svg%3E");
   -webkit-mask-size: 33.333% 100%;
   mask-size: 33.333% 100%;
   -webkit-mask-repeat: repeat-x;
   mask-repeat: repeat-x;
+
   will-change: transform;
 }
 
-/* Задняя волна — шире, медленнее, глубже */
+/* Задняя волна — выше, шире, медленнее */
 #bgWaves::before {
-  top: 22%;
-  height: 55%;
-  animation: waveShift 55s linear infinite;
-  opacity: 0.75;
+  top: 5%;
+  animation: waveShift 65s linear infinite;
+  opacity: 0.7;
 }
 
-/* Передняя волна — тоньше, быстрее, плывёт в другую сторону */
+/* Передняя волна — ниже, уже, быстрее, в другую сторону */
 #bgWaves::after {
-  top: 48%;
-  height: 42%;
-  animation: waveShift 38s linear infinite reverse;
-  opacity: 0.55;
+  top: 35%;
+  height: 55%;
+  animation: waveShift 45s linear infinite reverse;
+  opacity: 0.5;
 }
 
 @keyframes waveShift {
@@ -4309,16 +4329,16 @@ a i,
   to   { transform: translate3d(33.333%, 0, 0); }
 }
 
-/* Светлые темы — волны мягче, иначе на белом фоне будет грязь */
+/* Светлые темы — тише, чтобы не выглядело грязно на белом */
 .theme-light-gold #bgWaves,
 .theme-light-blue #bgWaves,
 .theme-light-green #bgWaves,
 .theme-light-purple #bgWaves,
 .theme-light-red #bgWaves {
-  opacity: 0.13;
+  opacity: 0.1;
 }
 
-/* Уважаем reduced-motion */
+/* Reduce motion */
 @media (prefers-reduced-motion: reduce) {
   #bgWaves::before,
   #bgWaves::after {
