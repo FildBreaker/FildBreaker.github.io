@@ -6,7 +6,7 @@ import { openDatePicker, formatDate } from './date-picker.js';
 // ============================================================
 // TELEGRAM NOTIFICATIONS
 // ============================================================
-const TG_WORKER_URL = 'https://orange-forest-4bcfb31les-notify.fildbreaker.workers.dev';
+const TG_WORKER_URL = 'https://jolly-violet-3d1eb31les.fildbreaker.workers.dev';
 
 async function tgNotify(message) {
   try {
