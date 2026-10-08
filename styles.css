@@ -3136,3 +3136,109 @@ body.theme-transitioning #bgImageLayer {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
+
+/* ============================================================
+   КАСТОМНЫЙ СКРОЛЛБАР ДЛЯ ВСЕЙ СТРАНИЦЫ
+   ============================================================ */
+
+/* === WEBKIT (Chrome, Edge, Safari, Opera) === */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 10px;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 80%, transparent),
+    var(--accent));
+  border-radius: 10px;
+  border: 3px solid var(--bg-hover);
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 70%, #000));
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:active,
+body::-webkit-scrollbar-thumb:active {
+  background: var(--btn-primary-hover);
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner {
+  background: var(--bg-hover);
+}
+
+/* === FIREFOX === */
+html, body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-hover);
+}
+
+/* ============================================================
+   ТАКЖЕ ДЛЯ ВСЕХ СКРОЛЛЯЩИХСЯ КОНТЕЙНЕРОВ
+   ============================================================ */
+
+/* Таблицы, textarea, любые overflow-блоки — чтобы не выбивались */
+.table-wrapper::-webkit-scrollbar,
+textarea::-webkit-scrollbar,
+.rich-content::-webkit-scrollbar,
+.icon-picker::-webkit-scrollbar,
+.date-picker-popover::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track,
+.rich-content::-webkit-scrollbar-track,
+.icon-picker::-webkit-scrollbar-track,
+.date-picker-popover::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb,
+.rich-content::-webkit-scrollbar-thumb,
+.icon-picker::-webkit-scrollbar-thumb,
+.date-picker-popover::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+  border: 2px solid var(--bg-hover);
+  background-clip: padding-box;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover,
+textarea::-webkit-scrollbar-thumb:hover,
+.rich-content::-webkit-scrollbar-thumb:hover,
+.icon-picker::-webkit-scrollbar-thumb:hover,
+.date-picker-popover::-webkit-scrollbar-thumb:hover {
+  background: var(--btn-primary-hover);
+  background-clip: padding-box;
+}
+
+/* Для Firefox во всех скроллящихся блоках */
+.table-wrapper,
+textarea,
+.rich-content,
+.icon-picker,
+.date-picker-popover {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-hover);
+}
