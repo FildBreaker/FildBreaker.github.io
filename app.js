@@ -2,6 +2,7 @@
 import { dataManager } from './dataManager.js';
 import { createRichEditor, sanitizeHtml, escapeHtml as esc } from './rich-editor.js';
 import { openDatePicker, formatDate } from './date-picker.js';
+import { toast, toastSuccess, toastError, toastWarning, toastInfo, confirmDialog } from './toast.js';
 
 // ============================================================
 // TELEGRAM NOTIFICATIONS
@@ -39,14 +40,6 @@ function toArray(val) {
     return Object.keys(val).sort((a, b) => Number(a) - Number(b)).map(k => val[k]);
   }
   return [];
-}
-
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.innerText = msg;
-  t.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#4a4e69; color:#fff3b0; padding:8px 24px; border-radius:40px; z-index:99999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.4s;';
-  document.body.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 1800);
 }
 
 function closeModal(id) {
@@ -240,12 +233,13 @@ async function renderHome() {
   };
 
   document.getElementById('homeDateSaveBtn').onclick = () => {
-    if (!selectedDate) { alert('Выберите дату'); return; }
+    if (!selectedDate) { toastWarning('Выберите дату'); return; }
     const iso = selectedDate.toISOString();
     if (activeTimer === 'exam') { examTarget = iso; localStorage.setItem('examTarget', iso); }
     else { gradTarget = iso; localStorage.setItem('gradTarget', iso); }
     updateAll();
     closeModal('homeDateModal');
+    toastSuccess('Дата сохранена');
   };
 }
 
@@ -305,10 +299,17 @@ async function renderSchedule() {
 
   setupScheduleModal();
   document.getElementById('resetScheduleBtn').onclick = async () => {
-    if (!confirm('Сбросить расписание к исходному?')) return;
+    const ok = await confirmDialog({
+      title: 'Сбросить расписание?',
+      message: 'Все текущие правки будут потеряны. Восстановится базовое расписание.',
+      confirmText: 'Сбросить',
+      danger: true
+    });
+    if (!ok) return;
     state.data.schedule = JSON.parse(JSON.stringify(defaultSchedule));
     await dataManager.save('schedule', state.data.schedule);
     renderScheduleTable();
+    toastSuccess('Расписание сброшено');
     tgNotify('🔄 <b>Расписание сброшено к стандартному</b>');
   };
 }
@@ -414,8 +415,8 @@ async function saveScheduleEdit() {
   const newStartDate = document.getElementById('scheduleEditStartDate').value.trim();
   const newEndDate = document.getElementById('scheduleEditEndDate').value.trim();
   const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
-  if (newStartDate && !datePattern.test(newStartDate)) { alert('Дата начала в формате ДД.ММ.ГГГГ'); return; }
-  if (newEndDate && !datePattern.test(newEndDate)) { alert('Дата окончания в формате ДД.ММ.ГГГГ'); return; }
+  if (newStartDate && !datePattern.test(newStartDate)) { toastWarning('Дата начала в формате ДД.ММ.ГГГГ'); return; }
+  if (newEndDate && !datePattern.test(newEndDate)) { toastWarning('Дата окончания в формате ДД.ММ.ГГГГ'); return; }
   const newNotes = scheduleEdit.notesEditor ? sanitizeHtml(scheduleEdit.notesEditor.getContent()) : '';
   if (!state.data.schedule[day]) state.data.schedule[day] = {};
   state.data.schedule[day][pair] = {
@@ -425,6 +426,7 @@ async function saveScheduleEdit() {
   await dataManager.save('schedule', state.data.schedule);
   renderScheduleTable();
   closeModal('scheduleEditModal');
+  toastSuccess('Пара сохранена');
 
   const typeText = scheduleEdit.type === 'lecture' ? '🎓 Лекция' : scheduleEdit.type === 'practice' ? '🛠 Практика' : '';
   tgNotify(
@@ -491,7 +493,7 @@ async function renderExam() {
         state.data.exams = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('exams', state.data.exams);
         renderExams();
-        showToast('Порядок сохранён');
+        toastSuccess('Порядок сохранён');
       }
     });
   }
@@ -564,7 +566,7 @@ function setupExamModal() {
     const format = document.getElementById('examFormat').value.trim();
     const resourcesStr = document.getElementById('examResources').value.trim();
     const method = document.getElementById('examMethod').value.trim();
-    if (!subject || !date || !room || !teacher || !format) { alert('Заполните все обязательные поля'); return; }
+    if (!subject || !date || !room || !teacher || !format) { toastWarning('Заполните все обязательные поля'); return; }
     const resources = resourcesStr ? resourcesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
     const notes = examEdit.notesEditor ? sanitizeHtml(examEdit.notesEditor.getContent()) : '';
     const examData = { subject, date, room, teacher, format, resources, method, notes };
@@ -578,6 +580,7 @@ function setupExamModal() {
     await dataManager.save('exams', state.data.exams);
     renderExams();
     closeModal('examModal');
+    toastSuccess(isEdit ? 'Экзамен обновлён' : 'Экзамен добавлен');
 
     tgNotify(
       `📚 <b>Экзамен ${isEdit ? 'изменён' : 'добавлен'}</b>\n` +
@@ -609,11 +612,18 @@ function openExamModal(id = null) {
 }
 
 async function deleteExam(id) {
-  if (!confirm('Удалить экзамен?')) return;
   const exam = state.data.exams.find(x => x.id === id);
+  const ok = await confirmDialog({
+    title: 'Удалить экзамен?',
+    message: exam ? `«${exam.subject}» будет удалён без возможности отмены.` : 'Экзамен будет удалён.',
+    confirmText: 'Удалить',
+    danger: true
+  });
+  if (!ok) return;
   state.data.exams = state.data.exams.filter(x => x.id !== id);
   await dataManager.save('exams', state.data.exams);
   renderExams();
+  toastSuccess('Экзамен удалён');
   if (exam) tgNotify(`🗑 <b>Экзамен удалён</b>\n📖 ${exam.subject || 'Без названия'}`);
 }
 
@@ -683,7 +693,7 @@ async function renderResources() {
         state.data.resources = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('resources', state.data.resources);
         renderResourceCards();
-        showToast('Порядок сохранён');
+        toastSuccess('Порядок сохранён');
       }
     });
   }
@@ -749,8 +759,8 @@ function setupResourceModal() {
     const link = document.getElementById('resourceLink').value.trim() || '#';
     const desc = resourceEdit.descEditor ? sanitizeHtml(resourceEdit.descEditor.getContent()) : '';
     const descText = resourceEdit.descEditor ? resourceEdit.descEditor.getText().trim() : '';
-    if (!title) { alert('Введите название'); return; }
-    if (!descText) { alert('Введите описание'); return; }
+    if (!title) { toastWarning('Введите название'); return; }
+    if (!descText) { toastWarning('Введите описание'); return; }
     const resData = { title, desc, category, icon, meta, link };
     const isEdit = !!resourceEdit.id;
     if (isEdit) {
@@ -762,6 +772,7 @@ function setupResourceModal() {
     await dataManager.save('resources', state.data.resources);
     renderResourceCards();
     closeModal('resourceModal');
+    toastSuccess(isEdit ? 'Ресурс обновлён' : 'Ресурс добавлен');
 
     tgNotify(`📂 <b>Ресурс ${isEdit ? 'изменён' : 'добавлен'}</b>\n📄 ${title}\n🏷 ${category}\n💬 ${descText.slice(0, 80)}${descText.length > 80 ? '…' : ''}`);
   };
@@ -820,11 +831,18 @@ function openResourceModal(id = null) {
 }
 
 async function deleteResource(id) {
-  if (!confirm('Удалить ресурс?')) return;
   const res = state.data.resources.find(r => r.id === id);
+  const ok = await confirmDialog({
+    title: 'Удалить ресурс?',
+    message: res ? `«${res.title}» будет удалён.` : 'Ресурс будет удалён.',
+    confirmText: 'Удалить',
+    danger: true
+  });
+  if (!ok) return;
   state.data.resources = state.data.resources.filter(r => r.id !== id);
   await dataManager.save('resources', state.data.resources);
   renderResourceCards();
+  toastSuccess('Ресурс удалён');
   if (res) tgNotify(`🗑 <b>Ресурс удалён</b>\n📄 ${res.title || 'Без названия'}`);
 }
 
@@ -897,7 +915,7 @@ async function renderHomework() {
         state.data.homework.subjects = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('homework', state.data.homework);
         renderSubjects();
-        showToast('Порядок сохранён');
+        toastSuccess('Порядок сохранён');
       }
     });
   }
@@ -927,7 +945,13 @@ function renderSubjects() {
     div.querySelector('.edit-subject').onclick = (e) => { e.stopPropagation(); openSubjectModal(subj.id); };
     div.querySelector('.delete-subject').onclick = async (e) => {
       e.stopPropagation();
-      if (!confirm(`Удалить предмет "${subj.name}"?`)) return;
+      const ok = await confirmDialog({
+        title: 'Удалить предмет?',
+        message: `«${subj.name}» и все его задания будут удалены без возможности отмены.`,
+        confirmText: 'Удалить',
+        danger: true
+      });
+      if (!ok) return;
       await deleteSubject(subj.id);
     };
     container.appendChild(div);
@@ -956,7 +980,7 @@ function selectSubject(subjectId) {
           subj.tasks = newIds.map(id => map.get(id)).filter(Boolean);
           await dataManager.save('homework', state.data.homework);
           renderTasks(subj.tasks);
-          showToast('Порядок сохранён');
+          toastSuccess('Порядок сохранён');
         }
       });
     }
@@ -1033,7 +1057,7 @@ function openSubjectModal(subjectId = null) {
 
 async function saveSubjectFromModal() {
   const name = document.getElementById('subjectNameInput').value.trim();
-  if (!name) return alert('Введите название');
+  if (!name) { toastWarning('Введите название'); return; }
   const isEdit = !!homeworkState.editSubjectId;
   if (isEdit) {
     const subj = state.data.homework.subjects.find(s => s.id === homeworkState.editSubjectId);
@@ -1048,6 +1072,7 @@ async function saveSubjectFromModal() {
   renderSubjects();
   if (homeworkState.currentSubjectId) selectSubject(homeworkState.currentSubjectId);
   closeModal('subjectModal');
+  toastSuccess(isEdit ? 'Предмет переименован' : 'Предмет добавлен');
   tgNotify(`📚 <b>Предмет ${isEdit ? 'переименован' : 'добавлен'}</b>\n📖 ${name}`);
 }
 
@@ -1063,6 +1088,7 @@ async function deleteSubject(subjectId) {
     clearTasksView();
   }
   renderSubjects();
+  toastSuccess('Предмет удалён');
   tgNotify(`🗑 <b>Предмет удалён</b>\n📖 ${subjName}`);
 }
 
@@ -1090,7 +1116,7 @@ function collectLinks() {
 }
 
 function openTaskModal(taskId = null) {
-  if (!homeworkState.currentSubjectId) { alert('Выберите предмет'); return; }
+  if (!homeworkState.currentSubjectId) { toastWarning('Выберите предмет'); return; }
   const subject = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
   if (!subject) return;
   if (!Array.isArray(subject.tasks)) subject.tasks = [];
@@ -1116,14 +1142,14 @@ function openTaskModal(taskId = null) {
 
 async function saveTaskFromModal() {
   try {
-    if (!homeworkState.currentSubjectId) { alert('Не выбран предмет'); return; }
+    if (!homeworkState.currentSubjectId) { toastWarning('Не выбран предмет'); return; }
     const descHtml = homeworkState.taskEditor ? homeworkState.taskEditor.getContent() : '';
     const descText = homeworkState.taskEditor ? homeworkState.taskEditor.getText().trim() : '';
-    if (!descText) { alert('Введите описание'); return; }
+    if (!descText) { toastWarning('Введите описание'); return; }
     const links = collectLinks();
     const tags = document.getElementById('taskTags').value.trim();
     const subject = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
-    if (!subject) { alert('Предмет не найден'); return; }
+    if (!subject) { toastError('Предмет не найден'); return; }
     if (!Array.isArray(subject.tasks)) subject.tasks = [];
     const isEdit = !!homeworkState.editTaskId;
     if (isEdit) {
@@ -1138,6 +1164,7 @@ async function saveTaskFromModal() {
     await dataManager.save('homework', state.data.homework);
     renderTasks(subject.tasks);
     closeModal('taskModal');
+    toastSuccess(isEdit ? 'Задание обновлено' : 'Задание добавлено');
 
     tgNotify(
       `📝 <b>Задание ${isEdit ? 'изменено' : 'добавлено'}</b>\n` +
@@ -1146,7 +1173,7 @@ async function saveTaskFromModal() {
     );
   } catch (err) {
     console.error(err);
-    alert('Ошибка сохранения: ' + err.message);
+    toastError('Ошибка сохранения: ' + err.message);
   }
 }
 
@@ -1154,11 +1181,20 @@ async function deleteTask(taskId) {
   if (!homeworkState.currentSubjectId) return;
   const subject = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
   if (!subject || !Array.isArray(subject.tasks)) return;
+  const task = subject.tasks.find(t => t.id === taskId);
+  const ok = await confirmDialog({
+    title: 'Удалить задание?',
+    message: task ? `«${(task.desc || '').slice(0, 80)}${(task.desc || '').length > 80 ? '…' : ''}» будет удалено.` : 'Задание будет удалено.',
+    confirmText: 'Удалить',
+    danger: true
+  });
+  if (!ok) return;
   const idx = subject.tasks.findIndex(t => t.id === taskId);
   if (idx === -1) return;
   subject.tasks.splice(idx, 1);
   await dataManager.save('homework', state.data.homework);
   renderTasks(subject.tasks);
+  toastSuccess('Задание удалено');
   tgNotify(`🗑 <b>Задание удалено</b>\n📚 ${subject.name}`);
 }
 
@@ -1372,18 +1408,35 @@ function renderEcTests(container, tests) {
 async function deleteEcItem(section, id) {
   const d = state.data.extracurricular;
   let title = '';
+  let typeRu = '';
   if (section === 'events') {
-    title = d.events.find(e => e.id === id)?.title || '';
-    d.events = d.events.filter(e => e.id !== id);
+    const item = d.events.find(e => e.id === id);
+    title = item?.title || '';
+    typeRu = 'Мероприятие';
   } else if (section === 'polls') {
-    title = d.polls.find(p => p.id === id)?.question || '';
-    d.polls = d.polls.filter(p => p.id !== id);
+    const item = d.polls.find(p => p.id === id);
+    title = item?.question || '';
+    typeRu = 'Опрос';
   } else {
-    title = d.tests.find(t => t.id === id)?.title || '';
-    d.tests = d.tests.filter(t => t.id !== id);
+    const item = d.tests.find(t => t.id === id);
+    title = item?.title || '';
+    typeRu = 'Тест';
   }
+
+  const ok = await confirmDialog({
+    title: `Удалить ${typeRu.toLowerCase()}?`,
+    message: title ? `«${title}» будет удалён.` : `${typeRu} будет удалён.`,
+    confirmText: 'Удалить',
+    danger: true
+  });
+  if (!ok) return;
+
+  if (section === 'events') d.events = d.events.filter(e => e.id !== id);
+  else if (section === 'polls') d.polls = d.polls.filter(p => p.id !== id);
+  else d.tests = d.tests.filter(t => t.id !== id);
   await dataManager.save('extracurricular', d);
   renderEcCurrent();
+  toastSuccess(`${typeRu} удалён`);
   tgNotify(`🗑 <b>Удалено из внеурочки</b>\n📄 ${title}`);
 }
 
@@ -1478,8 +1531,8 @@ async function saveEcModalItem() {
     const link = document.getElementById('ecEvLink')?.value.trim();
     const descHtml = ecState.eventDescEditor ? sanitizeHtml(ecState.eventDescEditor.getContent()) : '';
     const descText = ecState.eventDescEditor ? ecState.eventDescEditor.getText().trim() : '';
-    if (!title || !date) { alert('Заполните название и дату'); return; }
-    if (!descText) { alert('Введите описание'); return; }
+    if (!title || !date) { toastWarning('Заполните название и дату'); return; }
+    if (!descText) { toastWarning('Введите описание'); return; }
     if (id) {
       const ev = d.events.find(x => x.id === id);
       if (ev) { ev.title = title; ev.date = date; ev.description = descHtml; ev.link = link || '#'; }
@@ -1490,9 +1543,9 @@ async function saveEcModalItem() {
   } else if (section === 'polls') {
     const question = document.getElementById('ecPollQuestion')?.value.trim();
     const optsText = document.getElementById('ecPollOptions')?.value;
-    if (!question || !optsText) { alert('Введите вопрос и варианты'); return; }
+    if (!question || !optsText) { toastWarning('Введите вопрос и варианты'); return; }
     const optionsArray = optsText.split('\n').filter(s => s.trim()).map(t => ({ text: t.trim(), votes: 0 }));
-    if (optionsArray.length < 2) { alert('Нужно минимум 2 варианта'); return; }
+    if (optionsArray.length < 2) { toastWarning('Нужно минимум 2 варианта'); return; }
     if (id) {
       const poll = d.polls.find(p => p.id === id);
       if (poll) { poll.question = question; poll.options = optionsArray; poll.totalVotes = 0; poll.userVoted = false; }
@@ -1502,7 +1555,7 @@ async function saveEcModalItem() {
     tgText = `📊 <b>Опрос ${isEdit ? 'изменён' : 'создан'}</b>\n❓ ${question}`;
   } else {
     const testTitle = document.getElementById('ecTestTitle')?.value.trim();
-    if (!testTitle) { alert('Введите название'); return; }
+    if (!testTitle) { toastWarning('Введите название'); return; }
     const questions = [];
     document.querySelectorAll('#ecQuestionsEditor .question-editor').forEach(div => {
       const qText = div.querySelector('.q-text')?.value.trim();
@@ -1510,7 +1563,7 @@ async function saveEcModalItem() {
       const correctIdx = parseInt(div.querySelector('.q-correct')?.value);
       if (qText && options.length >= 2) questions.push({ text: qText, options, correctIndex: correctIdx });
     });
-    if (!questions.length) { alert('Добавьте хотя бы один вопрос'); return; }
+    if (!questions.length) { toastWarning('Добавьте хотя бы один вопрос'); return; }
     if (id) {
       const test = d.tests.find(t => t.id === id);
       if (test) { test.title = testTitle; test.questions = questions; }
@@ -1522,6 +1575,7 @@ async function saveEcModalItem() {
   await dataManager.save('extracurricular', d);
   closeModal('ecEditModal');
   renderEcCurrent();
+  toastSuccess(isEdit ? 'Сохранено' : 'Добавлено');
   if (tgText) tgNotify(tgText);
 }
 
@@ -1661,7 +1715,7 @@ function setupTeacherModal() {
     const phone = document.getElementById('teacherPhone').value.trim();
     const email = document.getElementById('teacherEmail').value.trim();
     const photo = document.getElementById('teacherPhoto').value.trim();
-    if (!name || !position || !degree || !degree2 || !phone || !email) { alert('Заполните все поля'); return; }
+    if (!name || !position || !degree || !degree2 || !phone || !email) { toastWarning('Заполните все поля'); return; }
     const data = { name, position, degree, degree2, phone, email, photo };
     const isEdit = !!teacherEdit.id;
     if (isEdit) {
@@ -1673,6 +1727,7 @@ function setupTeacherModal() {
     await dataManager.save('teachers', state.data.teachers);
     renderTeachers();
     closeModal('teacherModal');
+    toastSuccess(isEdit ? 'Преподаватель обновлён' : 'Преподаватель добавлен');
 
     tgNotify(`👤 <b>Преподаватель ${isEdit ? 'изменён' : 'добавлен'}</b>\n🎓 ${name}\n💼 ${position}`);
   };
@@ -1693,11 +1748,18 @@ function openTeacherModal(id = null) {
 }
 
 async function deleteTeacher(id) {
-  if (!confirm('Удалить преподавателя?')) return;
   const t = state.data.teachers.find(x => x.id === id);
+  const ok = await confirmDialog({
+    title: 'Удалить преподавателя?',
+    message: t ? `«${t.name}» будет удалён из списка.` : 'Преподаватель будет удалён.',
+    confirmText: 'Удалить',
+    danger: true
+  });
+  if (!ok) return;
   state.data.teachers = state.data.teachers.filter(t => t.id !== id);
   await dataManager.save('teachers', state.data.teachers);
   renderTeachers();
+  toastSuccess('Преподаватель удалён');
   if (t) tgNotify(`🗑 <b>Преподаватель удалён</b>\n👤 ${t.name}`);
 }
 
