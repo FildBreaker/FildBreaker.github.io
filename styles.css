@@ -3337,3 +3337,56 @@ select {
 .danger-btn {
   letter-spacing: 0.01em;
 }
+/* ============================================================
+   ГАРАНТИЯ ИКОНОК FONT AWESOME
+   (шрифты Manrope/Unbounded не должны перебивать FA)
+   ============================================================ */
+
+/* Иконки внутри кнопок и ссылок — всегда FA */
+button i,
+a i,
+.nav-btn i,
+.nav-links i,
+.filter-btn i,
+.section-btn i,
+.reset-btn i,
+.save-btn i,
+.cancel-btn i,
+.add-task-btn i,
+.add-subject-btn i,
+.add-global-btn i,
+.add-link-btn i,
+.settings-btn i,
+.btn i,
+.icon-option i,
+[class*="fa-"]::before,
+[class*="fas"]::before,
+[class*="far"]::before,
+[class*="fab"]::before {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free" !important;
+  font-weight: 900;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Regular-вариант иконок (контурные) */
+[class*="far"]::before,
+.far {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 400 !important;
+}
+
+/* Иконки в заголовках — не наследуют Unbounded */
+h1 i, h2 i, h3 i, h4 i, h5 i,
+.schedule-header h2 i,
+.exams-hero h2 i,
+.hero-resources h2 i,
+.homework-header h2 i,
+.section-header h2 i,
+.welcome-strip h2 i {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+  font-weight: 900;
+  font-style: normal;
+}
