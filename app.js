@@ -3,6 +3,23 @@ import { dataManager } from './dataManager.js';
 import { createRichEditor, sanitizeHtml, escapeHtml as esc } from './rich-editor.js';
 import { openDatePicker, formatDate } from './date-picker.js';
 
+// ============================================================
+// TELEGRAM NOTIFICATIONS
+// ============================================================
+const TG_WORKER_URL = 'https://orange-forest-4bcfb31les-notify.fildbreaker.workers.dev';
+
+async function tgNotify(message) {
+  try {
+    await fetch(TG_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
+    });
+  } catch (err) {
+    console.warn('TG notify failed:', err);
+  }
+}
+
 const state = {
   currentRoute: null,
   intervals: {},
@@ -72,7 +89,6 @@ async function navigate() {
 
   const mc = document.getElementById('mainContent');
 
-  // Фаза выхода
   if (state.currentRoute && mc) {
     mc.classList.add('route-exit');
     await new Promise(r => setTimeout(r, 180));
@@ -90,7 +106,6 @@ async function navigate() {
     const renderer = RENDERERS[route];
     if (renderer) await renderer();
 
-    // Фаза входа
     if (mc) {
       mc.classList.remove('route-enter');
       void mc.offsetWidth;
@@ -294,6 +309,7 @@ async function renderSchedule() {
     state.data.schedule = JSON.parse(JSON.stringify(defaultSchedule));
     await dataManager.save('schedule', state.data.schedule);
     renderScheduleTable();
+    tgNotify('🔄 <b>Расписание сброшено к стандартному</b>');
   };
 }
 
@@ -349,6 +365,7 @@ function renderScheduleTable() {
 }
 
 const scheduleEdit = { day: null, pair: null, type: '', notesEditor: null };
+const DAY_NAMES = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
 
 function setupScheduleModal() {
   const typeBtns = ['scheduleTypeLecture', 'scheduleTypePractice', 'scheduleTypeNone'];
@@ -408,6 +425,15 @@ async function saveScheduleEdit() {
   await dataManager.save('schedule', state.data.schedule);
   renderScheduleTable();
   closeModal('scheduleEditModal');
+
+  const typeText = scheduleEdit.type === 'lecture' ? '🎓 Лекция' : scheduleEdit.type === 'practice' ? '🛠 Практика' : '';
+  tgNotify(
+    `📅 <b>Расписание обновлено</b>\n` +
+    `📆 ${DAY_NAMES[day]}, ${pair}-я пара\n` +
+    (newSubject ? `📖 ${newSubject}\n` : '') +
+    (newRoom ? `🚪 Ауд.: ${newRoom}\n` : '') +
+    (typeText ? typeText : '')
+  );
 }
 
 // ============================================================
@@ -542,7 +568,8 @@ function setupExamModal() {
     const resources = resourcesStr ? resourcesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
     const notes = examEdit.notesEditor ? sanitizeHtml(examEdit.notesEditor.getContent()) : '';
     const examData = { subject, date, room, teacher, format, resources, method, notes };
-    if (examEdit.id) {
+    const isEdit = !!examEdit.id;
+    if (isEdit) {
       const idx = state.data.exams.findIndex(x => x.id === examEdit.id);
       if (idx !== -1) state.data.exams[idx] = { ...state.data.exams[idx], ...examData };
     } else {
@@ -551,6 +578,14 @@ function setupExamModal() {
     await dataManager.save('exams', state.data.exams);
     renderExams();
     closeModal('examModal');
+
+    tgNotify(
+      `📚 <b>Экзамен ${isEdit ? 'изменён' : 'добавлен'}</b>\n` +
+      `📖 ${subject}\n` +
+      `📅 ${date}\n` +
+      `🚪 Ауд.: ${room}\n` +
+      `👤 ${teacher}`
+    );
   };
 }
 
@@ -575,9 +610,11 @@ function openExamModal(id = null) {
 
 async function deleteExam(id) {
   if (!confirm('Удалить экзамен?')) return;
+  const exam = state.data.exams.find(x => x.id === id);
   state.data.exams = state.data.exams.filter(x => x.id !== id);
   await dataManager.save('exams', state.data.exams);
   renderExams();
+  if (exam) tgNotify(`🗑 <b>Экзамен удалён</b>\n📖 ${exam.subject || 'Без названия'}`);
 }
 
 // ============================================================
@@ -715,7 +752,8 @@ function setupResourceModal() {
     if (!title) { alert('Введите название'); return; }
     if (!descText) { alert('Введите описание'); return; }
     const resData = { title, desc, category, icon, meta, link };
-    if (resourceEdit.id) {
+    const isEdit = !!resourceEdit.id;
+    if (isEdit) {
       const idx = state.data.resources.findIndex(r => r.id === resourceEdit.id);
       if (idx !== -1) state.data.resources[idx] = { ...state.data.resources[idx], ...resData };
     } else {
@@ -724,6 +762,8 @@ function setupResourceModal() {
     await dataManager.save('resources', state.data.resources);
     renderResourceCards();
     closeModal('resourceModal');
+
+    tgNotify(`📂 <b>Ресурс ${isEdit ? 'изменён' : 'добавлен'}</b>\n📄 ${title}\n🏷 ${category}\n💬 ${descText.slice(0, 80)}${descText.length > 80 ? '…' : ''}`);
   };
   document.getElementById('clearIconBtn').onclick = () => {
     document.getElementById('resourceIcon').value = '';
@@ -781,9 +821,11 @@ function openResourceModal(id = null) {
 
 async function deleteResource(id) {
   if (!confirm('Удалить ресурс?')) return;
+  const res = state.data.resources.find(r => r.id === id);
   state.data.resources = state.data.resources.filter(r => r.id !== id);
   await dataManager.save('resources', state.data.resources);
   renderResourceCards();
+  if (res) tgNotify(`🗑 <b>Ресурс удалён</b>\n📄 ${res.title || 'Без названия'}`);
 }
 
 // ============================================================
@@ -992,7 +1034,8 @@ function openSubjectModal(subjectId = null) {
 async function saveSubjectFromModal() {
   const name = document.getElementById('subjectNameInput').value.trim();
   if (!name) return alert('Введите название');
-  if (homeworkState.editSubjectId) {
+  const isEdit = !!homeworkState.editSubjectId;
+  if (isEdit) {
     const subj = state.data.homework.subjects.find(s => s.id === homeworkState.editSubjectId);
     if (subj) subj.name = name;
   } else {
@@ -1005,11 +1048,13 @@ async function saveSubjectFromModal() {
   renderSubjects();
   if (homeworkState.currentSubjectId) selectSubject(homeworkState.currentSubjectId);
   closeModal('subjectModal');
+  tgNotify(`📚 <b>Предмет ${isEdit ? 'переименован' : 'добавлен'}</b>\n📖 ${name}`);
 }
 
 async function deleteSubject(subjectId) {
   const idx = state.data.homework.subjects.findIndex(s => s.id === subjectId);
   if (idx === -1) return;
+  const subjName = state.data.homework.subjects[idx].name;
   state.data.homework.subjects.splice(idx, 1);
   await dataManager.save('homework', state.data.homework);
   if (homeworkState.currentSubjectId === subjectId) {
@@ -1018,6 +1063,7 @@ async function deleteSubject(subjectId) {
     clearTasksView();
   }
   renderSubjects();
+  tgNotify(`🗑 <b>Предмет удалён</b>\n📖 ${subjName}`);
 }
 
 function addLinkGroup(urlVal = '', titleVal = '') {
@@ -1079,7 +1125,8 @@ async function saveTaskFromModal() {
     const subject = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
     if (!subject) { alert('Предмет не найден'); return; }
     if (!Array.isArray(subject.tasks)) subject.tasks = [];
-    if (homeworkState.editTaskId) {
+    const isEdit = !!homeworkState.editTaskId;
+    if (isEdit) {
       const task = subject.tasks.find(t => t.id === homeworkState.editTaskId);
       if (task) { task.desc = sanitizeHtml(descHtml); task.links = links; task.tags = tags; }
     } else {
@@ -1091,6 +1138,12 @@ async function saveTaskFromModal() {
     await dataManager.save('homework', state.data.homework);
     renderTasks(subject.tasks);
     closeModal('taskModal');
+
+    tgNotify(
+      `📝 <b>Задание ${isEdit ? 'изменено' : 'добавлено'}</b>\n` +
+      `📚 ${subject.name}\n` +
+      `💬 ${descText.slice(0, 150)}${descText.length > 150 ? '…' : ''}`
+    );
   } catch (err) {
     console.error(err);
     alert('Ошибка сохранения: ' + err.message);
@@ -1106,6 +1159,7 @@ async function deleteTask(taskId) {
   subject.tasks.splice(idx, 1);
   await dataManager.save('homework', state.data.homework);
   renderTasks(subject.tasks);
+  tgNotify(`🗑 <b>Задание удалено</b>\n📚 ${subject.name}`);
 }
 
 // ============================================================
@@ -1317,11 +1371,20 @@ function renderEcTests(container, tests) {
 
 async function deleteEcItem(section, id) {
   const d = state.data.extracurricular;
-  if (section === 'events') d.events = d.events.filter(e => e.id !== id);
-  else if (section === 'polls') d.polls = d.polls.filter(p => p.id !== id);
-  else d.tests = d.tests.filter(t => t.id !== id);
+  let title = '';
+  if (section === 'events') {
+    title = d.events.find(e => e.id === id)?.title || '';
+    d.events = d.events.filter(e => e.id !== id);
+  } else if (section === 'polls') {
+    title = d.polls.find(p => p.id === id)?.question || '';
+    d.polls = d.polls.filter(p => p.id !== id);
+  } else {
+    title = d.tests.find(t => t.id === id)?.title || '';
+    d.tests = d.tests.filter(t => t.id !== id);
+  }
   await dataManager.save('extracurricular', d);
   renderEcCurrent();
+  tgNotify(`🗑 <b>Удалено из внеурочки</b>\n📄 ${title}`);
 }
 
 function setupEcModals() {
@@ -1406,6 +1469,8 @@ async function saveEcModalItem() {
   const section = ecState.editModalSection;
   const id = ecState.editModalId;
   const d = state.data.extracurricular;
+  const isEdit = !!id;
+  let tgText = '';
 
   if (section === 'events') {
     const title = document.getElementById('ecEvTitle')?.value.trim();
@@ -1421,6 +1486,7 @@ async function saveEcModalItem() {
     } else {
       d.events.push({ id: Date.now().toString(), title, date, description: descHtml, link: link || '#' });
     }
+    tgText = `🎉 <b>Мероприятие ${isEdit ? 'изменено' : 'добавлено'}</b>\n📌 ${title}\n📅 ${date}`;
   } else if (section === 'polls') {
     const question = document.getElementById('ecPollQuestion')?.value.trim();
     const optsText = document.getElementById('ecPollOptions')?.value;
@@ -1433,6 +1499,7 @@ async function saveEcModalItem() {
     } else {
       d.polls.push({ id: Date.now().toString(), question, options: optionsArray, totalVotes: 0, userVoted: false });
     }
+    tgText = `📊 <b>Опрос ${isEdit ? 'изменён' : 'создан'}</b>\n❓ ${question}`;
   } else {
     const testTitle = document.getElementById('ecTestTitle')?.value.trim();
     if (!testTitle) { alert('Введите название'); return; }
@@ -1450,10 +1517,12 @@ async function saveEcModalItem() {
     } else {
       d.tests.push({ id: Date.now().toString(), title: testTitle, questions });
     }
+    tgText = `🧠 <b>Тест ${isEdit ? 'изменён' : 'создан'}</b>\n📝 ${testTitle}\n❓ Вопросов: ${questions.length}`;
   }
   await dataManager.save('extracurricular', d);
   closeModal('ecEditModal');
   renderEcCurrent();
+  if (tgText) tgNotify(tgText);
 }
 
 function openEcTest(testId) {
@@ -1594,7 +1663,8 @@ function setupTeacherModal() {
     const photo = document.getElementById('teacherPhoto').value.trim();
     if (!name || !position || !degree || !degree2 || !phone || !email) { alert('Заполните все поля'); return; }
     const data = { name, position, degree, degree2, phone, email, photo };
-    if (teacherEdit.id) {
+    const isEdit = !!teacherEdit.id;
+    if (isEdit) {
       const idx = state.data.teachers.findIndex(t => t.id === teacherEdit.id);
       if (idx !== -1) state.data.teachers[idx] = { ...state.data.teachers[idx], ...data };
     } else {
@@ -1603,6 +1673,8 @@ function setupTeacherModal() {
     await dataManager.save('teachers', state.data.teachers);
     renderTeachers();
     closeModal('teacherModal');
+
+    tgNotify(`👤 <b>Преподаватель ${isEdit ? 'изменён' : 'добавлен'}</b>\n🎓 ${name}\n💼 ${position}`);
   };
 }
 
@@ -1622,9 +1694,11 @@ function openTeacherModal(id = null) {
 
 async function deleteTeacher(id) {
   if (!confirm('Удалить преподавателя?')) return;
+  const t = state.data.teachers.find(x => x.id === id);
   state.data.teachers = state.data.teachers.filter(t => t.id !== id);
   await dataManager.save('teachers', state.data.teachers);
   renderTeachers();
+  if (t) tgNotify(`🗑 <b>Преподаватель удалён</b>\n👤 ${t.name}`);
 }
 
 const RENDERERS = {
