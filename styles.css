@@ -4250,3 +4250,78 @@ a i,
   grid-column: 1 / -1;
   width: 100%;
 }
+
+/* ============================================================
+   ВОЛНЫ НА ФОНЕ
+   Два слоя полупрозрачных волн, плывущих через весь экран
+   ============================================================ */
+
+#bgWaves {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.22;
+}
+
+#bgWaves::before,
+#bgWaves::after {
+  content: "";
+  position: absolute;
+  left: -100%;
+  width: 300%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 60%, transparent) 20%,
+    var(--accent) 50%,
+    color-mix(in srgb, var(--accent) 60%, transparent) 80%,
+    transparent 100%
+  );
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0,100 Q300,40 600,100 T1200,100 V200 H0 Z' fill='white'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0,100 Q300,40 600,100 T1200,100 V200 H0 Z' fill='white'/%3E%3C/svg%3E");
+  -webkit-mask-size: 33.333% 100%;
+  mask-size: 33.333% 100%;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  will-change: transform;
+}
+
+/* Задняя волна — шире, медленнее, глубже */
+#bgWaves::before {
+  top: 22%;
+  height: 55%;
+  animation: waveShift 55s linear infinite;
+  opacity: 0.75;
+}
+
+/* Передняя волна — тоньше, быстрее, плывёт в другую сторону */
+#bgWaves::after {
+  top: 48%;
+  height: 42%;
+  animation: waveShift 38s linear infinite reverse;
+  opacity: 0.55;
+}
+
+@keyframes waveShift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(33.333%, 0, 0); }
+}
+
+/* Светлые темы — волны мягче, иначе на белом фоне будет грязь */
+.theme-light-gold #bgWaves,
+.theme-light-blue #bgWaves,
+.theme-light-green #bgWaves,
+.theme-light-purple #bgWaves,
+.theme-light-red #bgWaves {
+  opacity: 0.13;
+}
+
+/* Уважаем reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  #bgWaves::before,
+  #bgWaves::after {
+    animation: none !important;
+  }
+}
