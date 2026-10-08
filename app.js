@@ -3,6 +3,7 @@ import { dataManager } from './dataManager.js';
 import { createRichEditor, sanitizeHtml, escapeHtml as esc } from './rich-editor.js';
 import { openDatePicker, formatDate } from './date-picker.js';
 import { toast, toastSuccess, toastError, toastWarning, toastInfo, confirmDialog } from './toast.js';
+import { renderEmpty } from './empty-states.js';
 
 // ============================================================
 // TELEGRAM NOTIFICATIONS
@@ -84,7 +85,7 @@ async function navigate() {
 
   if (state.currentRoute && mc) {
     mc.classList.add('route-exit');
-    await new Promise(r => setTimeout(r, 180));
+    await new Promise(r => setTimeout(r, 200));
     mc.classList.remove('route-exit');
   }
 
@@ -103,7 +104,7 @@ async function navigate() {
       mc.classList.remove('route-enter');
       void mc.offsetWidth;
       mc.classList.add('route-enter');
-      setTimeout(() => mc.classList.remove('route-enter'), 520);
+      setTimeout(() => mc.classList.remove('route-enter'), 700);
     }
 
     if (window.setStagger) window.setStagger();
@@ -503,7 +504,12 @@ function renderExams() {
   const grid = document.getElementById('examsGrid');
   if (!grid) return;
   if (!Array.isArray(state.data.exams) || !state.data.exams.length) {
-    grid.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Нет экзаменов.</p></div>`;
+    renderEmpty(grid, 'exams', {
+      title: 'Экзамены пока не завезли',
+      subtitle: 'Ни одного экзамена в списке. Как только появится — будет здесь.',
+      actionLabel: '+ Добавить экзамен',
+      onAction: () => openExamModal()
+    });
     return;
   }
   grid.innerHTML = '';
@@ -703,7 +709,12 @@ function renderResourceCards() {
   const grid = document.getElementById('resourcesGrid');
   if (!grid) return;
   if (!state.data.resources.length) {
-    grid.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><p>Нет ресурсов.</p></div>`;
+    renderEmpty(grid, 'resources', {
+      title: 'Ресурсный центр пуст',
+      subtitle: 'Ни одного файла, ссылки или видео. Самое время добавить первый.',
+      actionLabel: '+ Добавить ресурс',
+      onAction: () => openResourceModal()
+    });
     return;
   }
   grid.innerHTML = '';
@@ -991,7 +1002,12 @@ function clearTasksView() {
   const titleEl = document.getElementById('currentSubjectTitle');
   if (titleEl) titleEl.innerHTML = '<i class="fas fa-folder"></i> Не выбран предмет';
   const tc = document.getElementById('tasksContainer');
-  if (tc) tc.innerHTML = `<div class="empty-state"><i class="fas fa-hand-point-left"></i><p>Выберите предмет слева</p></div>`;
+  if (tc) {
+    renderEmpty(tc, 'homework', {
+      title: 'Выберите предмет',
+      subtitle: 'Слева в списке найди нужный предмет или создай новый.'
+    });
+  }
   const btn = document.getElementById('addTaskBtn');
   if (btn) btn.disabled = true;
 }
@@ -1000,7 +1016,12 @@ function renderTasks(tasks) {
   const container = document.getElementById('tasksContainer');
   if (!container) return;
   if (!tasks || tasks.length === 0) {
-    container.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Нет заданий.</p></div>`;
+    renderEmpty(container, 'homework', {
+      title: 'Заданий нет',
+      subtitle: 'Пока по этому предмету ничего не задали. Отдыхай или добавь сам.',
+      actionLabel: '+ Добавить задание',
+      onAction: () => openTaskModal()
+    });
     return;
   }
   container.innerHTML = '';
@@ -1310,7 +1331,15 @@ function renderEcCurrent() {
 }
 
 function renderEcEvents(container, events) {
-  if (!events.length) { container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Пока нет мероприятий</p></div>`; return; }
+  if (!events.length) {
+    renderEmpty(container, 'events', {
+      title: 'Тишина',
+      subtitle: 'Никаких мероприятий пока не запланировано. Скучно, но честно.',
+      actionLabel: '+ Добавить мероприятие',
+      onAction: () => openEcEditModal('events')
+    });
+    return;
+  }
   container.innerHTML = '';
   events.forEach(ev => {
     const card = document.createElement('div');
@@ -1335,7 +1364,15 @@ function renderEcEvents(container, events) {
 }
 
 function renderEcPolls(container, polls) {
-  if (!polls.length) { container.innerHTML = `<div class="empty-state"><i class="fas fa-chart-simple"></i><p>Нет опросов</p></div>`; return; }
+  if (!polls.length) {
+    renderEmpty(container, 'polls', {
+      title: 'Опросов нет',
+      subtitle: 'Никто не спрашивал мнения. Может, ты первый?',
+      actionLabel: '+ Создать опрос',
+      onAction: () => openEcEditModal('polls')
+    });
+    return;
+  }
   container.innerHTML = '';
   polls.forEach(poll => {
     const card = document.createElement('div');
@@ -1381,7 +1418,15 @@ async function voteEcPoll(pollId, optionIndex) {
 }
 
 function renderEcTests(container, tests) {
-  if (!tests.length) { container.innerHTML = `<div class="empty-state"><i class="fas fa-puzzle-piece"></i><p>Нет тестов</p></div>`; return; }
+  if (!tests.length) {
+    renderEmpty(container, 'tests', {
+      title: 'Тестов нет',
+      subtitle: 'Ни одного теста, ни одной проверки. Наслаждайся.',
+      actionLabel: '+ Создать тест',
+      onAction: () => openEcEditModal('tests')
+    });
+    return;
+  }
   container.innerHTML = '';
   tests.forEach(test => {
     const card = document.createElement('div');
@@ -1674,7 +1719,12 @@ function renderTeachers() {
   const container = document.getElementById('teachersGridContainer');
   if (!container) return;
   if (!state.data.teachers.length) {
-    container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>Нет преподавателей.</p></div>`;
+    renderEmpty(container, 'teachers', {
+      title: 'Преподавателей нет',
+      subtitle: 'Пусто, как в аудитории на первой паре. Добавь первого.',
+      actionLabel: '+ Добавить преподавателя',
+      onAction: () => openTeacherModal()
+    });
     return;
   }
   container.innerHTML = '';
