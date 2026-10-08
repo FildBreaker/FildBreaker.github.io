@@ -3242,3 +3242,98 @@ textarea,
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-hover);
 }
+/* ============================================================
+   ТИПОГРАФИКА — Manrope + Unbounded
+   ============================================================ */
+
+/* Основной текст */
+body {
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: 'ss01' on, 'ss02' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Логотип */
+.logo h1,
+.logo-fx-text {
+  font-family: 'Unbounded', 'Manrope', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Крупные заголовки разделов (Расписание, Экзамены, Ресурсный центр и т.д.) */
+.schedule-header h2,
+.exams-hero h2,
+.hero-resources h2,
+.homework-header h2,
+.teachers-section h2,
+.section-header h2,
+.welcome-strip h2,
+.info-block h3 {
+  font-family: 'Unbounded', 'Manrope', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* Заголовки внутри карточек */
+.exam-card .exam-title h3,
+.resource-card .card-content h3,
+.event-card h3,
+.poll-card .poll-header h3,
+.test-card .test-header h3,
+.task-card .task-desc {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* Имя предмета в сайдбаре, имя преподавателя */
+.subject-name,
+.teacher-name {
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* Немного поправим размеры — Unbounded выглядит крупнее Inter */
+.schedule-header h2,
+.exams-hero h2,
+.hero-resources h2,
+.section-header h2 { font-size: 1.7rem; }
+
+.homework-header h2 { font-size: 1.5rem; }
+.welcome-strip h2  { font-size: 1.8rem; }
+.logo h1           { font-size: 1.55rem; }
+
+/* Цифры в таймерах — ровные, не «прыгают» */
+.timer-display {
+  font-family: 'Manrope', monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* Всё остальное, где был явно задан Inter */
+.nav-links a,
+.nav-btn,
+.filter-btn,
+.section-btn,
+button,
+input,
+textarea,
+select {
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+/* Кнопки — чуть плотнее по буквам */
+.save-btn,
+.cancel-btn,
+.reset-btn,
+.add-task-btn,
+.add-subject-btn,
+.add-global-btn,
+.add-link-btn,
+.danger-btn {
+  letter-spacing: 0.01em;
+}
