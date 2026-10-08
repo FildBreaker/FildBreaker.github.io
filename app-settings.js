@@ -1,7 +1,7 @@
 // app-settings.js
 import { dataManager } from './dataManager.js';
+import { toast, toastSuccess, toastError, toastWarning, confirmDialog } from './toast.js';
 
-// Русские названия для сообщений
 const SECTION_NAMES = {
   schedule: 'Расписание',
   homework: 'Домашка',
@@ -11,16 +11,14 @@ const SECTION_NAMES = {
   teachers: 'Преподаватели'
 };
 
-// Сколько элементов в разделе — для превью перед импортом
 function countItems(key, value) {
-  if (!value) return 0;
+  if (!value) return '';
   if (key === 'homework' && value.subjects) return value.subjects.length + ' предметов';
   if (Array.isArray(value)) return value.length + ' шт.';
   if (typeof value === 'object') return Object.keys(value).length + ' шт.';
   return '';
 }
 
-// ===== ЭКСПОРТ ДАННЫХ =====
 export function exportData() {
   Promise.all([
     dataManager.load('schedule'),
@@ -39,10 +37,10 @@ export function exportData() {
     a.download = `backup-b31les-${today}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }).catch(err => alert('Ошибка экспорта: ' + err.message));
+    toastSuccess('Файл экспорта скачан');
+  }).catch(err => toastError('Ошибка экспорта: ' + err.message));
 }
 
-// ===== ИМПОРТ ДАННЫХ =====
 export function importData(file) {
   const reader = new FileReader();
 
@@ -51,22 +49,18 @@ export function importData(file) {
     try {
       data = JSON.parse(e.target.result);
     } catch (err) {
-      alert('❌ Файл повреждён или это не JSON.\n\n' + err.message);
+      toastError('Файл повреждён или это не JSON');
       return;
     }
 
-    // Что вообще есть в файле
     const found = Object.keys(SECTION_NAMES).filter(k => data[k] !== undefined);
-
     if (found.length === 0) {
-      alert('❌ В файле нет данных сайта Б-31ЛЕС.\n\nВозможно, это не наш бэкап.');
+      toastError('В файле нет данных сайта Б-31ЛЕС');
       return;
     }
 
-    // Что пропустим
     const missing = Object.keys(SECTION_NAMES).filter(k => data[k] === undefined);
 
-    // Превью — что будет импортировано
     let preview = '📦 В файле найдены разделы:\n\n';
     found.forEach(k => {
       preview += `• ${SECTION_NAMES[k]} — ${countItems(k, data[k])}\n`;
@@ -79,36 +73,40 @@ export function importData(file) {
       });
     }
 
-    preview += '\n\n⚠️ Всё, что есть сейчас в этих разделах, будет заменено на данные из файла.\n\nПродолжить?';
+    const ok = await confirmDialog({
+      title: 'Импортировать данные?',
+      message: preview + '\n\n⚠️ Всё, что есть сейчас в этих разделах, будет заменено на данные из файла.',
+      confirmText: 'Импортировать',
+      danger: true
+    });
+    if (!ok) return;
 
-    if (!confirm(preview)) return;
-
-    // Импортируем по одному разделу
     const results = [];
+    let successCount = 0;
     for (const key of Object.keys(SECTION_NAMES)) {
       if (data[key] === undefined) continue;
       try {
         await dataManager.save(key, data[key]);
         results.push('✅ ' + SECTION_NAMES[key]);
+        successCount++;
       } catch (err) {
         results.push('❌ ' + SECTION_NAMES[key] + ': ' + err.message);
       }
     }
 
-    alert('Импорт завершён:\n\n' + results.join('\n') + '\n\nСтраница сейчас перезагрузится.');
+    if (successCount === found.length) {
+      toastSuccess(`Импортировано разделов: ${successCount}. Обновляю страницу...`, 2500);
+    } else {
+      toastWarning(`Импорт завершён с ошибками:\n${results.join('\n')}`, 5000);
+    }
 
-    // Небольшая задержка, чтобы алерт успел прочитаться
-    setTimeout(() => location.reload(), 500);
+    setTimeout(() => location.reload(), 2000);
   };
 
-  reader.onerror = () => {
-    alert('❌ Не удалось прочитать файл.');
-  };
-
+  reader.onerror = () => toastError('Не удалось прочитать файл');
   reader.readAsText(file);
 }
 
-// ===== ДОБАВЛЕНИЕ КНОПОК В САЙДБАР =====
 export function initSidebarButtons() {
   const themeBtn = document.getElementById('settingsThemeBtn');
   const exportBtn = document.getElementById('settingsExportBtn');
@@ -125,7 +123,7 @@ export function initSidebarButtons() {
     importBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length) importData(e.target.files[0]);
-      fileInput.value = ''; // чтобы можно было выбрать тот же файл снова
+      fileInput.value = '';
     });
   }
 }
