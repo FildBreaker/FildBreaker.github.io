@@ -4454,3 +4454,53 @@ a i,
     max-height: 140px;
   }
 }
+/* ============================================================
+   ФИКС ДЛИННЫХ НАЗВАНИЙ ПРЕДМЕТОВ В САЙДБАРЕ
+   ============================================================ */
+
+.subject-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 10px 8px 14px;
+}
+
+.subject-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  /* Обрезаем длинный текст и ставим многоточие */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Иконка в начале не должна сжиматься */
+.subject-name i {
+  flex-shrink: 0;
+}
+
+/* Кнопки (редактировать / удалить) — не сжимаются, всегда справа */
+.subject-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Сами кнопки — компактнее, чтобы не раздували строку */
+.subject-actions button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
