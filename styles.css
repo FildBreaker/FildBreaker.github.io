@@ -4504,3 +4504,69 @@ a i,
   border-radius: 50%;
   flex-shrink: 0;
 }
+/* ============================================================
+   СКРОЛЛ ДЛИННЫХ НАЗВАНИЙ ПРЕДМЕТОВ В САЙДБАРЕ
+   ============================================================ */
+
+.subject-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.subject-name > i {
+  flex-shrink: 0;
+}
+
+.subject-text-wrap {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 8px,
+    black calc(100% - 8px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 8px,
+    black calc(100% - 8px),
+    transparent 100%
+  );
+}
+
+.subject-text {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+  transform: translateX(0);
+}
+
+.subject-text-wrap.has-scroll .subject-text {
+  animation: subjectMarquee var(--marquee-duration, 10s) ease-in-out infinite;
+}
+
+@keyframes subjectMarquee {
+  0%, 12%   { transform: translateX(0); }
+  45%, 55%  { transform: translateX(calc(-1 * var(--scroll-distance, 0px))); }
+  88%, 100% { transform: translateX(0); }
+}
+
+/* На hover — пауза, чтобы можно было прочитать без движения */
+.subject-item:hover .subject-text-wrap.has-scroll .subject-text {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subject-text-wrap.has-scroll .subject-text {
+    animation: none;
+  }
+}
