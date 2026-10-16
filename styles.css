@@ -1555,11 +1555,13 @@ a:hover {
   flex-wrap: wrap;
   gap: 3px;
   padding: 6px 8px;
-  background: var(--card-bg);
+  background: var(--input-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
   border-bottom: 1px solid var(--border-color);
   align-items: center;
   position: sticky;
-  top: 0;
+  top: -28px;
   z-index: 10;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
