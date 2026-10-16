@@ -4,6 +4,7 @@ import { createRichEditor, sanitizeHtml, escapeHtml as esc } from './rich-editor
 import { openDatePicker, formatDate } from './date-picker.js';
 import { toast, toastSuccess, toastError, toastWarning, toastInfo, confirmDialog } from './toast.js';
 import { renderEmpty } from './empty-states.js';
+import { applyCollapse, watchCollapse } from './collapse.js';
 
 // ============================================================
 // TELEGRAM NOTIFICATIONS
@@ -107,6 +108,7 @@ async function navigate() {
       setTimeout(() => mc.classList.remove('route-enter'), 700);
     }
 
+    applyCollapse();
     if (window.setStagger) window.setStagger();
   } catch (err) {
     console.error(`[route:${route}] error:`, err);
@@ -744,6 +746,7 @@ function renderResourceCards() {
     grid.appendChild(card);
   });
   applyResourceFilters();
+  applyCollapse(grid);
 }
 
 function applyResourceFilters() {
@@ -1053,6 +1056,7 @@ function renderTasks(tasks) {
     card.querySelector('.delete-task').onclick = () => deleteTask(task.id);
     container.appendChild(card);
   });
+  applyCollapse(container);
 }
 
 function setupHomeworkModals() {
@@ -1361,6 +1365,7 @@ function renderEcEvents(container, events) {
     card.querySelector('.delete-event').onclick = () => deleteEcItem('events', ev.id);
     container.appendChild(card);
   });
+  applyCollapse(container);
 }
 
 function renderEcPolls(container, polls) {
@@ -1827,6 +1832,7 @@ function init() {
   setupModalGlobals();
   if (!location.hash) location.hash = '#/home';
   navigate();
+  watchCollapse();
 }
 
 if (document.readyState === 'loading') {
