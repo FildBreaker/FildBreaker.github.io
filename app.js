@@ -946,7 +946,12 @@ function renderSubjects() {
     div.className = `subject-item ${homeworkState.currentSubjectId === subj.id ? 'active' : ''}`;
     div.dataset.id = subj.id;
     div.innerHTML = `
-      <span class="subject-name"><i class="fas fa-chalkboard"></i> ${esc(subj.name)}</span>
+      <span class="subject-name">
+        <i class="fas fa-chalkboard"></i>
+        <span class="subject-text-wrap">
+          <span class="subject-text">${esc(subj.name)}</span>
+        </span>
+      </span>
       <div class="subject-actions">
         <button class="edit-subject" data-id="${subj.id}"><i class="fas fa-edit"></i></button>
         <button class="delete-subject" data-id="${subj.id}"><i class="fas fa-trash"></i></button>
@@ -969,9 +974,28 @@ function renderSubjects() {
       await deleteSubject(subj.id);
     };
     container.appendChild(div);
+    requestAnimationFrame(() => setupSubjectScroll(div));
   });
   const btn = document.getElementById('addTaskBtn');
   if (btn) btn.disabled = !homeworkState.currentSubjectId;
+}
+
+function setupSubjectScroll(item) {
+  const wrap = item.querySelector('.subject-text-wrap');
+  const text = item.querySelector('.subject-text');
+  if (!wrap || !text) return;
+
+  wrap.classList.remove('has-scroll');
+  text.style.removeProperty('--scroll-distance');
+  text.style.removeProperty('--marquee-duration');
+
+  const overflow = text.scrollWidth - wrap.clientWidth;
+  if (overflow > 4) {
+    text.style.setProperty('--scroll-distance', overflow + 'px');
+    const duration = Math.max(8, Math.min(20, 4 + overflow / 8));
+    text.style.setProperty('--marquee-duration', duration + 's');
+    wrap.classList.add('has-scroll');
+  }
 }
 
 function selectSubject(subjectId) {
@@ -1833,6 +1857,10 @@ function init() {
   if (!location.hash) location.hash = '#/home';
   navigate();
   watchCollapse();
+
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.subject-item').forEach(setupSubjectScroll);
+  });
 }
 
 if (document.readyState === 'loading') {
