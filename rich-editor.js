@@ -1,7 +1,13 @@
 // rich-editor.js
 import { openColorPicker } from './color-picker.js';
 
-const ALLOWED_TAGS = ['B','I','U','S','BR','SPAN','STRONG','EM','FONT','MARK','SUB','SUP'];
+const ALLOWED_TAGS = [
+  'B','I','U','S','BR','SPAN','STRONG','EM','FONT','MARK','SUB','SUP',
+  'H1','H2','H3','H4','H5','H6',
+  'UL','OL','LI',
+  'BLOCKQUOTE','PRE','CODE',
+  'A','HR','P','DIV'
+];
 
 export function escapeHtml(str) {
   if (str == null) return '';
@@ -31,17 +37,29 @@ export function sanitizeHtml(html) {
       const name = attr.name.toLowerCase();
       const value = attr.value;
       if (name.startsWith('on')) node.removeAttribute(attr.name);
-      if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(value)) node.removeAttribute(attr.name);
+
+      if (name === 'href' || name === 'src') {
+        if (/^\s*(javascript|data|vbscript):/i.test(value)) {
+          node.removeAttribute(attr.name);
+        }
+      }
+
       if (name === 'class') {
         const safe = value.split(/\s+/).filter(c => c.startsWith('anim-')).join(' ');
         if (safe) node.setAttribute('class', safe);
         else node.removeAttribute('class');
       }
+
       if (name === 'style') {
-        const safeStyle = value.split(';').filter(s => /^\s*(color|background-color)\s*:/i.test(s)).join(';');
+        const safeStyle = value.split(';').filter(s => {
+          return /^\s*(color|background-color|text-align|font-size|font-weight|font-style|text-decoration)\s*:/i.test(s);
+        }).join(';');
         if (safeStyle) node.setAttribute('style', safeStyle);
         else node.removeAttribute('style');
       }
+
+      if (name === 'target' && value !== '_blank') node.removeAttribute('target');
+      if (name === 'rel' && !/noopener|noreferrer/.test(value)) node.removeAttribute('rel');
     });
     [...node.childNodes].forEach(walk);
   }
@@ -59,10 +77,20 @@ export function createRichEditor(target, options = {}) {
   container.classList.add('rich-editor-wrapper');
   container.innerHTML = `
     <div class="rich-toolbar" role="toolbar">
-      <button type="button" data-cmd="bold" title="Жирный"><i class="fas fa-bold"></i></button>
-      <button type="button" data-cmd="italic" title="Курсив"><i class="fas fa-italic"></i></button>
-      <button type="button" data-cmd="underline" title="Подчёркнутый"><i class="fas fa-underline"></i></button>
+      <select class="rich-format-select" title="Стиль текста">
+        <option value="p">Обычный</option>
+        <option value="h1">Заголовок 1</option>
+        <option value="h2">Заголовок 2</option>
+        <option value="h3">Заголовок 3</option>
+        <option value="h4">Заголовок 4</option>
+      </select>
+      <span class="rich-sep"></span>
+      <button type="button" data-cmd="bold" title="Жирный (Ctrl+B)"><i class="fas fa-bold"></i></button>
+      <button type="button" data-cmd="italic" title="Курсив (Ctrl+I)"><i class="fas fa-italic"></i></button>
+      <button type="button" data-cmd="underline" title="Подчёркнутый (Ctrl+U)"><i class="fas fa-underline"></i></button>
       <button type="button" data-cmd="strikeThrough" title="Зачёркнутый"><i class="fas fa-strikethrough"></i></button>
+      <button type="button" data-cmd="subscript" title="Нижний индекс"><i class="fas fa-subscript"></i></button>
+      <button type="button" data-cmd="superscript" title="Верхний индекс"><i class="fas fa-superscript"></i></button>
       <span class="rich-sep"></span>
       <button type="button" class="rich-color-btn" data-cmd="foreColor" title="Цвет текста">
         <i class="fas fa-font"></i>
@@ -73,12 +101,24 @@ export function createRichEditor(target, options = {}) {
         <span class="rich-color-swatch" data-swatch="hiliteColor" data-color="#fff3b0" style="background:#fff3b0;"></span>
       </button>
       <span class="rich-sep"></span>
+      <button type="button" data-cmd="justifyLeft" title="По левому краю"><i class="fas fa-align-left"></i></button>
+      <button type="button" data-cmd="justifyCenter" title="По центру"><i class="fas fa-align-center"></i></button>
+      <button type="button" data-cmd="justifyRight" title="По правому краю"><i class="fas fa-align-right"></i></button>
+      <button type="button" data-cmd="justifyFull" title="По ширине"><i class="fas fa-align-justify"></i></button>
+      <span class="rich-sep"></span>
+      <button type="button" data-cmd="insertUnorderedList" title="Маркированный список"><i class="fas fa-list-ul"></i></button>
+      <button type="button" data-cmd="insertOrderedList" title="Нумерованный список"><i class="fas fa-list-ol"></i></button>
+      <button type="button" data-cmd="formatBlock" data-value="blockquote" title="Цитата"><i class="fas fa-quote-right"></i></button>
+      <button type="button" data-cmd="formatBlock" data-value="pre" title="Код"><i class="fas fa-code"></i></button>
+      <button type="button" data-action="link" title="Вставить ссылку"><i class="fas fa-link"></i></button>
+      <button type="button" data-cmd="insertHorizontalRule" title="Разделитель"><i class="fas fa-minus"></i></button>
+      <span class="rich-sep"></span>
       <button type="button" data-anim="anim-glow" title="Свечение"><i class="fas fa-sun"></i></button>
       <button type="button" data-anim="anim-pulse" title="Пульсация"><i class="fas fa-heartbeat"></i></button>
       <button type="button" data-anim="anim-shake" title="Тряска"><i class="fas fa-bolt"></i></button>
       <button type="button" data-anim="anim-gradient" title="Градиент"><i class="fas fa-fill-drip"></i></button>
       <span class="rich-sep"></span>
-      <button type="button" data-cmd="removeFormat" title="Очистить"><i class="fas fa-eraser"></i></button>
+      <button type="button" data-cmd="removeFormat" title="Очистить формат"><i class="fas fa-eraser"></i></button>
     </div>
     <div class="rich-content" contenteditable="true" data-placeholder="${escapeHtml(placeholder)}" style="min-height:${minHeight};">${initial}</div>
   `;
@@ -86,7 +126,15 @@ export function createRichEditor(target, options = {}) {
   const toolbar = container.querySelector('.rich-toolbar');
 
   function updateState() {
-    ['bold','italic','underline','strikeThrough'].forEach(cmd => {
+    ['bold','italic','underline','strikeThrough','subscript','superscript'].forEach(cmd => {
+      const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
+      if (!btn) return;
+      try {
+        if (document.queryCommandState(cmd)) btn.classList.add('active');
+        else btn.classList.remove('active');
+      } catch (_) {}
+    });
+    ['justifyLeft','justifyCenter','justifyRight','justifyFull','insertUnorderedList','insertOrderedList'].forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
       try {
@@ -95,22 +143,69 @@ export function createRichEditor(target, options = {}) {
       } catch (_) {}
     });
   }
+
   function updatePlaceholder() {
     const empty = content.textContent.trim() === '' && !content.querySelector('span');
     content.classList.toggle('empty', empty);
   }
 
-  // Обычные команды
+  // Обычные команды (учитываем data-value для formatBlock)
   toolbar.querySelectorAll('button[data-cmd]').forEach(btn => {
     if (btn.classList.contains('rich-color-btn')) return;
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
       e.preventDefault();
       content.focus();
-      document.execCommand(btn.dataset.cmd, false, null);
+      const cmd = btn.dataset.cmd;
+      const val = btn.dataset.value || null;
+      document.execCommand(cmd, false, val);
       updateState();
     });
   });
+
+  // Дропдаун стилей (обычный текст / заголовки)
+  const formatSelect = toolbar.querySelector('.rich-format-select');
+  if (formatSelect) {
+    formatSelect.addEventListener('mousedown', e => e.stopPropagation());
+    formatSelect.addEventListener('change', (e) => {
+      content.focus();
+      const val = e.target.value;
+      document.execCommand('formatBlock', false, val);
+      updateState();
+    });
+  }
+
+  // Кнопка «Вставить ссылку»
+  const linkBtn = toolbar.querySelector('[data-action="link"]');
+  if (linkBtn) {
+    linkBtn.addEventListener('mousedown', e => e.preventDefault());
+    linkBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const sel = window.getSelection();
+      let savedRange = null;
+      if (sel.rangeCount) {
+        try { savedRange = sel.getRangeAt(0).cloneRange(); } catch (_) {}
+      }
+      const url = prompt('Введите URL ссылки:', 'https://');
+      if (!url || !/^https?:\/\//i.test(url)) return;
+      content.focus();
+      if (savedRange) {
+        const s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(savedRange);
+      }
+      const sel2 = window.getSelection();
+      if (sel2.isCollapsed) {
+        const text = prompt('Текст ссылки:', url) || url;
+        document.execCommand('insertHTML', false,
+          `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`);
+      } else {
+        document.execCommand('createLink', false, url);
+      }
+      updateState();
+    });
+  }
 
   // Кнопки выбора цвета → открывают кастомный пикер
   toolbar.querySelectorAll('.rich-color-btn').forEach(btn => {
@@ -173,6 +268,16 @@ export function createRichEditor(target, options = {}) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       document.execCommand('insertHTML', false, '<br><br>');
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+      const k = e.key.toLowerCase();
+      const map = { b: 'bold', i: 'italic', u: 'underline' };
+      if (map[k]) {
+        e.preventDefault();
+        document.execCommand(map[k], false, null);
+        updateState();
+      }
     }
   });
 
