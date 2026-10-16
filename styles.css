@@ -4570,3 +4570,79 @@ a i,
     animation: none;
   }
 }
+
+/* ============================================================
+   РЕЖИМ РЕДАКТОРА — скрываем кнопки у всех, кроме админов
+   ============================================================ */
+
+/* По умолчанию всё редактирование скрыто */
+.add-task-btn,
+.add-subject-btn,
+.add-global-btn,
+.add-link-btn,
+.reset-btn,
+#addExamBtn,
+#addTeacherBtn,
+#addResourceBtn,
+.edit-task, .delete-task,
+.edit-resource, .delete-resource,
+.edit-exam, .delete-exam,
+.edit-teacher, .delete-teacher,
+.edit-event, .delete-event,
+.edit-poll, .delete-poll,
+.edit-test, .delete-test,
+.edit-subject, .delete-subject {
+  display: none;
+}
+
+/* Когда тело помечено как is-editor — показываем обратно */
+body.is-editor .add-task-btn,
+body.is-editor .add-subject-btn,
+body.is-editor .add-global-btn,
+body.is-editor .add-link-btn,
+body.is-editor .reset-btn,
+body.is-editor #addExamBtn,
+body.is-editor #addTeacherBtn,
+body.is-editor #addResourceBtn,
+body.is-editor .edit-task,
+body.is-editor .delete-task,
+body.is-editor .edit-resource,
+body.is-editor .delete-resource,
+body.is-editor .edit-exam,
+body.is-editor .delete-exam,
+body.is-editor .edit-teacher,
+body.is-editor .delete-teacher,
+body.is-editor .edit-event,
+body.is-editor .delete-event,
+body.is-editor .edit-poll,
+body.is-editor .delete-poll,
+body.is-editor .edit-test,
+body.is-editor .delete-test,
+body.is-editor .edit-subject,
+body.is-editor .delete-subject {
+  display: inline-flex;
+}
+
+/* Курсор на расписании только у редактора */
+body:not(.is-editor) .schedule-cell {
+  cursor: default;
+}
+body:not(.is-editor) .cell-content .edit-icon {
+  display: none;
+}
+
+/* Кнопка входа/выхода — особый стиль */
+#authBtn {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+#authBtn:hover {
+  background: var(--bg-active);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+body.is-editor #authBtn {
+  border-color: var(--accent);
+  color: var(--accent);
+}
