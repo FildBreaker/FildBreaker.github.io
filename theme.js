@@ -1,3 +1,4 @@
+// theme.js
 import { dataManager } from './dataManager.js';
 
 export const THEMES = {
@@ -13,18 +14,61 @@ export const THEMES = {
   'light-red':   '☀️ Светлая красная'
 };
 
+// Все картинки — Pexels CDN, хотлинк разрешён, ВПН не мешает.
+// Формат: https://images.pexels.com/photos/{id}/pexels-photo-{id}.jpeg?auto=compress&cs=tinysrgb&w=1920
 const THEME_BG_LIST = {
-  'dark-gold': ['https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=50&fm=webp'],
-  'dark-blue': ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&q=50&fm=webp'],
-  'dark-green': ['https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&q=50&fm=webp'],
-  'dark-purple': ['https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&q=50&fm=webp'],
-  'dark-red': ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=50&fm=webp'],
-  'light-gold': ['https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=50&fm=webp'],
-  'light-blue': ['https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=50&fm=webp'],
-  'light-green': ['https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=50&fm=webp'],
-  'light-purple': ['https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=50&fm=webp'],
-  'light-red': ['https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=800&q=50&fm=webp','https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=50&fm=webp']
+  'dark-gold': [
+    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'dark-blue': [
+    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'dark-green': [
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'dark-purple': [
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'dark-red': [
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'light-gold': [
+    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'light-blue': [
+    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'light-green': [
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'light-purple': [
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ],
+  'light-red': [
+    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ]
 };
+
 const THEME_BG_FALLBACK = {
   'dark-gold':'linear-gradient(135deg,#1a1a2e,#2d1f0e,#3d2b1f)',
   'dark-blue':'linear-gradient(135deg,#0a1628,#1a2a4a,#1f3a6a)',
@@ -37,6 +81,7 @@ const THEME_BG_FALLBACK = {
   'light-purple':'linear-gradient(135deg,#f0e8f5,#e0d0ec,#d0b8e3)',
   'light-red':'linear-gradient(135deg,#f5e8e8,#ecd0d0,#e3b8b8)'
 };
+
 const themePreviewColors = {
   'dark-gold':'#ffb347','dark-blue':'#4a8cff','dark-green':'#4caf50',
   'dark-purple':'#ab47bc','dark-red':'#e74c3c',
@@ -64,6 +109,7 @@ function testImageUrl(url) {
     setTimeout(() => resolve(false), 6000);
   });
 }
+
 async function findWorkingBg(themeName, startIndex = 0) {
   const list = THEME_BG_LIST[themeName] || [];
   for (let i = 0; i < list.length; i++) {
@@ -105,7 +151,7 @@ async function setBackgroundForTheme(themeName, startIndex = 0) {
     });
     requestAnimationFrame(() => layer.classList.add('visible'));
   } else {
-    document.documentElement.style.setProperty('--bg-image-url', 'none');
+    document.documentElement.style.setProperty('--bg-image-url', THEME_BG_FALLBACK[themeName] || 'none');
     layer.classList.remove('visible');
   }
 }
@@ -122,7 +168,6 @@ export function applyTheme(themeName) {
   currentTheme = themeName;
   try { localStorage.setItem('b21-theme', themeName); } catch (e) {}
 
-  // ПЛАВНЫЙ ПЕРЕХОД — включаем на 700 мс
   if (!firstThemeApply) {
     document.body.classList.add('theme-transitioning');
     clearTimeout(window.__themeTransitionTimer);
@@ -221,6 +266,7 @@ export function openThemeModal() {
     themeModal.style.display = 'flex';
   }
 }
+
 export function closeThemeModal() {
   if (themeModal) themeModal.style.display = 'none';
 }
