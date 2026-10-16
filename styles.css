@@ -2,7 +2,7 @@
    ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (будут переопределены темами)
    ============================================================ */
 :root {
-  --bg-image-url: url("https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80");
+  --bg-image-url: none;
   --bg-overlay: rgba(0, 0, 0, 0.65);
   --primary-bg: #22223b;
   --header-bg: #4a4e69;
