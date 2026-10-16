@@ -5,6 +5,7 @@ import { openDatePicker, formatDate } from './date-picker.js';
 import { toast, toastSuccess, toastError, toastWarning, toastInfo, confirmDialog } from './toast.js';
 import { renderEmpty } from './empty-states.js';
 import { applyCollapse, watchCollapse } from './collapse.js';
+import { isEditor } from './auth.js';
 
 // ============================================================
 // TELEGRAM NOTIFICATIONS
@@ -302,6 +303,7 @@ async function renderSchedule() {
 
   setupScheduleModal();
   document.getElementById('resetScheduleBtn').onclick = async () => {
+    if (!isEditor()) { toastError('Нет прав на редактирование'); return; }
     const ok = await confirmDialog({
       title: 'Сбросить расписание?',
       message: 'Все текущие правки будут потеряны. Восстановится базовое расписание.',
@@ -388,6 +390,7 @@ function setupScheduleModal() {
 }
 
 function openScheduleEdit(day, pair) {
+  if (!isEditor()) return;
   scheduleEdit.day = day;
   scheduleEdit.pair = pair;
   const lesson = state.data.schedule[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '' };
@@ -411,6 +414,7 @@ function openScheduleEdit(day, pair) {
 }
 
 async function saveScheduleEdit() {
+  if (!isEditor()) { closeModal('scheduleEditModal'); return; }
   const day = scheduleEdit.day, pair = scheduleEdit.pair;
   if (day === null || pair === null) return;
   const newSubject = document.getElementById('scheduleEditSubject').value.trim();
@@ -492,6 +496,7 @@ async function renderExam() {
     window.enableDragSort(grid, {
       itemSelector: '.exam-card',
       onReorder: async (newIds) => {
+        if (!isEditor()) return;
         const map = new Map(state.data.exams.map(e => [e.id, e]));
         state.data.exams = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('exams', state.data.exams);
@@ -567,6 +572,7 @@ const examEdit = { id: null, notesEditor: null };
 function setupExamModal() {
   document.getElementById('examForm').onsubmit = async (e) => {
     e.preventDefault();
+    if (!isEditor()) { closeModal('examModal'); return; }
     const subject = document.getElementById('examSubject').value.trim();
     const date = document.getElementById('examDate').value.trim();
     const room = document.getElementById('examRoom').value.trim();
@@ -601,6 +607,7 @@ function setupExamModal() {
 }
 
 function openExamModal(id = null) {
+  if (!isEditor()) return;
   examEdit.id = id;
   const exam = id ? state.data.exams.find(x => x.id === id) : null;
   document.getElementById('examModalTitle').innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать экзамен' : '<i class="fas fa-plus"></i> Добавить экзамен';
@@ -620,6 +627,7 @@ function openExamModal(id = null) {
 }
 
 async function deleteExam(id) {
+  if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const exam = state.data.exams.find(x => x.id === id);
   const ok = await confirmDialog({
     title: 'Удалить экзамен?',
@@ -697,6 +705,7 @@ async function renderResources() {
     window.enableDragSort(grid, {
       itemSelector: '.resource-card',
       onReorder: async (newIds) => {
+        if (!isEditor()) return;
         const map = new Map(state.data.resources.map(r => [r.id, r]));
         state.data.resources = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('resources', state.data.resources);
@@ -766,6 +775,7 @@ const resourceEdit = { id: null, descEditor: null };
 function setupResourceModal() {
   document.getElementById('resourceForm').onsubmit = async (e) => {
     e.preventDefault();
+    if (!isEditor()) { closeModal('resourceModal'); return; }
     const title = document.getElementById('resourceTitle').value.trim();
     const category = document.getElementById('resourceCategory').value;
     const icon = document.getElementById('resourceIcon').value.trim() || 'fa-file';
@@ -815,6 +825,7 @@ function renderIconPicker(selectedIcon) {
 }
 
 function openResourceModal(id = null) {
+  if (!isEditor()) return;
   resourceEdit.id = id;
   let currentIcon = '', currentDesc = '';
   if (id) {
@@ -845,6 +856,7 @@ function openResourceModal(id = null) {
 }
 
 async function deleteResource(id) {
+  if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const res = state.data.resources.find(r => r.id === id);
   const ok = await confirmDialog({
     title: 'Удалить ресурс?',
@@ -925,6 +937,7 @@ async function renderHomework() {
     window.enableDragSort(document.getElementById('subjectsList'), {
       itemSelector: '.subject-item',
       onReorder: async (newIds) => {
+        if (!isEditor()) return;
         const map = new Map(state.data.homework.subjects.map(s => [s.id, s]));
         state.data.homework.subjects = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('homework', state.data.homework);
@@ -964,6 +977,7 @@ function renderSubjects() {
     div.querySelector('.edit-subject').onclick = (e) => { e.stopPropagation(); openSubjectModal(subj.id); };
     div.querySelector('.delete-subject').onclick = async (e) => {
       e.stopPropagation();
+      if (!isEditor()) { toastError('Нет прав на удаление'); return; }
       const ok = await confirmDialog({
         title: 'Удалить предмет?',
         message: `«${subj.name}» и все его задания будут удалены без возможности отмены.`,
@@ -1012,6 +1026,7 @@ function selectSubject(subjectId) {
       window.enableDragSort(tc, {
         itemSelector: '.task-card',
         onReorder: async (newIds) => {
+          if (!isEditor()) return;
           const subj = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
           if (!subj) return;
           const map = new Map(subj.tasks.map(t => [t.id, t]));
@@ -1090,6 +1105,7 @@ function setupHomeworkModals() {
 }
 
 function openSubjectModal(subjectId = null) {
+  if (!isEditor()) return;
   homeworkState.editSubjectId = subjectId;
   if (subjectId) {
     const subj = state.data.homework.subjects.find(s => s.id === subjectId);
@@ -1105,6 +1121,7 @@ function openSubjectModal(subjectId = null) {
 }
 
 async function saveSubjectFromModal() {
+  if (!isEditor()) { closeModal('subjectModal'); return; }
   const name = document.getElementById('subjectNameInput').value.trim();
   if (!name) { toastWarning('Введите название'); return; }
   const isEdit = !!homeworkState.editSubjectId;
@@ -1126,6 +1143,7 @@ async function saveSubjectFromModal() {
 }
 
 async function deleteSubject(subjectId) {
+  if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const idx = state.data.homework.subjects.findIndex(s => s.id === subjectId);
   if (idx === -1) return;
   const subjName = state.data.homework.subjects[idx].name;
@@ -1165,6 +1183,7 @@ function collectLinks() {
 }
 
 function openTaskModal(taskId = null) {
+  if (!isEditor()) return;
   if (!homeworkState.currentSubjectId) { toastWarning('Выберите предмет'); return; }
   const subject = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
   if (!subject) return;
@@ -1191,6 +1210,7 @@ function openTaskModal(taskId = null) {
 
 async function saveTaskFromModal() {
   try {
+    if (!isEditor()) { closeModal('taskModal'); return; }
     if (!homeworkState.currentSubjectId) { toastWarning('Не выбран предмет'); return; }
     const descHtml = homeworkState.taskEditor ? homeworkState.taskEditor.getContent() : '';
     const descText = homeworkState.taskEditor ? homeworkState.taskEditor.getText().trim() : '';
@@ -1227,6 +1247,7 @@ async function saveTaskFromModal() {
 }
 
 async function deleteTask(taskId) {
+  if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   if (!homeworkState.currentSubjectId) return;
   const subject = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
   if (!subject || !Array.isArray(subject.tasks)) return;
@@ -1321,6 +1342,7 @@ async function renderExtracurricular() {
     window.enableDragSort(document.getElementById('ecContentContainer'), {
       itemSelector: '.event-card, .poll-card, .test-card',
       onReorder: async (newIds) => {
+        if (!isEditor()) return;
         const d = state.data.extracurricular;
         if (ecState.currentSection === 'events') {
           const map = new Map(d.events.map(x => [x.id, x]));
@@ -1480,6 +1502,7 @@ function renderEcTests(container, tests) {
 }
 
 async function deleteEcItem(section, id) {
+  if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const d = state.data.extracurricular;
   let title = '';
   let typeRu = '';
@@ -1519,6 +1542,7 @@ function setupEcModals() {
 }
 
 function openEcEditModal(section, id = null) {
+  if (!isEditor()) return;
   ecState.editModalSection = section;
   ecState.editModalId = id;
   const title = document.getElementById('ecModalTitle');
@@ -1593,6 +1617,7 @@ function openEcEditModal(section, id = null) {
 }
 
 async function saveEcModalItem() {
+  if (!isEditor()) { closeModal('ecEditModal'); return; }
   const section = ecState.editModalSection;
   const id = ecState.editModalId;
   const d = state.data.extracurricular;
@@ -1733,6 +1758,7 @@ async function renderTeacher() {
     window.enableDragSort(grid, {
       itemSelector: '.teacher-card',
       onReorder: async (newIds) => {
+        if (!isEditor()) return;
         const map = new Map(state.data.teachers.map(t => [t.id, t]));
         state.data.teachers = newIds.map(id => map.get(id)).filter(Boolean);
         await dataManager.save('teachers', state.data.teachers);
@@ -1787,6 +1813,7 @@ function renderTeachers() {
 function setupTeacherModal() {
   document.getElementById('teacherForm').onsubmit = async (e) => {
     e.preventDefault();
+    if (!isEditor()) { closeModal('teacherModal'); return; }
     const name = document.getElementById('teacherName').value.trim();
     const position = document.getElementById('teacherPosition').value.trim();
     const degree = document.getElementById('teacherDegree').value.trim();
@@ -1813,6 +1840,7 @@ function setupTeacherModal() {
 }
 
 function openTeacherModal(id = null) {
+  if (!isEditor()) return;
   teacherEdit.id = id;
   const t = id ? state.data.teachers.find(x => x.id === id) : null;
   document.getElementById('teacherModalTitle').innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать' : '<i class="fas fa-plus"></i> Добавить';
@@ -1827,6 +1855,7 @@ function openTeacherModal(id = null) {
 }
 
 async function deleteTeacher(id) {
+  if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const t = state.data.teachers.find(x => x.id === id);
   const ok = await confirmDialog({
     title: 'Удалить преподавателя?',
