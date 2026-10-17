@@ -261,5 +261,12 @@
 
 <script type="module" src="app-settings.js?v=6"></script>
 <script type="module" src="app.js?v=6"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed', err));
+    });
+  }
+</script>
 </body>
 </html>
