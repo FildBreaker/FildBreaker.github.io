@@ -1089,15 +1089,35 @@ function renderTasks(tasks) {
     }
     const tagsHtml = task.tags ? `<div class="task-tags"><i class="fas fa-tags"></i> ${esc(task.tags)}</div>` : '';
     
-    let deadlineHtml = '';
+        let deadlineHtml = '';
     if (task.deadline) {
       const d = new Date(task.deadline);
       const now = new Date();
+      
+      // Сбрасываем время на полночь для обеих дат, чтобы считать именно дни, а не часы
+      const dDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
       const diffMs = d - now;
-      const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      let badgeClass = 'deadline-safe'; let label = `До ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}`;
-      if (diffMs < 0) { badgeClass = 'deadline-danger'; label = 'ПРОСРОЧЕНО'; }
-      else if (daysLeft <= 2) { badgeClass = 'deadline-warning'; label = daysLeft === 0 ? 'Сегодня!' : `Осталось ${daysLeft} дн.`; }
+      const diffDays = Math.round((dDate - nowDate) / (1000 * 60 * 60 * 24));
+      
+      let badgeClass = 'deadline-safe'; 
+      let label = `До ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}`;
+      
+      if (diffMs < 0) { 
+        badgeClass = 'deadline-danger'; 
+        label = 'ПРОСРОЧЕНО'; 
+      } else if (diffDays === 0) { 
+        badgeClass = 'deadline-warning'; 
+        label = 'Сегодня!'; 
+      } else if (diffDays === 1) { 
+        badgeClass = 'deadline-warning'; 
+        label = 'Завтра'; 
+      } else if (diffDays <= 3) {
+        badgeClass = 'deadline-warning'; 
+        label = `Осталось ${diffDays} дн.`; 
+      }
+      
       deadlineHtml = `<div class="task-deadline ${badgeClass}"><i class="fas fa-clock"></i> ${label}</div>`;
     }
 
