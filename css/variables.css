@@ -33,11 +33,11 @@
   --badge-color: #1e293b;
   --radius: 28px;
   
-  /* Переменные для стекла */
-  --glass-bg: color-mix(in srgb, var(--card-bg) 65%, transparent);
-  --glass-bg-hover: color-mix(in srgb, var(--card-bg) 78%, transparent);
-  --glass-border: color-mix(in srgb, var(--text-color) 12%, transparent);
-  --glass-shadow: inset 0 1px 0 0 color-mix(in srgb, #fff 14%, transparent), inset 0 -1px 0 0 color-mix(in srgb, #000 8%, transparent), 0 12px 32px rgba(0, 0, 0, 0.25);
+  /* Переменные для стекла (без color-mix, чтобы не ломалось) */
+  --glass-bg: rgba(42, 42, 62, 0.65);
+  --glass-bg-hover: rgba(42, 42, 62, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 12px 32px rgba(0, 0, 0, 0.25);
 }
 
 /* ТЁМНЫЕ ТЕМЫ */
@@ -63,13 +63,14 @@
   --table-row-hover: rgba(255, 255, 255, 0.05);
   --input-bg: rgba(255, 255, 255, 0.06);
   --input-border: rgba(255, 255, 255, 0.12);
-  --input-focus: var(--accent);
   --btn-primary: #2d6a4f;
   --btn-primary-hover: #1f543d;
   --btn-secondary: #5a5a72;
   --btn-secondary-hover: #4a4a62;
   --badge-bg: #ffb347;
   --badge-color: #1a1a2e;
+  --glass-bg: rgba(42, 42, 62, 0.65);
+  --glass-bg-hover: rgba(42, 42, 62, 0.85);
 }
 
 .theme-dark-blue {
@@ -94,13 +95,14 @@
   --table-row-hover: rgba(255, 255, 255, 0.04);
   --input-bg: rgba(255, 255, 255, 0.06);
   --input-border: rgba(255, 255, 255, 0.1);
-  --input-focus: var(--accent);
   --btn-primary: #2980b9;
   --btn-primary-hover: #1f618d;
   --btn-secondary: #4a6a7a;
   --btn-secondary-hover: #3a5a6a;
   --badge-bg: #4a8cff;
   --badge-color: #0a1628;
+  --glass-bg: rgba(26, 42, 58, 0.65);
+  --glass-bg-hover: rgba(26, 42, 58, 0.85);
 }
 
 .theme-dark-green {
@@ -125,13 +127,14 @@
   --table-row-hover: rgba(255, 255, 255, 0.04);
   --input-bg: rgba(255, 255, 255, 0.06);
   --input-border: rgba(255, 255, 255, 0.1);
-  --input-focus: var(--accent);
   --btn-primary: #27ae60;
   --btn-primary-hover: #1e8449;
   --btn-secondary: #4a7a5a;
   --btn-secondary-hover: #3a6a4a;
   --badge-bg: #4caf50;
   --badge-color: #0a1f0a;
+  --glass-bg: rgba(26, 58, 42, 0.65);
+  --glass-bg-hover: rgba(26, 58, 42, 0.85);
 }
 
 .theme-dark-purple {
@@ -156,13 +159,14 @@
   --table-row-hover: rgba(255, 255, 255, 0.04);
   --input-bg: rgba(255, 255, 255, 0.06);
   --input-border: rgba(255, 255, 255, 0.1);
-  --input-focus: var(--accent);
   --btn-primary: #8e44ad;
   --btn-primary-hover: #6c3483;
   --btn-secondary: #6a4a7a;
   --btn-secondary-hover: #5a3a6a;
   --badge-bg: #ab47bc;
   --badge-color: #1a0a2a;
+  --glass-bg: rgba(42, 26, 58, 0.65);
+  --glass-bg-hover: rgba(42, 26, 58, 0.85);
 }
 
 .theme-dark-red {
@@ -187,13 +191,14 @@
   --table-row-hover: rgba(255, 255, 255, 0.04);
   --input-bg: rgba(255, 255, 255, 0.06);
   --input-border: rgba(255, 255, 255, 0.1);
-  --input-focus: var(--accent);
   --btn-primary: #c0392b;
   --btn-primary-hover: #a93226;
   --btn-secondary: #7a4a4a;
   --btn-secondary-hover: #6a3a3a;
   --badge-bg: #e74c3c;
   --badge-color: #2a0a0a;
+  --glass-bg: rgba(58, 26, 26, 0.65);
+  --glass-bg-hover: rgba(58, 26, 26, 0.85);
 }
 
 /* СВЕТЛЫЕ ТЕМЫ */
@@ -219,15 +224,16 @@
   --table-row-hover: rgba(0, 0, 0, 0.04);
   --input-bg: rgba(0, 0, 0, 0.04);
   --input-border: #d4c4b0;
-  --input-focus: #b8860b;
   --btn-primary: #b8860b;
   --btn-primary-hover: #a0750a;
   --btn-secondary: #d4c4b0;
   --btn-secondary-hover: #c4b4a0;
   --badge-bg: #b8860b;
   --badge-color: #fff;
-  --glass-bg: color-mix(in srgb, var(--card-bg) 78%, transparent);
-  --glass-bg-hover: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .theme-light-blue {
@@ -252,15 +258,16 @@
   --table-row-hover: rgba(0, 0, 0, 0.04);
   --input-bg: rgba(0, 0, 0, 0.04);
   --input-border: #b0c8e0;
-  --input-focus: #1a6b8a;
   --btn-primary: #1a6b8a;
   --btn-primary-hover: #155a75;
   --btn-secondary: #b0c8e0;
   --btn-secondary-hover: #a0b8d0;
   --badge-bg: #1a6b8a;
   --badge-color: #fff;
-  --glass-bg: color-mix(in srgb, var(--card-bg) 78%, transparent);
-  --glass-bg-hover: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .theme-light-green {
@@ -285,15 +292,16 @@
   --table-row-hover: rgba(0, 0, 0, 0.04);
   --input-bg: rgba(0, 0, 0, 0.04);
   --input-border: #b0d4b8;
-  --input-focus: #1a7a3a;
   --btn-primary: #1a7a3a;
   --btn-primary-hover: #156a32;
   --btn-secondary: #b0d4b8;
   --btn-secondary-hover: #a0c4a8;
   --badge-bg: #1a7a3a;
   --badge-color: #fff;
-  --glass-bg: color-mix(in srgb, var(--card-bg) 78%, transparent);
-  --glass-bg-hover: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .theme-light-purple {
@@ -318,15 +326,16 @@
   --table-row-hover: rgba(0, 0, 0, 0.04);
   --input-bg: rgba(0, 0, 0, 0.04);
   --input-border: #c8b8d8;
-  --input-focus: #6a1a8a;
   --btn-primary: #6a1a8a;
   --btn-primary-hover: #5a1578;
   --btn-secondary: #c8b8d8;
   --btn-secondary-hover: #b8a8c8;
   --badge-bg: #6a1a8a;
   --badge-color: #fff;
-  --glass-bg: color-mix(in srgb, var(--card-bg) 78%, transparent);
-  --glass-bg-hover: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .theme-light-red {
@@ -351,13 +360,14 @@
   --table-row-hover: rgba(0, 0, 0, 0.04);
   --input-bg: rgba(0, 0, 0, 0.04);
   --input-border: #d8b8b8;
-  --input-focus: #8a1a1a;
   --btn-primary: #8a1a1a;
   --btn-primary-hover: #751515;
   --btn-secondary: #d8b8b8;
   --btn-secondary-hover: #c8a8a8;
   --badge-bg: #8a1a1a;
   --badge-color: #fff;
-  --glass-bg: color-mix(in srgb, var(--card-bg) 78%, transparent);
-  --glass-bg-hover: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
