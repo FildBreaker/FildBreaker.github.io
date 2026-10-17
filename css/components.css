@@ -220,6 +220,11 @@
 .rich-content ol {padding-left: 24px; margin: 8px 0;}
 .rich-content li {margin-bottom: 4px;}
 .rich-content blockquote {border-left: 3px solid var(--accent); padding: 6px 14px; margin: 8px 0; background: var(--bg-hover); border-radius: 0 10px 10px 0; color: var(--text-secondary); font-style: italic;}
+.rich-content, .rich-display { word-break: break-word !important; overflow-wrap: break-word !important; white-space: pre-wrap !important; min-width: 0; max-width: 100%; }
+.rich-content pre, .rich-display pre, .rich-content code, .rich-display code { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: break-word !important; }
+.rich-content ul, .rich-content ol { padding-left: 24px !important; margin: 8px 0; }
+.rich-content li { margin-bottom: 4px; }
+.rich-toolbar button.active { background: var(--bg-active); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
 /* ============================================================
    DATE PICKER И COLOR PICKER
    ============================================================ */
