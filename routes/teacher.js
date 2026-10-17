@@ -7,6 +7,10 @@ import { isEditor } from '../auth.js';
 import { state } from '../state.js';
 import { setSidebar, setMain, setSidebarNavHandlers, openModal, closeModal, tgNotify, showSkeletonMain, hideSkeletonMain } from '../utils.js';
 
+// Импортируем Firebase Storage
+import { storage } from '../firebase-config.js';
+import { ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+
 const teacherEdit = { id: null };
 
 export async function renderTeacher() {
@@ -94,27 +98,99 @@ function renderTeachers() {
 }
 
 function setupTeacherModal() {
+  const fileInput = document.getElementById('teacherPhotoFile');
+  const previewContainer = document.getElementById('teacherPhotoPreview');
+  const previewImg = previewContainer.querySelector('img');
+  const urlInput = document.getElementById('teacherPhoto');
+
+  // Превью выбранного файла
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) {
+        const url = URL.createObjectURL(fileInput.files[0]);
+        previewImg.src = url;
+        previewContainer.style.display = 'block';
+        urlInput.value = ''; // Очищаем ручной ввод, если выбрали файл
+      } else {
+        previewContainer.style.display = 'none';
+      }
+    });
+  }
+
   document.getElementById('teacherForm').onsubmit = async (e) => {
     e.preventDefault();
     if (!isEditor()) { closeModal('teacherModal'); return; }
+
     const name = document.getElementById('teacherName').value.trim();
     const position = document.getElementById('teacherPosition').value.trim();
     const degree = document.getElementById('teacherDegree').value.trim();
     const degree2 = document.getElementById('teacherDegree2').value.trim();
     const phone = document.getElementById('teacherPhone').value.trim();
     const email = document.getElementById('teacherEmail').value.trim();
-    const photo = document.getElementById('teacherPhoto').value.trim();
-    if (!name || !position || !degree || !degree2 || !phone || !email) { toastWarning('Заполните все поля'); return; }
-    const data = { name, position, degree, degree2, phone, email, photo };
-    const isEdit = !!teacherEdit.id;
-    if (isEdit) { const idx = state.data.teachers.findIndex(t => t.id === teacherEdit.id); if (idx !== -1) state.data.teachers[idx] = { ...state.data.teachers[idx], ...data }; }
-    else { state.data.teachers.push({ id: Date.now().toString(), ...data }); }
-    const success = await dataManager.save('teachers', state.data.teachers);
-    if (!success) return;
-    renderTeachers();
-    closeModal('teacherModal');
-    toastSuccess(isEdit ? 'Преподаватель обновлён' : 'Преподаватель добавлен');
-    tgNotify(`👤 <b>Преподаватель ${isEdit ? 'изменён' : 'добавлен'}</b>\n🎓 ${name}\n💼 ${position}`);
+    let photo = document.getElementById('teacherPhoto').value.trim();
+
+    if (!name || !position || !degree || !degree2 || !phone || !email) {
+      toastWarning('Заполните все поля'); 
+      return; 
+    }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
+
+    try {
+      // Если выбран файл — грузим его в Firebase Storage
+      const file = fileInput.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('Файл слишком большой (макс. 5 МБ)');
+        }
+        
+        const ext = file.name.split('.').pop();
+        const fileName = `teachers/teacher_${Date.now()}.${ext}`;
+        const fileRef = storageRef(storage, fileName);
+
+        const uploadTask = uploadBytesResumable(fileRef, file);
+        
+        await new Promise((resolve, reject) => {
+          uploadTask.on('state_changed', 
+            null, 
+            (error) => reject(error), 
+            () => resolve()
+          );
+        });
+
+        // Получаем прямую ссылку на загруженный файл
+        photo = await getDownloadURL(fileRef);
+      }
+
+      const data = { name, position, degree, degree2, phone, email, photo };
+      const isEdit = !!teacherEdit.id;
+
+      if (isEdit) {
+        const idx = state.data.teachers.findIndex(t => t.id === teacherEdit.id);
+        if (idx !== -1) state.data.teachers[idx] = { ...state.data.teachers[idx], ...data };
+      } else {
+        state.data.teachers.push({ id: Date.now().toString(), ...data });
+      }
+
+      const success = await dataManager.save('teachers', state.data.teachers);
+      if (!success) throw new Error('Ошибка сохранения в базу данных');
+
+      renderTeachers();
+      closeModal('teacherModal');
+      toastSuccess(isEdit ? 'Преподаватель обновлён' : 'Преподаватель добавлен');
+      
+      tgNotify(`👤 <b>Преподаватель ${isEdit ? 'изменён' : 'добавлен'}</b>\n🎓 ${name}\n💼 ${position}`);
+
+    } catch (err) {
+      console.error(err);
+      toastError(err.message || 'Ошибка при сохранении');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
   };
 }
 
@@ -122,6 +198,7 @@ function openTeacherModal(id = null) {
   if (!isEditor()) return;
   teacherEdit.id = id;
   const t = id ? state.data.teachers.find(x => x.id === id) : null;
+  
   document.getElementById('teacherModalTitle').innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать' : '<i class="fas fa-plus"></i> Добавить';
   document.getElementById('teacherName').value = t ? (t.name || '') : '';
   document.getElementById('teacherPosition').value = t ? (t.position || '') : '';
@@ -130,6 +207,21 @@ function openTeacherModal(id = null) {
   document.getElementById('teacherPhone').value = t ? (t.phone || '') : '';
   document.getElementById('teacherEmail').value = t ? (t.email || '') : '';
   document.getElementById('teacherPhoto').value = t ? (t.photo || '') : '';
+
+  // Сброс загрузки файла и превью
+  const fileInput = document.getElementById('teacherPhotoFile');
+  if (fileInput) fileInput.value = '';
+  document.getElementById('teacherPhotoFileText').textContent = 'Выбрать файл';
+  
+  const previewContainer = document.getElementById('teacherPhotoPreview');
+  const previewImg = previewContainer.querySelector('img');
+  if (t && t.photo) {
+    previewImg.src = t.photo;
+    previewContainer.style.display = 'block';
+  } else {
+    previewContainer.style.display = 'none';
+  }
+
   openModal('teacherModal');
 }
 
