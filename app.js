@@ -132,7 +132,73 @@ function destroyRoute(route) {
 
 window.addEventListener('hashchange', navigate);
 
+// ============================================================
+// САЙДБАР (ЦЕНТРАЛИЗОВАННЫЙ)
+// ============================================================
 function setSidebar(html) { document.getElementById('sidebarDynamic').innerHTML = html; }
+
+function setSidebarNavHandlers() {
+  document.querySelectorAll('#sidebarDynamic [data-nav]').forEach(btn => {
+    btn.onclick = () => { location.hash = '#/' + btn.dataset.nav; };
+  });
+}
+
+function renderSidebar(route) {
+  let html = '';
+
+  if (['home', 'schedule', 'exam', 'teacher'].includes(route)) {
+    let note = '';
+    if (route === 'home') note = '<div class="sidebar-note"><i class="fas fa-database"></i><p>Данные синхронизируются через Firebase.</p></div>';
+    if (route === 'schedule') note = '<div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Большой брат следит за тобой.</p></div>';
+    if (route === 'exam') note = '<div class="sidebar-note"><i class="fas fa-info-circle"></i><p>Информация о экзаменах, на которую мы забьём болт.</p></div>';
+    if (route === 'teacher') note = '<div class="sidebar-note"><i class="fas fa-users"></i><p>Преподавательский состав</p></div>';
+
+    html = `
+      <h3><i class="fas fa-compass"></i> Основное</h3>
+      <div class="nav-buttons">
+        <button class="nav-btn" data-nav="extracurricular"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
+        <button class="nav-btn" data-nav="teacher"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
+        <button class="nav-btn" data-nav="resources"><i class="fas fa-link"></i> Ресурсы</button>
+        <button class="nav-btn" data-nav="homework"><i class="fas fa-book-open"></i> Домашка</button>
+      </div>
+      ${note}
+    `;
+  } else if (route === 'resources') {
+    html = `
+      <h3><i class="fas fa-filter"></i> Фильтры</h3>
+      <div class="filter-buttons">
+        <button class="filter-btn active-filter" data-category="all"><i class="fas fa-th-large"></i> Все</button>
+        <button class="filter-btn" data-category="study"><i class="fas fa-book"></i> Учебники</button>
+        <button class="filter-btn" data-category="video"><i class="fas fa-video"></i> Видео</button>
+        <button class="filter-btn" data-category="test"><i class="fas fa-tasks"></i> Конспекты</button>
+        <button class="filter-btn" data-category="soft"><i class="fas fa-laptop-code"></i> Прочее</button>
+      </div>
+      <div class="sidebar-note"><i class="fas fa-database"></i><p>Архив для всякого хлама.</p></div>
+    `;
+  } else if (route === 'homework') {
+    html = `
+      <h3><i class="fas fa-book"></i> Предметы</h3>
+      <div class="subjects-list" id="subjectsList"></div>
+      <button class="add-subject-btn" id="addSubjectBtn"><i class="fas fa-plus-circle"></i> Добавить предмет</button>
+      <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Расписание, на которое хотя бы смотреть можно.</p></div>
+    `;
+  } else if (route === 'extracurricular') {
+    html = `
+      <h3><i class="fas fa-compass"></i> Разделы</h3>
+      <div class="nav-sections">
+        <button class="section-btn active" data-section="events"><i class="fas fa-bullhorn"></i> Мероприятия</button>
+        <button class="section-btn" data-section="polls"><i class="fas fa-chart-simple"></i> Опросы</button>
+        <button class="section-btn" data-section="tests"><i class="fas fa-puzzle-piece"></i> Тесты</button>
+      </div>
+      <button class="add-global-btn" id="globalAddBtn"><i class="fas fa-plus-circle"></i> Добавить</button>
+      <div class="sidebar-note"><i class="fas fa-database"></i><p>День прошёл, число сменилось...</p></div>
+    `;
+  }
+
+  setSidebar(html);
+  setSidebarNavHandlers();
+}
+
 function setMain(html) { document.getElementById('mainContent').innerHTML = html; }
 function showSkeletonMain(kind, count) {
   if (window.showSkeleton) window.showSkeleton('mainContent', count || 3, kind || 'card');
@@ -140,27 +206,12 @@ function showSkeletonMain(kind, count) {
 function hideSkeletonMain() {
   if (window.hideSkeleton) window.hideSkeleton('mainContent');
 }
-function setSidebarNavHandlers() {
-  document.querySelectorAll('#sidebarDynamic [data-nav]').forEach(btn => {
-    btn.onclick = () => { location.hash = '#/' + btn.dataset.nav; };
-  });
-}
 
 // ============================================================
 // ГЛАВНАЯ
 // ============================================================
 async function renderHome() {
-  setSidebar(`
-    <h3><i class="fas fa-compass"></i> Основное</h3>
-    <div class="nav-buttons">
-      <button class="nav-btn" data-nav="extracurricular"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
-      <button class="nav-btn" data-nav="teacher"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
-      <button class="nav-btn" data-nav="resources"><i class="fas fa-link"></i> Ресурсы</button>
-      <button class="nav-btn" data-nav="homework"><i class="fas fa-book-open"></i> Домашка</button>
-    </div>
-    <div class="sidebar-note"><i class="fas fa-database"></i><p>Данные синхронизируются через Firebase.</p></div>
-  `);
-  setSidebarNavHandlers();
+  renderSidebar('home');
 
   setMain(`
     <div class="welcome-strip">
@@ -229,14 +280,8 @@ async function renderHome() {
     openModal('homeDateModal');
   }
 
-  document.getElementById('setExamDateBtn').onclick = () => {
-    if (!isEditor()) return;
-    openDateModal('exam');
-  };
-  document.getElementById('setGradDateBtn').onclick = () => {
-    if (!isEditor()) return;
-    openDateModal('grad');
-  };
+  document.getElementById('setExamDateBtn').onclick = () => { if (isEditor()) openDateModal('exam'); };
+  document.getElementById('setGradDateBtn').onclick = () => { if (isEditor()) openDateModal('grad'); };
 
   document.getElementById('homeDatePickerBtn').onclick = () => {
     openDatePicker({
@@ -268,17 +313,7 @@ const breaks = { 1: "Перерыв: 15 минут", 2: "Перерыв: 15 ми
 const MAX_PAIR = 6;
 
 async function renderSchedule() {
-  setSidebar(`
-    <h3><i class="fas fa-compass"></i> Основное</h3>
-    <div class="nav-buttons">
-      <button class="nav-btn" data-nav="extracurricular"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
-      <button class="nav-btn" data-nav="teacher"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
-      <button class="nav-btn" data-nav="resources"><i class="fas fa-link"></i> Ресурсы</button>
-      <button class="nav-btn" data-nav="homework"><i class="fas fa-book-open"></i> Домашка</button>
-    </div>
-    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Большой брат следит за тобой.</p></div>
-  `);
-  setSidebarNavHandlers();
+  renderSidebar('schedule');
 
   setMain(`
     <div class="schedule-section">
@@ -307,12 +342,7 @@ async function renderSchedule() {
   setupScheduleModal();
   document.getElementById('resetScheduleBtn').onclick = async () => {
     if (!isEditor()) { toastError('Нет прав на редактирование'); return; }
-    const ok = await confirmDialog({
-      title: 'Сбросить расписание?',
-      message: 'Все текущие правки будут потеряны. Восстановится базовое расписание.',
-      confirmText: 'Сбросить',
-      danger: true
-    });
+    const ok = await confirmDialog({ title: 'Сбросить расписание?', message: 'Все текущие правки будут потеряны.', confirmText: 'Сбросить', danger: true });
     if (!ok) return;
     state.data.schedule = {};
     const success = await dataManager.save('schedule', state.data.schedule);
@@ -431,10 +461,7 @@ async function saveScheduleEdit() {
   const newNotes = scheduleEdit.notesEditor ? sanitizeHtml(scheduleEdit.notesEditor.getContent()) : '';
   
   if (!state.data.schedule[day]) state.data.schedule[day] = {};
-  state.data.schedule[day][pair] = {
-    subject: newSubject, room: newRoom, startDate: newStartDate, endDate: newEndDate,
-    type: scheduleEdit.type || '', notes: newNotes
-  };
+  state.data.schedule[day][pair] = { subject: newSubject, room: newRoom, startDate: newStartDate, endDate: newEndDate, type: scheduleEdit.type || '', notes: newNotes };
   
   const success = await dataManager.save('schedule', state.data.schedule);
   if (!success) return;
@@ -448,8 +475,7 @@ async function saveScheduleEdit() {
     `📅 <b>Расписание обновлено</b>\n` +
     `📆 ${DAY_NAMES[day]}, ${pair}-я пара\n` +
     (newSubject ? `📖 ${newSubject}\n` : '') +
-    (newRoom ? `🚪 Ауд.: ${newRoom}\n` : '') +
-    (typeText ? typeText : '')
+    (newRoom ? `🚪 Ауд.: ${newRoom}\n` : '') + (typeText ? typeText : '')
   );
 }
 
@@ -457,17 +483,7 @@ async function saveScheduleEdit() {
 // ЭКЗАМЕНЫ
 // ============================================================
 async function renderExam() {
-  setSidebar(`
-    <h3><i class="fas fa-compass"></i> Основное</h3>
-    <div class="nav-buttons">
-      <button class="nav-btn" data-nav="extracurricular"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
-      <button class="nav-btn" data-nav="teacher"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
-      <button class="nav-btn" data-nav="resources"><i class="fas fa-link"></i> Ресурсы</button>
-      <button class="nav-btn" data-nav="homework"><i class="fas fa-book-open"></i> Домашка</button>
-    </div>
-    <div class="sidebar-note"><i class="fas fa-info-circle"></i><p>Информация о экзаменах, на которую мы забьём болт.</p></div>
-  `);
-  setSidebarNavHandlers();
+  renderSidebar('exam');
 
   setMain(`
     <div class="exams-hero">
@@ -500,10 +516,7 @@ async function renderExam() {
         const map = new Map(state.data.exams.map(e => [e.id, e]));
         state.data.exams = newIds.map(id => map.get(id)).filter(Boolean);
         const success = await dataManager.save('exams', state.data.exams);
-        if (success) {
-          renderExams();
-          toastSuccess('Порядок сохранён');
-        }
+        if (success) { renderExams(); toastSuccess('Порядок сохранён'); }
       }
     });
   }
@@ -513,12 +526,7 @@ function renderExams() {
   const grid = document.getElementById('examsGrid');
   if (!grid) return;
   if (!Array.isArray(state.data.exams) || !state.data.exams.length) {
-    renderEmpty(grid, 'exams', {
-      title: 'Экзамены пока не завезли',
-      subtitle: 'Ни одного экзамена в списке. Как только появится — будет здесь.',
-      actionLabel: isEditor() ? '+ Добавить экзамен' : '',
-      onAction: () => openExamModal()
-    });
+    renderEmpty(grid, 'exams', { title: 'Экзамены пока не завезли', subtitle: 'Ни одного экзамена в списке.', actionLabel: isEditor() ? '+ Добавить экзамен' : '', onAction: () => openExamModal() });
     return;
   }
   grid.innerHTML = '';
@@ -526,16 +534,10 @@ function renderExams() {
     if (!rawExam || typeof rawExam !== 'object') return;
     const exam = {
       id: rawExam.id || Date.now().toString() + Math.random().toString(36).substr(2, 4),
-      subject: rawExam.subject || 'Без названия',
-      date: rawExam.date || '',
-      room: rawExam.room || '',
-      teacher: rawExam.teacher || '',
-      format: rawExam.format || '',
-      resources: Array.isArray(rawExam.resources) ? rawExam.resources : [],
-      method: rawExam.method || '',
-      notes: rawExam.notes || ''
+      subject: rawExam.subject || 'Без названия', date: rawExam.date || '', room: rawExam.room || '',
+      teacher: rawExam.teacher || '', format: rawExam.format || '', resources: Array.isArray(rawExam.resources) ? rawExam.resources : [],
+      method: rawExam.method || '', notes: rawExam.notes || ''
     };
-
     const card = document.createElement('div');
     card.className = 'exam-card';
     card.dataset.id = exam.id;
@@ -555,11 +557,7 @@ function renderExams() {
         <div class="detail-row"><i class="fas fa-user-graduate"></i> <strong>Преподаватель:</strong> ${esc(exam.teacher)}</div>
         <div class="detail-row"><i class="fas fa-clock"></i> <strong>Формат:</strong> ${esc(exam.format)}</div>
       </div>
-      ${exam.resources.length ? `
-        <div class="exam-resources">
-          <p class="resources-title"><i class="fas fa-link"></i> Ресурсы:</p>
-          <div class="resource-buttons">${exam.resources.map(r => `<a href="#" class="res-link"><i class="fas fa-file-pdf"></i> ${esc(r)}</a>`).join('')}</div>
-        </div>` : ''}
+      ${exam.resources.length ? `<div class="exam-resources"><p class="resources-title"><i class="fas fa-link"></i> Ресурсы:</p><div class="resource-buttons">${exam.resources.map(r => `<a href="#" class="res-link"><i class="fas fa-file-pdf"></i> ${esc(r)}</a>`).join('')}</div></div>` : ''}
       ${exam.method ? `<div class="card-footer-note"><i class="fas fa-arrow-right"></i> <a href="#">${esc(exam.method)}</a></div>` : ''}
       ${exam.notes ? `<div class="exam-notes rich-display">${sanitizeHtml(exam.notes)}</div>` : ''}
     `;
@@ -587,27 +585,14 @@ function setupExamModal() {
     const notes = examEdit.notesEditor ? sanitizeHtml(examEdit.notesEditor.getContent()) : '';
     const examData = { subject, date, room, teacher, format, resources, method, notes };
     const isEdit = !!examEdit.id;
-    if (isEdit) {
-      const idx = state.data.exams.findIndex(x => x.id === examEdit.id);
-      if (idx !== -1) state.data.exams[idx] = { ...state.data.exams[idx], ...examData };
-    } else {
-      state.data.exams.push({ id: Date.now().toString(), ...examData });
-    }
-    
+    if (isEdit) { const idx = state.data.exams.findIndex(x => x.id === examEdit.id); if (idx !== -1) state.data.exams[idx] = { ...state.data.exams[idx], ...examData }; }
+    else { state.data.exams.push({ id: Date.now().toString(), ...examData }); }
     const success = await dataManager.save('exams', state.data.exams);
     if (!success) return;
-
     renderExams();
     closeModal('examModal');
     toastSuccess(isEdit ? 'Экзамен обновлён' : 'Экзамен добавлен');
-
-    tgNotify(
-      `📚 <b>Экзамен ${isEdit ? 'изменён' : 'добавлен'}</b>\n` +
-      `📖 ${subject}\n` +
-      `📅 ${date}\n` +
-      `🚪 Ауд.: ${room}\n` +
-      `👤 ${teacher}`
-    );
+    tgNotify(`📚 <b>Экзамен ${isEdit ? 'изменён' : 'добавлен'}</b>\n📖 ${subject}\n📅 ${date}\n🚪 Ауд.: ${room}\n👤 ${teacher}`);
   };
 }
 
@@ -623,7 +608,6 @@ function openExamModal(id = null) {
   document.getElementById('examFormat').value = exam ? (exam.format || '') : '';
   document.getElementById('examResources').value = exam ? ((exam.resources || []).join(', ')) : '';
   document.getElementById('examMethod').value = exam ? (exam.method || '') : '';
-
   const nc = document.getElementById('examNotesEditor');
   nc.innerHTML = '';
   examEdit.notesEditor = createRichEditor(nc, { placeholder: 'Дополнительные заметки...', minHeight: '60px' });
@@ -634,17 +618,11 @@ function openExamModal(id = null) {
 async function deleteExam(id) {
   if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const exam = state.data.exams.find(x => x.id === id);
-  const ok = await confirmDialog({
-    title: 'Удалить экзамен?',
-    message: exam ? `«${exam.subject}» будет удалён без возможности отмены.` : 'Экзамен будет удалён.',
-    confirmText: 'Удалить',
-    danger: true
-  });
+  const ok = await confirmDialog({ title: 'Удалить экзамен?', message: exam ? `«${exam.subject}» будет удалён.` : 'Экзамен будет удалён.', confirmText: 'Удалить', danger: true });
   if (!ok) return;
   state.data.exams = state.data.exams.filter(x => x.id !== id);
   const success = await dataManager.save('exams', state.data.exams);
   if (!success) return;
-
   renderExams();
   toastSuccess('Экзамен удалён');
   if (exam) tgNotify(`🗑 <b>Экзамен удалён</b>\n📖 ${exam.subject || 'Без названия'}`);
@@ -656,18 +634,7 @@ async function deleteExam(id) {
 const iconList = ['fa-book','fa-book-open','fa-file-pdf','fa-file-alt','fa-video','fa-film','fa-youtube','fa-play-circle','fa-tasks','fa-check-circle','fa-question-circle','fa-puzzle-piece','fa-laptop-code','fa-desktop','fa-download','fa-cloud-download-alt','fa-link','fa-external-link-alt','fa-folder-open','fa-archive','fa-graduation-cap','fa-chalkboard-teacher','fa-user-graduate'];
 
 async function renderResources() {
-  setSidebar(`
-    <h3><i class="fas fa-filter"></i> Фильтры</h3>
-    <div class="filter-buttons">
-      <button class="filter-btn active-filter" data-category="all"><i class="fas fa-th-large"></i> Все</button>
-      <button class="filter-btn" data-category="study"><i class="fas fa-book"></i> Учебники</button>
-      <button class="filter-btn" data-category="video"><i class="fas fa-video"></i> Видео</button>
-      <button class="filter-btn" data-category="test"><i class="fas fa-tasks"></i> Конспекты</button>
-      <button class="filter-btn" data-category="soft"><i class="fas fa-laptop-code"></i> Прочее</button>
-    </div>
-    <div class="sidebar-note"><i class="fas fa-database"></i><p>Архив для всякого хлама.</p></div>
-  `);
-  setSidebarNavHandlers();
+  renderSidebar('resources');
 
   setMain(`
     <div class="hero-resources">
@@ -708,10 +675,7 @@ async function renderResources() {
         const map = new Map(state.data.resources.map(r => [r.id, r]));
         state.data.resources = newIds.map(id => map.get(id)).filter(Boolean);
         const success = await dataManager.save('resources', state.data.resources);
-        if (success) {
-          renderResourceCards();
-          toastSuccess('Порядок сохранён');
-        }
+        if (success) { renderResourceCards(); toastSuccess('Порядок сохранён'); }
       }
     });
   }
@@ -721,12 +685,7 @@ function renderResourceCards() {
   const grid = document.getElementById('resourcesGrid');
   if (!grid) return;
   if (!state.data.resources.length) {
-    renderEmpty(grid, 'resources', {
-      title: 'Ресурсный центр пуст',
-      subtitle: 'Ни одного файла, ссылки или видео. Самое время добавить первый.',
-      actionLabel: isEditor() ? '+ Добавить ресурс' : '',
-      onAction: () => openResourceModal()
-    });
+    renderEmpty(grid, 'resources', { title: 'Ресурсный центр пуст', subtitle: 'Ни одного файла, ссылки или видео.', actionLabel: isEditor() ? '+ Добавить ресурс' : '', onAction: () => openResourceModal() });
     return;
   }
   grid.innerHTML = '';
@@ -788,25 +747,16 @@ function setupResourceModal() {
     if (!descText) { toastWarning('Введите описание'); return; }
     const resData = { title, desc, category, icon, meta, link };
     const isEdit = !!resourceEdit.id;
-    if (isEdit) {
-      const idx = state.data.resources.findIndex(r => r.id === resourceEdit.id);
-      if (idx !== -1) state.data.resources[idx] = { ...state.data.resources[idx], ...resData };
-    } else {
-      state.data.resources.push({ id: Date.now().toString(), ...resData });
-    }
+    if (isEdit) { const idx = state.data.resources.findIndex(r => r.id === resourceEdit.id); if (idx !== -1) state.data.resources[idx] = { ...state.data.resources[idx], ...resData }; }
+    else { state.data.resources.push({ id: Date.now().toString(), ...resData }); }
     const success = await dataManager.save('resources', state.data.resources);
     if (!success) return;
-
     renderResourceCards();
     closeModal('resourceModal');
     toastSuccess(isEdit ? 'Ресурс обновлён' : 'Ресурс добавлен');
-
-    tgNotify(`📂 <b>Ресурс ${isEdit ? 'изменён' : 'добавлен'}</b>\n📄 ${title}\n🏷 ${category}\n💬 ${descText.slice(0, 80)}${descText.length > 80 ? '…' : ''}`);
+    tgNotify(`📂 <b>Ресурс ${isEdit ? 'изменён' : 'добавлен'}</b>\n📄 ${title}\n🏷 ${category}`);
   };
-  document.getElementById('clearIconBtn').onclick = () => {
-    document.getElementById('resourceIcon').value = '';
-    renderIconPicker('');
-  };
+  document.getElementById('clearIconBtn').onclick = () => { document.getElementById('resourceIcon').value = ''; renderIconPicker(''); };
 }
 
 function renderIconPicker(selectedIcon) {
@@ -818,11 +768,7 @@ function renderIconPicker(selectedIcon) {
     btn.className = `icon-option ${selectedIcon === icon ? 'active' : ''}`;
     btn.innerHTML = `<i class="fas ${icon}"></i>`;
     btn.title = icon;
-    btn.onclick = () => {
-      container.querySelectorAll('.icon-option').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('resourceIcon').value = icon;
-    };
+    btn.onclick = () => { container.querySelectorAll('.icon-option').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('resourceIcon').value = icon; };
     container.appendChild(btn);
   });
 }
@@ -837,18 +783,14 @@ function openResourceModal(id = null) {
     document.getElementById('resourceModalTitle').innerHTML = '<i class="fas fa-edit"></i> Редактировать ресурс';
     document.getElementById('resourceTitle').value = res.title || '';
     document.getElementById('resourceCategory').value = res.category || 'study';
-    currentIcon = res.icon || '';
-    document.getElementById('resourceIcon').value = currentIcon;
+    currentIcon = res.icon || ''; document.getElementById('resourceIcon').value = currentIcon;
     document.getElementById('resourceMeta').value = res.meta || '';
     document.getElementById('resourceLink').value = res.link || '';
     currentDesc = res.desc || '';
   } else {
     document.getElementById('resourceModalTitle').innerHTML = '<i class="fas fa-plus"></i> Добавить ресурс';
-    document.getElementById('resourceTitle').value = '';
-    document.getElementById('resourceCategory').value = 'study';
-    document.getElementById('resourceIcon').value = '';
-    document.getElementById('resourceMeta').value = '';
-    document.getElementById('resourceLink').value = '';
+    document.getElementById('resourceTitle').value = ''; document.getElementById('resourceCategory').value = 'study';
+    document.getElementById('resourceIcon').value = ''; document.getElementById('resourceMeta').value = ''; document.getElementById('resourceLink').value = '';
   }
   renderIconPicker(currentIcon);
   const ed = document.getElementById('resourceDescEditor');
@@ -861,17 +803,11 @@ function openResourceModal(id = null) {
 async function deleteResource(id) {
   if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const res = state.data.resources.find(r => r.id === id);
-  const ok = await confirmDialog({
-    title: 'Удалить ресурс?',
-    message: res ? `«${res.title}» будет удалён.` : 'Ресурс будет удалён.',
-    confirmText: 'Удалить',
-    danger: true
-  });
+  const ok = await confirmDialog({ title: 'Удалить ресурс?', message: res ? `«${res.title}» будет удалён.` : 'Ресурс будет удалён.', confirmText: 'Удалить', danger: true });
   if (!ok) return;
   state.data.resources = state.data.resources.filter(r => r.id !== id);
   const success = await dataManager.save('resources', state.data.resources);
   if (!success) return;
-
   renderResourceCards();
   toastSuccess('Ресурс удалён');
   if (res) tgNotify(`🗑 <b>Ресурс удалён</b>\n📄 ${res.title || 'Без названия'}`);
@@ -896,12 +832,7 @@ function normalizeHomework(raw) {
 }
 
 async function renderHomework() {
-  setSidebar(`
-    <h3><i class="fas fa-book"></i> Предметы</h3>
-    <div class="subjects-list" id="subjectsList"></div>
-    <button class="add-subject-btn" id="addSubjectBtn"><i class="fas fa-plus-circle"></i> Добавить предмет</button>
-    <div class="sidebar-note"><i class="fas fa-cloud-upload-alt"></i><p>Расписание, на которое хотя бы смотреть можно.</p></div>
-  `);
+  renderSidebar('homework');
 
   setMain(`
     <div class="homework-header">
@@ -919,9 +850,8 @@ async function renderHomework() {
   }
 
   homeworkState.currentSubjectId = sessionStorage.getItem('activeSubjectId');
-  if (homeworkState.currentSubjectId && !state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId)) {
-    homeworkState.currentSubjectId = null;
-  }
+  if (homeworkState.currentSubjectId && !state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId)) homeworkState.currentSubjectId = null;
+  
   renderSubjects();
   if (homeworkState.currentSubjectId) selectSubject(homeworkState.currentSubjectId);
   else if (state.data.homework.subjects.length) selectSubject(state.data.homework.subjects[0].id);
@@ -939,10 +869,7 @@ async function renderHomework() {
         const map = new Map(state.data.homework.subjects.map(s => [s.id, s]));
         state.data.homework.subjects = newIds.map(id => map.get(id)).filter(Boolean);
         const success = await dataManager.save('homework', state.data.homework);
-        if (success) {
-          renderSubjects();
-          toastSuccess('Порядок сохранён');
-        }
+        if (success) { renderSubjects(); toastSuccess('Порядок сохранён'); }
       }
     });
   }
@@ -970,20 +897,12 @@ function renderSubjects() {
         <button class="delete-subject" data-id="${subj.id}"><i class="fas fa-trash"></i></button>
       </div>
     `;
-    div.onclick = (e) => {
-      if (e.target.closest('button')) return;
-      selectSubject(subj.id);
-    };
+    div.onclick = (e) => { if (e.target.closest('button')) return; selectSubject(subj.id); };
     div.querySelector('.edit-subject').onclick = (e) => { e.stopPropagation(); openSubjectModal(subj.id); };
     div.querySelector('.delete-subject').onclick = async (e) => {
       e.stopPropagation();
       if (!isEditor()) { toastError('Нет прав на удаление'); return; }
-      const ok = await confirmDialog({
-        title: 'Удалить предмет?',
-        message: `«${subj.name}» и все его задания будут удалены без возможности отмены.`,
-        confirmText: 'Удалить',
-        danger: true
-      });
+      const ok = await confirmDialog({ title: 'Удалить предмет?', message: `«${subj.name}» и все его задания будут удалены.`, confirmText: 'Удалить', danger: true });
       if (!ok) return;
       await deleteSubject(subj.id);
     };
@@ -998,11 +917,9 @@ function setupSubjectScroll(item) {
   const wrap = item.querySelector('.subject-text-wrap');
   const text = item.querySelector('.subject-text');
   if (!wrap || !text) return;
-
   wrap.classList.remove('has-scroll');
   text.style.removeProperty('--scroll-distance');
   text.style.removeProperty('--marquee-duration');
-
   const overflow = text.scrollWidth - wrap.clientWidth;
   if (overflow > 4) {
     text.style.setProperty('--scroll-distance', overflow + 'px');
@@ -1032,10 +949,7 @@ function selectSubject(subjectId) {
           const map = new Map(subj.tasks.map(t => [t.id, t]));
           subj.tasks = newIds.map(id => map.get(id)).filter(Boolean);
           const success = await dataManager.save('homework', state.data.homework);
-          if (success) {
-            renderTasks(subj.tasks);
-            toastSuccess('Порядок сохранён');
-          }
+          if (success) { renderTasks(subj.tasks); toastSuccess('Порядок сохранён'); }
         }
       });
     }
@@ -1046,12 +960,7 @@ function clearTasksView() {
   const titleEl = document.getElementById('currentSubjectTitle');
   if (titleEl) titleEl.innerHTML = '<i class="fas fa-folder"></i> Не выбран предмет';
   const tc = document.getElementById('tasksContainer');
-  if (tc) {
-    renderEmpty(tc, 'homework', {
-      title: 'Выберите предмет',
-      subtitle: 'Слева в списке найди нужный предмет или создай новый.'
-    });
-  }
+  if (tc) renderEmpty(tc, 'homework', { title: 'Выберите предмет', subtitle: 'Слева в списке найди нужный предмет.' });
   const btn = document.getElementById('addTaskBtn');
   if (btn) btn.disabled = true;
 }
@@ -1060,12 +969,7 @@ function renderTasks(tasks) {
   const container = document.getElementById('tasksContainer');
   if (!container) return;
   if (!tasks || tasks.length === 0) {
-    renderEmpty(container, 'homework', {
-      title: 'Заданий нет',
-      subtitle: 'Пока по этому предмету ничего не задали. Отдыхай или добавь сам.',
-      actionLabel: isEditor() ? '+ Добавить задание' : '',
-      onAction: () => openTaskModal()
-    });
+    renderEmpty(container, 'homework', { title: 'Заданий нет', subtitle: 'Пока по этому предмету ничего не задали.', actionLabel: isEditor() ? '+ Добавить задание' : '', onAction: () => openTaskModal() });
     return;
   }
   container.innerHTML = '';
@@ -1077,32 +981,20 @@ function renderTasks(tasks) {
     let linksHtml = '';
     if (task.links && task.links.length) {
       linksHtml = '<div class="task-links"><i class="fas fa-link"></i> Ресурсы: ';
-      task.links.forEach(link => {
-        linksHtml += `<a href="${esc(link.url)}" target="_blank" rel="noopener">${esc(link.title || 'Ссылка')}</a> `;
-      });
+      task.links.forEach(link => { linksHtml += `<a href="${esc(link.url)}" target="_blank" rel="noopener">${esc(link.title || 'Ссылка')}</a> `; });
       linksHtml += '</div>';
     }
     const tagsHtml = task.tags ? `<div class="task-tags"><i class="fas fa-tags"></i> ${esc(task.tags)}</div>` : '';
     
-    // ЛОГИКА ДЕДЛАЙНОВ
     let deadlineHtml = '';
     if (task.deadline) {
       const d = new Date(task.deadline);
       const now = new Date();
       const diffMs = d - now;
       const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      
-      let badgeClass = 'deadline-safe';
-      let label = `До ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}`;
-      
-      if (diffMs < 0) {
-        badgeClass = 'deadline-danger';
-        label = 'ПРОСРОЧЕНО';
-      } else if (daysLeft <= 2) {
-        badgeClass = 'deadline-warning';
-        label = daysLeft === 0 ? 'Сегодня!' : `Осталось ${daysLeft} дн.`;
-      }
-      
+      let badgeClass = 'deadline-safe'; let label = `До ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}`;
+      if (diffMs < 0) { badgeClass = 'deadline-danger'; label = 'ПРОСРОЧЕНО'; }
+      else if (daysLeft <= 2) { badgeClass = 'deadline-warning'; label = daysLeft === 0 ? 'Сегодня!' : `Осталось ${daysLeft} дн.`; }
       deadlineHtml = `<div class="task-deadline ${badgeClass}"><i class="fas fa-clock"></i> ${label}</div>`;
     }
 
@@ -1136,13 +1028,9 @@ function openSubjectModal(subjectId = null) {
   homeworkState.editSubjectId = subjectId;
   if (subjectId) {
     const subj = state.data.homework.subjects.find(s => s.id === subjectId);
-    if (subj) {
-      document.getElementById('subjectModalTitle').innerHTML = '<i class="fas fa-pen"></i> Редактировать предмет';
-      document.getElementById('subjectNameInput').value = subj.name;
-    }
+    if (subj) { document.getElementById('subjectModalTitle').innerHTML = '<i class="fas fa-pen"></i> Редактировать предмет'; document.getElementById('subjectNameInput').value = subj.name; }
   } else {
-    document.getElementById('subjectModalTitle').innerHTML = '<i class="fas fa-plus"></i> Новый предмет';
-    document.getElementById('subjectNameInput').value = '';
+    document.getElementById('subjectModalTitle').innerHTML = '<i class="fas fa-plus"></i> Новый предмет'; document.getElementById('subjectNameInput').value = '';
   }
   openModal('subjectModal');
 }
@@ -1158,12 +1046,10 @@ async function saveSubjectFromModal() {
   } else {
     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 6);
     state.data.homework.subjects.push({ id: newId, name, tasks: [] });
-    homeworkState.currentSubjectId = newId;
-    sessionStorage.setItem('activeSubjectId', newId);
+    homeworkState.currentSubjectId = newId; sessionStorage.setItem('activeSubjectId', newId);
   }
   const success = await dataManager.save('homework', state.data.homework);
   if (!success) return;
-
   renderSubjects();
   if (homeworkState.currentSubjectId) selectSubject(homeworkState.currentSubjectId);
   closeModal('subjectModal');
@@ -1179,12 +1065,7 @@ async function deleteSubject(subjectId) {
   state.data.homework.subjects.splice(idx, 1);
   const success = await dataManager.save('homework', state.data.homework);
   if (!success) return;
-
-  if (homeworkState.currentSubjectId === subjectId) {
-    homeworkState.currentSubjectId = null;
-    sessionStorage.removeItem('activeSubjectId');
-    clearTasksView();
-  }
+  if (homeworkState.currentSubjectId === subjectId) { homeworkState.currentSubjectId = null; sessionStorage.removeItem('activeSubjectId'); clearTasksView(); }
   renderSubjects();
   toastSuccess('Предмет удалён');
   tgNotify(`🗑 <b>Предмет удалён</b>\n📖 ${subjName}`);
@@ -1229,32 +1110,20 @@ function openTaskModal(taskId = null) {
   document.getElementById('taskTags').value = tagsVal;
   const lc = document.getElementById('linksContainer');
   lc.innerHTML = '';
-  if (linksVal.length) linksVal.forEach(l => addLinkGroup(l.url, l.title));
-  else addLinkGroup('', '');
+  if (linksVal.length) linksVal.forEach(l => addLinkGroup(l.url, l.title)); else addLinkGroup('', '');
 
-  // Инициализация дедлайна
   homeworkState.taskDeadline = task ? (task.deadline || null) : null;
   const deadlineText = document.getElementById('taskDeadlineText');
   if (deadlineText) {
-    deadlineText.textContent = homeworkState.taskDeadline 
-      ? formatDate(new Date(homeworkState.taskDeadline))
-      : 'Не указан';
-
+    deadlineText.textContent = homeworkState.taskDeadline ? formatDate(new Date(homeworkState.taskDeadline)) : 'Не указан';
     document.getElementById('taskDeadlinePickerBtn').onclick = () => {
       openDatePicker({
         anchorEl: document.getElementById('taskDeadlinePickerBtn'),
         initial: homeworkState.taskDeadline ? new Date(homeworkState.taskDeadline) : new Date(),
-        onPick: (date) => {
-          homeworkState.taskDeadline = date.toISOString();
-          deadlineText.textContent = formatDate(date);
-        }
+        onPick: (date) => { homeworkState.taskDeadline = date.toISOString(); deadlineText.textContent = formatDate(date); }
       });
     };
-
-    document.getElementById('clearTaskDeadlineBtn').onclick = () => {
-      homeworkState.taskDeadline = null;
-      deadlineText.textContent = 'Не указан';
-    };
+    document.getElementById('clearTaskDeadlineBtn').onclick = () => { homeworkState.taskDeadline = null; deadlineText.textContent = 'Не указан'; };
   }
 
   const container = document.getElementById('taskDescEditor');
@@ -1277,37 +1146,20 @@ async function saveTaskFromModal() {
     if (!subject) { toastError('Предмет не найден'); return; }
     if (!Array.isArray(subject.tasks)) subject.tasks = [];
     const isEdit = !!homeworkState.editTaskId;
-    
     if (isEdit) {
       const task = subject.tasks.find(t => t.id === homeworkState.editTaskId);
-      if (task) { 
-        task.desc = sanitizeHtml(descHtml); 
-        task.links = links; 
-        task.tags = tags; 
-        task.deadline = homeworkState.taskDeadline; 
-      }
+      if (task) { task.desc = sanitizeHtml(descHtml); task.links = links; task.tags = tags; task.deadline = homeworkState.taskDeadline; }
     } else {
-      subject.tasks.push({
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 6),
-        desc: sanitizeHtml(descHtml), links, tags, deadline: homeworkState.taskDeadline
-      });
+      subject.tasks.push({ id: Date.now().toString() + Math.random().toString(36).substr(2, 6), desc: sanitizeHtml(descHtml), links, tags, deadline: homeworkState.taskDeadline });
     }
-    
     const success = await dataManager.save('homework', state.data.homework);
     if (!success) return;
-
     renderTasks(subject.tasks);
     closeModal('taskModal');
     toastSuccess(isEdit ? 'Задание обновлено' : 'Задание добавлено');
-
-    tgNotify(
-      `📝 <b>Задание ${isEdit ? 'изменено' : 'добавлено'}</b>\n` +
-      `📚 ${subject.name}\n` +
-      `💬 ${descText.slice(0, 150)}${descText.length > 150 ? '…' : ''}`
-    );
+    tgNotify(`📝 <b>Задание ${isEdit ? 'изменено' : 'добавлено'}</b>\n📚 ${subject.name}\n💬 ${descText.slice(0, 150)}${descText.length > 150 ? '…' : ''}`);
   } catch (err) {
-    console.error(err);
-    toastError('Ошибка сохранения: ' + err.message);
+    console.error(err); toastError('Ошибка сохранения: ' + err.message);
   }
 }
 
@@ -1317,19 +1169,13 @@ async function deleteTask(taskId) {
   const subject = state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId);
   if (!subject || !Array.isArray(subject.tasks)) return;
   const task = subject.tasks.find(t => t.id === taskId);
-  const ok = await confirmDialog({
-    title: 'Удалить задание?',
-    message: task ? `«${(task.desc || '').slice(0, 80)}${(task.desc || '').length > 80 ? '…' : ''}» будет удалено.` : 'Задание будет удалено.',
-    confirmText: 'Удалить',
-    danger: true
-  });
+  const ok = await confirmDialog({ title: 'Удалить задание?', message: task ? `«${(task.desc || '').slice(0, 80)}${(task.desc || '').length > 80 ? '…' : ''}» будет удалено.` : 'Задание будет удалено.', confirmText: 'Удалить', danger: true });
   if (!ok) return;
   const idx = subject.tasks.findIndex(t => t.id === taskId);
   if (idx === -1) return;
   subject.tasks.splice(idx, 1);
   const success = await dataManager.save('homework', state.data.homework);
   if (!success) return;
-
   renderTasks(subject.tasks);
   toastSuccess('Задание удалено');
   tgNotify(`🗑 <b>Задание удалено</b>\n📚 ${subject.name}`);
@@ -1339,16 +1185,7 @@ async function deleteTask(taskId) {
 // ВНЕУРОЧКА
 // ============================================================
 async function renderExtracurricular() {
-  setSidebar(`
-    <h3><i class="fas fa-compass"></i> Разделы</h3>
-    <div class="nav-sections">
-      <button class="section-btn active" data-section="events"><i class="fas fa-bullhorn"></i> Мероприятия</button>
-      <button class="section-btn" data-section="polls"><i class="fas fa-chart-simple"></i> Опросы</button>
-      <button class="section-btn" data-section="tests"><i class="fas fa-puzzle-piece"></i> Тесты</button>
-    </div>
-    <button class="add-global-btn" id="globalAddBtn"><i class="fas fa-plus-circle"></i> Добавить</button>
-    <div class="sidebar-note"><i class="fas fa-database"></i><p>День прошёл, число сменилось...</p></div>
-  `);
+  renderSidebar('extracurricular');
 
   setMain(`
     <div class="section-header" id="ecSectionHeader">
@@ -1362,11 +1199,7 @@ async function renderExtracurricular() {
   if (!state.data.extracurricular) {
     const saved = await dataManager.load('extracurricular');
     if (saved) {
-      state.data.extracurricular = {
-        events: Array.isArray(saved.events) ? saved.events : [],
-        polls: Array.isArray(saved.polls) ? saved.polls : [],
-        tests: Array.isArray(saved.tests) ? saved.tests : []
-      };
+      state.data.extracurricular = { events: Array.isArray(saved.events) ? saved.events : [], polls: Array.isArray(saved.polls) ? saved.polls : [], tests: Array.isArray(saved.tests) ? saved.tests : [] };
     } else {
       state.data.extracurricular = { events: [], polls: [], tests: [] };
     }
@@ -1397,16 +1230,9 @@ async function renderExtracurricular() {
       onReorder: async (newIds) => {
         if (!isEditor()) return;
         const d = state.data.extracurricular;
-        if (ecState.currentSection === 'events') {
-          const map = new Map(d.events.map(x => [x.id, x]));
-          d.events = newIds.map(id => map.get(id)).filter(Boolean);
-        } else if (ecState.currentSection === 'polls') {
-          const map = new Map(d.polls.map(x => [x.id, x]));
-          d.polls = newIds.map(id => map.get(id)).filter(Boolean);
-        } else {
-          const map = new Map(d.tests.map(x => [x.id, x]));
-          d.tests = newIds.map(id => map.get(id)).filter(Boolean);
-        }
+        if (ecState.currentSection === 'events') { const map = new Map(d.events.map(x => [x.id, x])); d.events = newIds.map(id => map.get(id)).filter(Boolean); }
+        else if (ecState.currentSection === 'polls') { const map = new Map(d.polls.map(x => [x.id, x])); d.polls = newIds.map(id => map.get(id)).filter(Boolean); }
+        else { const map = new Map(d.tests.map(x => [x.id, x])); d.tests = newIds.map(id => map.get(id)).filter(Boolean); }
         const success = await dataManager.save('extracurricular', d);
         if (success) renderEcCurrent();
       }
@@ -1421,26 +1247,14 @@ function renderEcCurrent() {
   const container = document.getElementById('ecContentContainer');
   if (!container) return;
   const d = state.data.extracurricular;
-  if (ecState.currentSection === 'events') {
-    headerEl.innerHTML = `<h2><i class="fas fa-bullhorn"></i> Мероприятия</h2><p>Ближайшие события и дни сурка</p>`;
-    renderEcEvents(container, d.events);
-  } else if (ecState.currentSection === 'polls') {
-    headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение</p>`;
-    renderEcPolls(container, d.polls);
-  } else {
-    headerEl.innerHTML = `<h2><i class="fas fa-puzzle-piece"></i> Тесты</h2><p>Проверьте знания</p>`;
-    renderEcTests(container, d.tests);
-  }
+  if (ecState.currentSection === 'events') { headerEl.innerHTML = `<h2><i class="fas fa-bullhorn"></i> Мероприятия</h2><p>Ближайшие события и дни сурка</p>`; renderEcEvents(container, d.events); }
+  else if (ecState.currentSection === 'polls') { headerEl.innerHTML = `<h2><i class="fas fa-chart-simple"></i> Опросы</h2><p>Выразите своё мнение</p>`; renderEcPolls(container, d.polls); }
+  else { headerEl.innerHTML = `<h2><i class="fas fa-puzzle-piece"></i> Тесты</h2><p>Проверьте знания</p>`; renderEcTests(container, d.tests); }
 }
 
 function renderEcEvents(container, events) {
   if (!events.length) {
-    renderEmpty(container, 'events', {
-      title: 'Тишина',
-      subtitle: 'Никаких мероприятий пока не запланировано. Скучно, но честно.',
-      actionLabel: isEditor() ? '+ Добавить мероприятие' : '',
-      onAction: () => openEcEditModal('events')
-    });
+    renderEmpty(container, 'events', { title: 'Тишина', subtitle: 'Никаких мероприятий пока не запланировано.', actionLabel: isEditor() ? '+ Добавить мероприятие' : '', onAction: () => openEcEditModal('events') });
     return;
   }
   container.innerHTML = '';
@@ -1469,12 +1283,7 @@ function renderEcEvents(container, events) {
 
 function renderEcPolls(container, polls) {
   if (!polls.length) {
-    renderEmpty(container, 'polls', {
-      title: 'Опросов нет',
-      subtitle: 'Никто не спрашивал мнения. Может, ты первый?',
-      actionLabel: isEditor() ? '+ Создать опрос' : '',
-      onAction: () => openEcEditModal('polls')
-    });
+    renderEmpty(container, 'polls', { title: 'Опросов нет', subtitle: 'Никто не спрашивал мнения. Может, ты первый?', actionLabel: isEditor() ? '+ Создать опрос' : '', onAction: () => openEcEditModal('polls') });
     return;
   }
   container.innerHTML = '';
@@ -1493,19 +1302,12 @@ function renderEcPolls(container, polls) {
         ${poll.options.map((opt, idx) => `
           <div class="poll-option">
             <div class="option-text">${esc(opt.text)}</div>
-            ${userVoted
-              ? `<div class="option-bar"><div class="bar-fill" style="width:${(opt.votes/total*100)}%"></div></div>
-                 <div class="option-stats">${opt.votes} (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>`
-              : `<button class="vote-btn" data-poll="${poll.id}" data-optidx="${idx}">Голосовать</button>`}
+            ${userVoted ? `<div class="option-bar"><div class="bar-fill" style="width:${(opt.votes/total*100)}%"></div></div><div class="option-stats">${opt.votes} (${total ? ((opt.votes/total)*100).toFixed(1) : 0}%)</div>` : `<button class="vote-btn" data-poll="${poll.id}" data-optidx="${idx}">Голосовать</button>`}
           </div>`).join('')}
       </div>
       <div class="poll-footer">Всего голосов: ${total}</div>
     `;
-    if (!userVoted) {
-      card.querySelectorAll('.vote-btn').forEach(btn => {
-        btn.onclick = () => voteEcPoll(btn.dataset.poll, parseInt(btn.dataset.optidx));
-      });
-    }
+    if (!userVoted) { card.querySelectorAll('.vote-btn').forEach(btn => { btn.onclick = () => voteEcPoll(btn.dataset.poll, parseInt(btn.dataset.optidx)); }); }
     card.querySelector('.delete-poll').onclick = () => deleteEcItem('polls', poll.id);
     container.appendChild(card);
   });
@@ -1523,12 +1325,7 @@ async function voteEcPoll(pollId, optionIndex) {
 
 function renderEcTests(container, tests) {
   if (!tests.length) {
-    renderEmpty(container, 'tests', {
-      title: 'Тестов нет',
-      subtitle: 'Ни одного теста, ни одной проверки. Наслаждайся.',
-      actionLabel: isEditor() ? '+ Создать тест' : '',
-      onAction: () => openEcEditModal('tests')
-    });
+    renderEmpty(container, 'tests', { title: 'Тестов нет', subtitle: 'Ни одного теста, ни одной проверки.', actionLabel: isEditor() ? '+ Создать тест' : '', onAction: () => openEcEditModal('tests') });
     return;
   }
   container.innerHTML = '';
@@ -1557,36 +1354,18 @@ function renderEcTests(container, tests) {
 async function deleteEcItem(section, id) {
   if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const d = state.data.extracurricular;
-  let title = '';
-  let typeRu = '';
-  if (section === 'events') {
-    const item = d.events.find(e => e.id === id);
-    title = item?.title || '';
-    typeRu = 'Мероприятие';
-  } else if (section === 'polls') {
-    const item = d.polls.find(p => p.id === id);
-    title = item?.question || '';
-    typeRu = 'Опрос';
-  } else {
-    const item = d.tests.find(t => t.id === id);
-    title = item?.title || '';
-    typeRu = 'Тест';
-  }
+  let title = ''; let typeRu = '';
+  if (section === 'events') { const item = d.events.find(e => e.id === id); title = item?.title || ''; typeRu = 'Мероприятие'; }
+  else if (section === 'polls') { const item = d.polls.find(p => p.id === id); title = item?.question || ''; typeRu = 'Опрос'; }
+  else { const item = d.tests.find(t => t.id === id); title = item?.title || ''; typeRu = 'Тест'; }
 
-  const ok = await confirmDialog({
-    title: `Удалить ${typeRu.toLowerCase()}?`,
-    message: title ? `«${title}» будет удалён.` : `${typeRu} будет удалён.`,
-    confirmText: 'Удалить',
-    danger: true
-  });
+  const ok = await confirmDialog({ title: `Удалить ${typeRu.toLowerCase()}?`, message: title ? `«${title}» будет удалён.` : `${typeRu} будет удалён.`, confirmText: 'Удалить', danger: true });
   if (!ok) return;
-
   if (section === 'events') d.events = d.events.filter(e => e.id !== id);
   else if (section === 'polls') d.polls = d.polls.filter(p => p.id !== id);
   else d.tests = d.tests.filter(t => t.id !== id);
   const success = await dataManager.save('extracurricular', d);
   if (!success) return;
-
   renderEcCurrent();
   toastSuccess(`${typeRu} удалён`);
   tgNotify(`🗑 <b>Удалено из внеурочки</b>\n📄 ${title}`);
@@ -1607,39 +1386,20 @@ function openEcEditModal(section, id = null) {
 
   if (section === 'events') {
     title.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать' : '<i class="fas fa-plus"></i> Добавить';
-    fields.innerHTML = `
-      <label>Название</label><input type="text" id="ecEvTitle">
-      <label>Дата (ГГГГ-ММ-ДД)</label><input type="date" id="ecEvDate">
-      <label>Описание</label><div id="ecEvDescEditor"></div>
-      <label>Ссылка</label><input type="url" id="ecEvLink" placeholder="https://...">
-    `;
+    fields.innerHTML = `<label>Название</label><input type="text" id="ecEvTitle"><label>Дата (ГГГГ-ММ-ДД)</label><input type="date" id="ecEvDate"><label>Описание</label><div id="ecEvDescEditor"></div><label>Ссылка</label><input type="url" id="ecEvLink" placeholder="https://...">`;
     const ev = id ? d.events.find(x => x.id === id) : null;
-    if (ev) {
-      document.getElementById('ecEvTitle').value = ev.title || '';
-      document.getElementById('ecEvDate').value = ev.date || '';
-      document.getElementById('ecEvLink').value = ev.link || '';
-    }
+    if (ev) { document.getElementById('ecEvTitle').value = ev.title || ''; document.getElementById('ecEvDate').value = ev.date || ''; document.getElementById('ecEvLink').value = ev.link || ''; }
     const ed = document.getElementById('ecEvDescEditor');
     ecState.eventDescEditor = createRichEditor(ed, { placeholder: 'Описание...', minHeight: '90px' });
     ecState.eventDescEditor.setContent(ev ? (ev.description || '') : '');
   } else if (section === 'polls') {
     title.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать опрос' : '<i class="fas fa-plus"></i> Создать опрос';
-    fields.innerHTML = `
-      <label>Вопрос</label><input type="text" id="ecPollQuestion">
-      <label>Варианты (каждый с новой строки)</label><textarea id="ecPollOptions" rows="3"></textarea>
-    `;
+    fields.innerHTML = `<label>Вопрос</label><input type="text" id="ecPollQuestion"><label>Варианты (каждый с новой строки)</label><textarea id="ecPollOptions" rows="3"></textarea>`;
     const poll = id ? d.polls.find(p => p.id === id) : null;
-    if (poll) {
-      document.getElementById('ecPollQuestion').value = poll.question;
-      document.getElementById('ecPollOptions').value = poll.options.map(o => o.text).join('\n');
-    }
+    if (poll) { document.getElementById('ecPollQuestion').value = poll.question; document.getElementById('ecPollOptions').value = poll.options.map(o => o.text).join('\n'); }
   } else {
     title.innerHTML = id ? '<i class="fas fa-edit"></i> Редактировать тест' : '<i class="fas fa-plus"></i> Создать тест';
-    fields.innerHTML = `
-      <label>Название</label><input type="text" id="ecTestTitle">
-      <div id="ecQuestionsEditor"></div>
-      <button type="button" id="ecAddQuestionBtn" class="add-link-btn"><i class="fas fa-plus"></i> Добавить вопрос</button>
-    `;
+    fields.innerHTML = `<label>Название</label><input type="text" id="ecTestTitle"><div id="ecQuestionsEditor"></div><button type="button" id="ecAddQuestionBtn" class="add-link-btn"><i class="fas fa-plus"></i> Добавить вопрос</button>`;
     let questions = id ? (d.tests.find(t => t.id === id)?.questions || []) : [];
     const renderQE = () => {
       const c = document.getElementById('ecQuestionsEditor');
@@ -1647,25 +1407,13 @@ function openEcEditModal(section, id = null) {
       questions.forEach((q, idx) => {
         const qDiv = document.createElement('div');
         qDiv.className = 'question-editor';
-        qDiv.innerHTML = `
-          <div class="question-text"><input type="text" value="${esc(q.text)}" class="q-text"></div>
-          <div class="question-options">
-            ${q.options.map(opt => `<div class="opt-row"><input type="text" value="${esc(opt)}" class="q-opt"></div>`).join('')}
-          </div>
-          <select class="q-correct">
-            ${q.options.map((_, oi) => `<option value="${oi}" ${oi === q.correctIndex ? 'selected' : ''}>Правильный: ${oi+1}</option>`).join('')}
-          </select>
-          <button class="remove-question-btn" type="button">Удалить</button>
-        `;
+        qDiv.innerHTML = `<div class="question-text"><input type="text" value="${esc(q.text)}" class="q-text"></div><div class="question-options">${q.options.map(opt => `<div class="opt-row"><input type="text" value="${esc(opt)}" class="q-opt"></div>`).join('')}</div><select class="q-correct">${q.options.map((_, oi) => `<option value="${oi}" ${oi === q.correctIndex ? 'selected' : ''}>Правильный: ${oi+1}</option>`).join('')}</select><button class="remove-question-btn" type="button">Удалить</button>`;
         qDiv.querySelector('.remove-question-btn').onclick = () => { questions.splice(idx, 1); renderQE(); };
         c.appendChild(qDiv);
       });
     };
     renderQE();
-    document.getElementById('ecAddQuestionBtn').onclick = () => {
-      questions.push({ text: 'Новый вопрос', options: ['Вариант 1', 'Вариант 2'], correctIndex: 0 });
-      renderQE();
-    };
+    document.getElementById('ecAddQuestionBtn').onclick = () => { questions.push({ text: 'Новый вопрос', options: ['Вариант 1', 'Вариант 2'], correctIndex: 0 }); renderQE(); };
     if (id) document.getElementById('ecTestTitle').value = d.tests.find(t => t.id === id).title;
   }
   openModal('ecEditModal');
@@ -1687,12 +1435,8 @@ async function saveEcModalItem() {
     const descText = ecState.eventDescEditor ? ecState.eventDescEditor.getText().trim() : '';
     if (!title || !date) { toastWarning('Заполните название и дату'); return; }
     if (!descText) { toastWarning('Введите описание'); return; }
-    if (id) {
-      const ev = d.events.find(x => x.id === id);
-      if (ev) { ev.title = title; ev.date = date; ev.description = descHtml; ev.link = link || '#'; }
-    } else {
-      d.events.push({ id: Date.now().toString(), title, date, description: descHtml, link: link || '#' });
-    }
+    if (id) { const ev = d.events.find(x => x.id === id); if (ev) { ev.title = title; ev.date = date; ev.description = descHtml; ev.link = link || '#'; } }
+    else { d.events.push({ id: Date.now().toString(), title, date, description: descHtml, link: link || '#' }); }
     tgText = `🎉 <b>Мероприятие ${isEdit ? 'изменено' : 'добавлено'}</b>\n📌 ${title}\n📅 ${date}`;
   } else if (section === 'polls') {
     const question = document.getElementById('ecPollQuestion')?.value.trim();
@@ -1700,12 +1444,8 @@ async function saveEcModalItem() {
     if (!question || !optsText) { toastWarning('Введите вопрос и варианты'); return; }
     const optionsArray = optsText.split('\n').filter(s => s.trim()).map(t => ({ text: t.trim(), votes: 0 }));
     if (optionsArray.length < 2) { toastWarning('Нужно минимум 2 варианта'); return; }
-    if (id) {
-      const poll = d.polls.find(p => p.id === id);
-      if (poll) { poll.question = question; poll.options = optionsArray; poll.totalVotes = 0; poll.userVoted = false; }
-    } else {
-      d.polls.push({ id: Date.now().toString(), question, options: optionsArray, totalVotes: 0, userVoted: false });
-    }
+    if (id) { const poll = d.polls.find(p => p.id === id); if (poll) { poll.question = question; poll.options = optionsArray; poll.totalVotes = 0; poll.userVoted = false; } }
+    else { d.polls.push({ id: Date.now().toString(), question, options: optionsArray, totalVotes: 0, userVoted: false }); }
     tgText = `📊 <b>Опрос ${isEdit ? 'изменён' : 'создан'}</b>\n❓ ${question}`;
   } else {
     const testTitle = document.getElementById('ecTestTitle')?.value.trim();
@@ -1718,17 +1458,12 @@ async function saveEcModalItem() {
       if (qText && options.length >= 2) questions.push({ text: qText, options, correctIndex: correctIdx });
     });
     if (!questions.length) { toastWarning('Добавьте хотя бы один вопрос'); return; }
-    if (id) {
-      const test = d.tests.find(t => t.id === id);
-      if (test) { test.title = testTitle; test.questions = questions; }
-    } else {
-      d.tests.push({ id: Date.now().toString(), title: testTitle, questions });
-    }
+    if (id) { const test = d.tests.find(t => t.id === id); if (test) { test.title = testTitle; test.questions = questions; } }
+    else { d.tests.push({ id: Date.now().toString(), title: testTitle, questions }); }
     tgText = `🧠 <b>Тест ${isEdit ? 'изменён' : 'создан'}</b>\n📝 ${testTitle}\n❓ Вопросов: ${questions.length}`;
   }
   const success = await dataManager.save('extracurricular', d);
   if (!success) return;
-
   closeModal('ecEditModal');
   renderEcCurrent();
   toastSuccess(isEdit ? 'Сохранено' : 'Добавлено');
@@ -1745,12 +1480,7 @@ function openEcTest(testId) {
   test.questions.forEach((q, idx) => {
     const qDiv = document.createElement('div');
     qDiv.className = 'test-question';
-    qDiv.innerHTML = `
-      <p><strong>${idx+1}. ${esc(q.text)}</strong></p>
-      <div class="test-options">
-        ${q.options.map((opt, oi) => `<label><input type="radio" name="ecq${idx}" value="${oi}"> ${esc(opt)}</label>`).join('')}
-      </div>
-    `;
+    qDiv.innerHTML = `<p><strong>${idx+1}. ${esc(q.text)}</strong></p><div class="test-options">${q.options.map((opt, oi) => `<label><input type="radio" name="ecq${idx}" value="${oi}"> ${esc(opt)}</label>`).join('')}</div>`;
     c.appendChild(qDiv);
   });
   document.getElementById('ecTestResult').innerHTML = '';
@@ -1760,8 +1490,7 @@ function openEcTest(testId) {
       const sel = document.querySelector(`input[name="ecq${idx}"]:checked`);
       if (sel && parseInt(sel.value) === q.correctIndex) score++;
     });
-    document.getElementById('ecTestResult').innerHTML =
-      `<i class="fas fa-chart-line"></i> ${score} из ${test.questions.length} (${Math.round(score/test.questions.length*100)}%)`;
+    document.getElementById('ecTestResult').innerHTML = `<i class="fas fa-chart-line"></i> ${score} из ${test.questions.length} (${Math.round(score/test.questions.length*100)}%)`;
   };
   openModal('ecTestModal');
 }
@@ -1770,17 +1499,7 @@ function openEcTest(testId) {
 // ПРЕПОДАВАТЕЛИ
 // ============================================================
 async function renderTeacher() {
-  setSidebar(`
-    <h3><i class="fas fa-compass"></i> Основное</h3>
-    <div class="nav-buttons">
-      <button class="nav-btn" data-nav="extracurricular"><i class="fas fa-calendar-alt"></i> Мероприятия</button>
-      <button class="nav-btn" data-nav="teacher"><i class="fas fa-chalkboard-teacher"></i> Преподаватели</button>
-      <button class="nav-btn" data-nav="resources"><i class="fas fa-link"></i> Ресурсы</button>
-      <button class="nav-btn" data-nav="homework"><i class="fas fa-book-open"></i> Домашка</button>
-    </div>
-    <div class="sidebar-note"><i class="fas fa-users"></i><p>Преподавательский состав</p></div>
-  `);
-  setSidebarNavHandlers();
+  renderSidebar('teacher');
 
   setMain(`
     <div class="teachers-section">
@@ -1824,12 +1543,7 @@ function renderTeachers() {
   const container = document.getElementById('teachersGridContainer');
   if (!container) return;
   if (!state.data.teachers.length) {
-    renderEmpty(container, 'teachers', {
-      title: 'Преподавателей нет',
-      subtitle: 'Пусто, как в аудитории на первой паре. Добавь первого.',
-      actionLabel: isEditor() ? '+ Добавить преподавателя' : '',
-      onAction: () => openTeacherModal()
-    });
+    renderEmpty(container, 'teachers', { title: 'Преподавателей нет', subtitle: 'Пусто, как в аудитории на первой паре.', actionLabel: isEditor() ? '+ Добавить преподавателя' : '', onAction: () => openTeacherModal() });
     return;
   }
   container.innerHTML = '';
@@ -1874,19 +1588,13 @@ function setupTeacherModal() {
     if (!name || !position || !degree || !degree2 || !phone || !email) { toastWarning('Заполните все поля'); return; }
     const data = { name, position, degree, degree2, phone, email, photo };
     const isEdit = !!teacherEdit.id;
-    if (isEdit) {
-      const idx = state.data.teachers.findIndex(t => t.id === teacherEdit.id);
-      if (idx !== -1) state.data.teachers[idx] = { ...state.data.teachers[idx], ...data };
-    } else {
-      state.data.teachers.push({ id: Date.now().toString(), ...data });
-    }
+    if (isEdit) { const idx = state.data.teachers.findIndex(t => t.id === teacherEdit.id); if (idx !== -1) state.data.teachers[idx] = { ...state.data.teachers[idx], ...data }; }
+    else { state.data.teachers.push({ id: Date.now().toString(), ...data }); }
     const success = await dataManager.save('teachers', state.data.teachers);
     if (!success) return;
-
     renderTeachers();
     closeModal('teacherModal');
     toastSuccess(isEdit ? 'Преподаватель обновлён' : 'Преподаватель добавлен');
-
     tgNotify(`👤 <b>Преподаватель ${isEdit ? 'изменён' : 'добавлен'}</b>\n🎓 ${name}\n💼 ${position}`);
   };
 }
@@ -1909,17 +1617,11 @@ function openTeacherModal(id = null) {
 async function deleteTeacher(id) {
   if (!isEditor()) { toastError('Нет прав на удаление'); return; }
   const t = state.data.teachers.find(x => x.id === id);
-  const ok = await confirmDialog({
-    title: 'Удалить преподавателя?',
-    message: t ? `«${t.name}» будет удалён из списка.` : 'Преподаватель будет удалён.',
-    confirmText: 'Удалить',
-    danger: true
-  });
+  const ok = await confirmDialog({ title: 'Удалить преподавателя?', message: t ? `«${t.name}» будет удалён из списка.` : 'Преподаватель будет удалён.', confirmText: 'Удалить', danger: true });
   if (!ok) return;
   state.data.teachers = state.data.teachers.filter(t => t.id !== id);
   const success = await dataManager.save('teachers', state.data.teachers);
   if (!success) return;
-
   renderTeachers();
   toastSuccess('Преподаватель удалён');
   if (t) tgNotify(`🗑 <b>Преподаватель удалён</b>\n👤 ${t.name}`);
