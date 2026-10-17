@@ -66,12 +66,14 @@ body::after {
   padding: 20px 24px;
 }
 
+/* МОБИЛЬНАЯ СЕТКА */
 @media (max-width: 850px) {
   .app-grid {
     grid-template-columns: 1fr;
-    grid-template-areas: "header" "sidebar" "main" "footer";
-    gap: 20px;
-    padding: 16px;
+    /* Ставим main перед sidebar! */
+    grid-template-areas: "header" "main" "sidebar" "footer"; 
+    gap: 16px;
+    padding: 12px;
   }
 }
 
