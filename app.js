@@ -5,7 +5,7 @@ import { openDatePicker, formatDate } from './date-picker.js';
 import { toast, toastSuccess, toastError, toastWarning, toastInfo, confirmDialog } from './toast.js';
 import { renderEmpty } from './empty-states.js';
 import { applyCollapse, watchCollapse } from './collapse.js';
-import { isEditor, getCurrentUser } from './auth.js'; 
+import { isEditor, getCurrentUser } from './auth.js';
 
 // ============================================================
 // TELEGRAM NOTIFICATIONS
@@ -230,8 +230,14 @@ async function renderHome() {
     openModal('homeDateModal');
   }
 
-  document.getElementById('setExamDateBtn').onclick = () => openDateModal('exam');
-  document.getElementById('setGradDateBtn').onclick = () => openDateModal('grad');
+  document.getElementById('setExamDateBtn').onclick = () => {
+    if (!isEditor()) return;
+    openDateModal('exam');
+  };
+  document.getElementById('setGradDateBtn').onclick = () => {
+    if (!isEditor()) return;
+    openDateModal('grad');
+  };
 
   document.getElementById('homeDatePickerBtn').onclick = () => {
     openDatePicker({
@@ -258,15 +264,6 @@ async function renderHome() {
 // ============================================================
 // РАСПИСАНИЕ
 // ============================================================
-const defaultSchedule = {
-  0: { 1: { subject: "Проектная деятельность (П)", room: "1-210", startDate: "", endDate: "31.05.2026", type: "practice" }, 2: { subject: "Основы лесопаркового хозяйства (П)", room: "1-308", startDate: "", endDate: "31.05.2026", type: "practice" }, 3: { subject: "Лесная энтомология (П)", room: "1-203", startDate: "", endDate: "31.05.2026", type: "practice" }, 4: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } },
-  1: { 1: { subject: "Экономическая теория (П)", room: "1-303", startDate: "", endDate: "31.05.2026", type: "practice" }, 2: { subject: "Экономическая теория (П)", room: "1-408а", startDate: "", endDate: "31.05.2026", type: "practice" }, 3: { subject: "Основы лесопаркового хозяйства (П)", room: "Библиотека 309", startDate: "", endDate: "31.05.2026", type: "practice" }, 4: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } },
-  2: { 1: { subject: "Цифровые технологии (П)", room: "4-222", startDate: "", endDate: "31.05.2026", type: "practice" }, 2: { subject: "Технология лесозащиты (П)", room: "1-308", startDate: "", endDate: "31.05.2026", type: "practice" }, 3: { subject: "Физ-ра", room: "Спорткомплекс", startDate: "", endDate: "31.05.2026", type: "practice" }, 4: { subject: "Цифровые технологии (П)", room: "Библиотека 3116", startDate: "", endDate: "31.05.2026", type: "practice" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } },
-  3: { 1: { subject: "Лесная селекция (П)", room: "1-305", startDate: "", endDate: "31.05.2026", type: "practice" }, 2: { subject: "Лесная селекция (П)", room: "1-210", startDate: "", endDate: "31.05.2026", type: "practice" }, 3: { subject: "Таксация леса (П)", room: "1-202", startDate: "", endDate: "31.05.2026", type: "practice" }, 4: { subject: "Таксация леса (П)", room: "1-202", startDate: "", endDate: "31.05.2026", type: "practice" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } },
-  4: { 1: { subject: "Начертательная геометрия (П)", room: "3-23", startDate: "", endDate: "31.05.2026", type: "practice" }, 2: { subject: "Начертательная геометрия (П)", room: "3-24", startDate: "", endDate: "31.05.2026", type: "practice" }, 3: { subject: "Лесная энтомология (П)", room: "1-202", startDate: "", endDate: "31.05.2026", type: "practice" }, 4: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } },
-  5: { 1: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 2: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 3: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 4: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } },
-  6: { 1: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 2: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 3: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 4: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 5: { subject: "", room: "", startDate: "", endDate: "", type: "" }, 6: { subject: "", room: "", startDate: "", endDate: "", type: "" } }
-};
 const pairTimes = { 1: "1 пара (9:00 – 10:30)", 2: "2 пара (10:45 – 12:15)", 3: "3 пара (12:30 – 14:00)", 4: "4 пара (14:40 – 16:10)", 5: "5 пара (16:20 – 17:50)", 6: "6 пара (18:00 – 19:30)" };
 const breaks = { 1: "Перерыв: 15 минут", 2: "Перерыв: 15 минут", 3: "Перерыв: 40 минут", 4: "Перерыв: 10 минут", 5: "Перерыв: 10 минут" };
 const MAX_PAIR = 6;
@@ -304,8 +301,7 @@ async function renderSchedule() {
 
   if (!state.data.schedule) {
     const saved = await dataManager.load('schedule');
-    state.data.schedule = saved || JSON.parse(JSON.stringify(defaultSchedule));
-    if (!saved) await dataManager.save('schedule', state.data.schedule);
+    state.data.schedule = saved || {}; // Если пусто, то пустой объект
   }
   renderScheduleTable();
 
@@ -319,11 +315,12 @@ async function renderSchedule() {
       danger: true
     });
     if (!ok) return;
-    state.data.schedule = JSON.parse(JSON.stringify(defaultSchedule));
+    // Очищаем всё
+    state.data.schedule = {};
     await dataManager.save('schedule', state.data.schedule);
     renderScheduleTable();
-    toastSuccess('Расписание сброшено');
-    tgNotify('🔄 <b>Расписание сброшено к стандартному</b>');
+    toastSuccess('Расписание очищено');
+    tgNotify('🔄 <b>Расписание сброшено</b>');
   };
 }
 
@@ -433,12 +430,16 @@ async function saveScheduleEdit() {
   if (newStartDate && !datePattern.test(newStartDate)) { toastWarning('Дата начала в формате ДД.ММ.ГГГГ'); return; }
   if (newEndDate && !datePattern.test(newEndDate)) { toastWarning('Дата окончания в формате ДД.ММ.ГГГГ'); return; }
   const newNotes = scheduleEdit.notesEditor ? sanitizeHtml(scheduleEdit.notesEditor.getContent()) : '';
+  
   if (!state.data.schedule[day]) state.data.schedule[day] = {};
   state.data.schedule[day][pair] = {
     subject: newSubject, room: newRoom, startDate: newStartDate, endDate: newEndDate,
     type: scheduleEdit.type || '', notes: newNotes
   };
-  await dataManager.save('schedule', state.data.schedule);
+  
+  const success = await dataManager.save('schedule', state.data.schedule);
+  if (!success) return; // Если не сохранилось, не показываем тост и не закрываем модалку
+
   renderScheduleTable();
   closeModal('scheduleEditModal');
   toastSuccess('Пара сохранена');
@@ -483,15 +484,7 @@ async function renderExam() {
   showSkeletonMain('card', 2);
   if (!state.data.exams) {
     const saved = await dataManager.load('exams');
-    if (saved && Array.isArray(saved)) {
-      state.data.exams = saved.filter(x => x && typeof x === 'object');
-    } else {
-      state.data.exams = [
-        { id: '1', subject: 'Лесоводство и таксация', date: '17 июня 2025, 10:00', room: '202 (лесной факультет)', teacher: 'доцент Сидорова Е.В.', format: 'устный билет + практика', resources: ['Билеты', 'Wiki', 'Видео'], method: 'методичка.pdf' },
-        { id: '2', subject: 'Лесная селекция', date: '19 июня 2025, 10:00', room: '305 (лесной факультет)', teacher: 'профессор Лебедев А.И.', format: 'тестирование + устно', resources: ['Лекции', 'Статьи'], method: 'селекция_методичка.pdf' }
-      ];
-      await dataManager.save('exams', state.data.exams);
-    }
+    state.data.exams = (saved && Array.isArray(saved)) ? saved.filter(x => x && typeof x === 'object') : [];
   }
   hideSkeletonMain();
   renderExams();
@@ -507,9 +500,11 @@ async function renderExam() {
         if (!isEditor()) return;
         const map = new Map(state.data.exams.map(e => [e.id, e]));
         state.data.exams = newIds.map(id => map.get(id)).filter(Boolean);
-        await dataManager.save('exams', state.data.exams);
-        renderExams();
-        toastSuccess('Порядок сохранён');
+        const success = await dataManager.save('exams', state.data.exams);
+        if (success) {
+          renderExams();
+          toastSuccess('Порядок сохранён');
+        }
       }
     });
   }
@@ -522,7 +517,7 @@ function renderExams() {
     renderEmpty(grid, 'exams', {
       title: 'Экзамены пока не завезли',
       subtitle: 'Ни одного экзамена в списке. Как только появится — будет здесь.',
-      actionLabel: '+ Добавить экзамен',
+      actionLabel: isEditor() ? '+ Добавить экзамен' : '',
       onAction: () => openExamModal()
     });
     return;
@@ -599,7 +594,10 @@ function setupExamModal() {
     } else {
       state.data.exams.push({ id: Date.now().toString(), ...examData });
     }
-    await dataManager.save('exams', state.data.exams);
+    
+    const success = await dataManager.save('exams', state.data.exams);
+    if (!success) return;
+
     renderExams();
     closeModal('examModal');
     toastSuccess(isEdit ? 'Экзамен обновлён' : 'Экзамен добавлен');
@@ -645,7 +643,9 @@ async function deleteExam(id) {
   });
   if (!ok) return;
   state.data.exams = state.data.exams.filter(x => x.id !== id);
-  await dataManager.save('exams', state.data.exams);
+  const success = await dataManager.save('exams', state.data.exams);
+  if (!success) return;
+
   renderExams();
   toastSuccess('Экзамен удалён');
   if (exam) tgNotify(`🗑 <b>Экзамен удалён</b>\n📖 ${exam.subject || 'Без названия'}`);
@@ -684,15 +684,7 @@ async function renderResources() {
   showSkeletonMain('card', 3);
   if (!state.data.resources) {
     const saved = await dataManager.load('resources');
-    if (saved && Array.isArray(saved)) state.data.resources = saved.filter(x => x && typeof x === 'object');
-    else {
-      state.data.resources = [
-        { id: '1', title: 'Лесоводство. Полный курс', desc: 'Учебник PDF, 320 стр.', category: 'study', icon: 'fa-book-open', meta: 'PDF, 24 МБ', link: '#' },
-        { id: '2', title: 'Лекции по таксации', desc: 'Плейлист из 12 видео', category: 'video', icon: 'fa-video', meta: 'YouTube', link: '#' },
-        { id: '3', title: 'QGIS для лесоустройства', desc: 'Установочный пакет + плагины', category: 'soft', icon: 'fa-laptop-code', meta: '450 МБ', link: '#' }
-      ];
-      await dataManager.save('resources', state.data.resources);
-    }
+    state.data.resources = (saved && Array.isArray(saved)) ? saved.filter(x => x && typeof x === 'object') : [];
   }
   hideSkeletonMain();
   renderResourceCards();
@@ -716,9 +708,11 @@ async function renderResources() {
         if (!isEditor()) return;
         const map = new Map(state.data.resources.map(r => [r.id, r]));
         state.data.resources = newIds.map(id => map.get(id)).filter(Boolean);
-        await dataManager.save('resources', state.data.resources);
-        renderResourceCards();
-        toastSuccess('Порядок сохранён');
+        const success = await dataManager.save('resources', state.data.resources);
+        if (success) {
+          renderResourceCards();
+          toastSuccess('Порядок сохранён');
+        }
       }
     });
   }
@@ -731,7 +725,7 @@ function renderResourceCards() {
     renderEmpty(grid, 'resources', {
       title: 'Ресурсный центр пуст',
       subtitle: 'Ни одного файла, ссылки или видео. Самое время добавить первый.',
-      actionLabel: '+ Добавить ресурс',
+      actionLabel: isEditor() ? '+ Добавить ресурс' : '',
       onAction: () => openResourceModal()
     });
     return;
@@ -801,7 +795,9 @@ function setupResourceModal() {
     } else {
       state.data.resources.push({ id: Date.now().toString(), ...resData });
     }
-    await dataManager.save('resources', state.data.resources);
+    const success = await dataManager.save('resources', state.data.resources);
+    if (!success) return;
+
     renderResourceCards();
     closeModal('resourceModal');
     toastSuccess(isEdit ? 'Ресурс обновлён' : 'Ресурс добавлен');
@@ -874,7 +870,9 @@ async function deleteResource(id) {
   });
   if (!ok) return;
   state.data.resources = state.data.resources.filter(r => r.id !== id);
-  await dataManager.save('resources', state.data.resources);
+  const success = await dataManager.save('resources', state.data.resources);
+  if (!success) return;
+
   renderResourceCards();
   toastSuccess('Ресурс удалён');
   if (res) tgNotify(`🗑 <b>Ресурс удалён</b>\n📄 ${res.title || 'Без названия'}`);
@@ -919,13 +917,6 @@ async function renderHomework() {
   if (!state.data.homework) {
     const saved = await dataManager.load('homework');
     state.data.homework = normalizeHomework(saved);
-    if (state.data.homework.subjects.length === 0 && !saved) {
-      state.data.homework = { subjects: [
-        { id: 'subj1', name: 'Лесоводство', tasks: [{ id: 'task1', desc: 'Прочитать главы 3-5.', links: [{ url: '#', title: 'Учебник' }], tags: 'конспект' }] },
-        { id: 'subj2', name: 'Экология леса', tasks: [{ id: 'task2', desc: 'Написать эссе.', links: [{ url: '#', title: 'Методичка' }], tags: 'эссе' }] }
-      ]};
-      await dataManager.save('homework', state.data.homework);
-    }
   }
 
   homeworkState.currentSubjectId = sessionStorage.getItem('activeSubjectId');
@@ -948,9 +939,11 @@ async function renderHomework() {
         if (!isEditor()) return;
         const map = new Map(state.data.homework.subjects.map(s => [s.id, s]));
         state.data.homework.subjects = newIds.map(id => map.get(id)).filter(Boolean);
-        await dataManager.save('homework', state.data.homework);
-        renderSubjects();
-        toastSuccess('Порядок сохранён');
+        const success = await dataManager.save('homework', state.data.homework);
+        if (success) {
+          renderSubjects();
+          toastSuccess('Порядок сохранён');
+        }
       }
     });
   }
@@ -1039,9 +1032,11 @@ function selectSubject(subjectId) {
           if (!subj) return;
           const map = new Map(subj.tasks.map(t => [t.id, t]));
           subj.tasks = newIds.map(id => map.get(id)).filter(Boolean);
-          await dataManager.save('homework', state.data.homework);
-          renderTasks(subj.tasks);
-          toastSuccess('Порядок сохранён');
+          const success = await dataManager.save('homework', state.data.homework);
+          if (success) {
+            renderTasks(subj.tasks);
+            toastSuccess('Порядок сохранён');
+          }
         }
       });
     }
@@ -1069,7 +1064,7 @@ function renderTasks(tasks) {
     renderEmpty(container, 'homework', {
       title: 'Заданий нет',
       subtitle: 'Пока по этому предмету ничего не задали. Отдыхай или добавь сам.',
-      actionLabel: '+ Добавить задание',
+      actionLabel: isEditor() ? '+ Добавить задание' : '',
       onAction: () => openTaskModal()
     });
     return;
@@ -1142,7 +1137,9 @@ async function saveSubjectFromModal() {
     homeworkState.currentSubjectId = newId;
     sessionStorage.setItem('activeSubjectId', newId);
   }
-  await dataManager.save('homework', state.data.homework);
+  const success = await dataManager.save('homework', state.data.homework);
+  if (!success) return;
+
   renderSubjects();
   if (homeworkState.currentSubjectId) selectSubject(homeworkState.currentSubjectId);
   closeModal('subjectModal');
@@ -1156,7 +1153,9 @@ async function deleteSubject(subjectId) {
   if (idx === -1) return;
   const subjName = state.data.homework.subjects[idx].name;
   state.data.homework.subjects.splice(idx, 1);
-  await dataManager.save('homework', state.data.homework);
+  const success = await dataManager.save('homework', state.data.homework);
+  if (!success) return;
+
   if (homeworkState.currentSubjectId === subjectId) {
     homeworkState.currentSubjectId = null;
     sessionStorage.removeItem('activeSubjectId');
@@ -1238,7 +1237,9 @@ async function saveTaskFromModal() {
         desc: sanitizeHtml(descHtml), links, tags
       });
     }
-    await dataManager.save('homework', state.data.homework);
+    const success = await dataManager.save('homework', state.data.homework);
+    if (!success) return;
+
     renderTasks(subject.tasks);
     closeModal('taskModal');
     toastSuccess(isEdit ? 'Задание обновлено' : 'Задание добавлено');
@@ -1270,7 +1271,9 @@ async function deleteTask(taskId) {
   const idx = subject.tasks.findIndex(t => t.id === taskId);
   if (idx === -1) return;
   subject.tasks.splice(idx, 1);
-  await dataManager.save('homework', state.data.homework);
+  const success = await dataManager.save('homework', state.data.homework);
+  if (!success) return;
+
   renderTasks(subject.tasks);
   toastSuccess('Задание удалено');
   tgNotify(`🗑 <b>Задание удалено</b>\n📚 ${subject.name}`);
@@ -1309,21 +1312,7 @@ async function renderExtracurricular() {
         tests: Array.isArray(saved.tests) ? saved.tests : []
       };
     } else {
-      state.data.extracurricular = {
-        events: [
-          { id: 'ev1', title: 'Лесная олимпиада', date: '2026-06-10', description: 'Командное соревнование.', link: '#' },
-          { id: 'ev2', title: 'Лекция по ГИС', date: '2026-05-25', description: 'Приглашённый специалист.', link: '#' }
-        ],
-        polls: [
-          { id: 'poll1', question: 'Какое направление интереснее?', options: [{text:'Лесоводство', votes:12}, {text:'Экология', votes:8}, {text:'ГИС', votes:5}], totalVotes: 25, userVoted: false }
-        ],
-        tests: [
-          { id: 'test1', title: 'Основы дендрологии', questions: [
-            { text: 'Какое дерево хвойное?', options: ['Берёза', 'Сосна', 'Дуб', 'Клён'], correctIndex: 1 }
-          ] }
-        ]
-      };
-      await dataManager.save('extracurricular', state.data.extracurricular);
+      state.data.extracurricular = { events: [], polls: [], tests: [] };
     }
   }
   state.data.extracurricular.polls.forEach(p => {
@@ -1362,8 +1351,8 @@ async function renderExtracurricular() {
           const map = new Map(d.tests.map(x => [x.id, x]));
           d.tests = newIds.map(id => map.get(id)).filter(Boolean);
         }
-        await dataManager.save('extracurricular', d);
-        renderEcCurrent();
+        const success = await dataManager.save('extracurricular', d);
+        if (success) renderEcCurrent();
       }
     });
   }
@@ -1393,7 +1382,7 @@ function renderEcEvents(container, events) {
     renderEmpty(container, 'events', {
       title: 'Тишина',
       subtitle: 'Никаких мероприятий пока не запланировано. Скучно, но честно.',
-      actionLabel: '+ Добавить мероприятие',
+      actionLabel: isEditor() ? '+ Добавить мероприятие' : '',
       onAction: () => openEcEditModal('events')
     });
     return;
@@ -1427,7 +1416,7 @@ function renderEcPolls(container, polls) {
     renderEmpty(container, 'polls', {
       title: 'Опросов нет',
       subtitle: 'Никто не спрашивал мнения. Может, ты первый?',
-      actionLabel: '+ Создать опрос',
+      actionLabel: isEditor() ? '+ Создать опрос' : '',
       onAction: () => openEcEditModal('polls')
     });
     return;
@@ -1472,8 +1461,8 @@ async function voteEcPoll(pollId, optionIndex) {
   poll.options[optionIndex].votes = (poll.options[optionIndex].votes || 0) + 1;
   poll.totalVotes = (poll.totalVotes || 0) + 1;
   poll.userVoted = true;
-  await dataManager.save('extracurricular', state.data.extracurricular);
-  renderEcCurrent();
+  const success = await dataManager.save('extracurricular', state.data.extracurricular);
+  if (success) renderEcCurrent();
 }
 
 function renderEcTests(container, tests) {
@@ -1481,7 +1470,7 @@ function renderEcTests(container, tests) {
     renderEmpty(container, 'tests', {
       title: 'Тестов нет',
       subtitle: 'Ни одного теста, ни одной проверки. Наслаждайся.',
-      actionLabel: '+ Создать тест',
+      actionLabel: isEditor() ? '+ Создать тест' : '',
       onAction: () => openEcEditModal('tests')
     });
     return;
@@ -1539,7 +1528,9 @@ async function deleteEcItem(section, id) {
   if (section === 'events') d.events = d.events.filter(e => e.id !== id);
   else if (section === 'polls') d.polls = d.polls.filter(p => p.id !== id);
   else d.tests = d.tests.filter(t => t.id !== id);
-  await dataManager.save('extracurricular', d);
+  const success = await dataManager.save('extracurricular', d);
+  if (!success) return;
+
   renderEcCurrent();
   toastSuccess(`${typeRu} удалён`);
   tgNotify(`🗑 <b>Удалено из внеурочки</b>\n📄 ${title}`);
@@ -1679,7 +1670,9 @@ async function saveEcModalItem() {
     }
     tgText = `🧠 <b>Тест ${isEdit ? 'изменён' : 'создан'}</b>\n📝 ${testTitle}\n❓ Вопросов: ${questions.length}`;
   }
-  await dataManager.save('extracurricular', d);
+  const success = await dataManager.save('extracurricular', d);
+  if (!success) return;
+
   closeModal('ecEditModal');
   renderEcCurrent();
   toastSuccess(isEdit ? 'Сохранено' : 'Добавлено');
@@ -1746,14 +1739,7 @@ async function renderTeacher() {
   showSkeletonMain('card', 3);
   if (!state.data.teachers) {
     const saved = await dataManager.load('teachers');
-    if (saved && Array.isArray(saved)) state.data.teachers = saved.filter(x => x && typeof x === 'object');
-    else {
-      state.data.teachers = [
-        { id: '1', name: 'Гайвас Алексей Алексеевич', position: 'кафедра садоводства, лесного хозяйства и защиты растений', degree: 'Кандидат сельскохозяйственных наук, доцент', degree2: 'Предмет: Энтомология', phone: '(3812) 65-27-63, 13-42', email: 'aa.gayvas@omgau.org', photo: 'data/Teachers/Gaivas.jpg' },
-        { id: '2', name: 'Иванова Елена Васильевна', position: 'кафедра лесоводства и лесопаркового хозяйства', degree: 'Доктор биологических наук, профессор', degree2: 'Предмет: Лесоводство', phone: '(3812) 65-27-64', email: 'ev.ivanova@omgau.org', photo: 'data/Teachers/Ivanova.jpg' }
-      ];
-      await dataManager.save('teachers', state.data.teachers);
-    }
+    state.data.teachers = (saved && Array.isArray(saved)) ? saved.filter(x => x && typeof x === 'object') : [];
   }
   hideSkeletonMain();
   renderTeachers();
@@ -1769,8 +1755,8 @@ async function renderTeacher() {
         if (!isEditor()) return;
         const map = new Map(state.data.teachers.map(t => [t.id, t]));
         state.data.teachers = newIds.map(id => map.get(id)).filter(Boolean);
-        await dataManager.save('teachers', state.data.teachers);
-        renderTeachers();
+        const success = await dataManager.save('teachers', state.data.teachers);
+        if (success) renderTeachers();
       }
     });
   }
@@ -1785,7 +1771,7 @@ function renderTeachers() {
     renderEmpty(container, 'teachers', {
       title: 'Преподавателей нет',
       subtitle: 'Пусто, как в аудитории на первой паре. Добавь первого.',
-      actionLabel: '+ Добавить преподавателя',
+      actionLabel: isEditor() ? '+ Добавить преподавателя' : '',
       onAction: () => openTeacherModal()
     });
     return;
@@ -1838,7 +1824,9 @@ function setupTeacherModal() {
     } else {
       state.data.teachers.push({ id: Date.now().toString(), ...data });
     }
-    await dataManager.save('teachers', state.data.teachers);
+    const success = await dataManager.save('teachers', state.data.teachers);
+    if (!success) return;
+
     renderTeachers();
     closeModal('teacherModal');
     toastSuccess(isEdit ? 'Преподаватель обновлён' : 'Преподаватель добавлен');
@@ -1873,7 +1861,9 @@ async function deleteTeacher(id) {
   });
   if (!ok) return;
   state.data.teachers = state.data.teachers.filter(t => t.id !== id);
-  await dataManager.save('teachers', state.data.teachers);
+  const success = await dataManager.save('teachers', state.data.teachers);
+  if (!success) return;
+
   renderTeachers();
   toastSuccess('Преподаватель удалён');
   if (t) tgNotify(`🗑 <b>Преподаватель удалён</b>\n👤 ${t.name}`);
