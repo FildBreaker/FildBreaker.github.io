@@ -37,19 +37,16 @@ export function sanitizeHtml(html) {
       const name = attr.name.toLowerCase();
       const value = attr.value;
       if (name.startsWith('on')) node.removeAttribute(attr.name);
-
       if (name === 'href' || name === 'src') {
         if (/^\s*(javascript|data|vbscript):/i.test(value)) {
           node.removeAttribute(attr.name);
         }
       }
-
       if (name === 'class') {
         const safe = value.split(/\s+/).filter(c => c.startsWith('anim-')).join(' ');
         if (safe) node.setAttribute('class', safe);
         else node.removeAttribute('class');
       }
-
       if (name === 'style') {
         const safeStyle = value.split(';').filter(s => {
           return /^\s*(color|background-color|text-align|font-size|font-weight|font-style|text-decoration)\s*:/i.test(s);
@@ -57,7 +54,6 @@ export function sanitizeHtml(html) {
         if (safeStyle) node.setAttribute('style', safeStyle);
         else node.removeAttribute('style');
       }
-
       if (name === 'target' && value !== '_blank') node.removeAttribute('target');
       if (name === 'rel' && !/noopener|noreferrer/.test(value)) node.removeAttribute('rel');
     });
@@ -118,14 +114,16 @@ export function createRichEditor(target, options = {}) {
       <button type="button" data-anim="anim-shake" title="Тряска"><i class="fas fa-bolt"></i></button>
       <button type="button" data-anim="anim-gradient" title="Градиент"><i class="fas fa-fill-drip"></i></button>
       <span class="rich-sep"></span>
-      <button type="button" data-cmd="removeFormat" title="Очистить формат"><i class="fas fa-eraser"></i></button>
+      <button type="button" data-action="clear" title="Очистить всё форматирование"><i class="fas fa-eraser"></i></button>
     </div>
     <div class="rich-content" contenteditable="true" data-placeholder="${escapeHtml(placeholder)}" style="min-height:${minHeight};">${initial}</div>
   `;
+  
   const content = container.querySelector('.rich-content');
   const toolbar = container.querySelector('.rich-toolbar');
 
   function updateState() {
+    // 1. Текстовые стили
     ['bold','italic','underline','strikeThrough','subscript','superscript'].forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
@@ -134,7 +132,30 @@ export function createRichEditor(target, options = {}) {
         else btn.classList.remove('active');
       } catch (_) {}
     });
-    ['justifyLeft','justifyCenter','justifyRight','justifyFull','insertUnorderedList','insertOrderedList'].forEach(cmd => {
+
+    // 2. Выравнивание (фикс бага с двумя кнопками)
+    const alignCmds = ['justifyLeft','justifyCenter','justifyRight','justifyFull'];
+    let anyAlign = false;
+    alignCmds.forEach(cmd => {
+      const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
+      if (!btn) return;
+      let isActive = false;
+      try { isActive = document.queryCommandState(cmd); } catch (_) {}
+      if (isActive) {
+        anyAlign = true;
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    // Если браузер тупит и не видит выравнивания, по умолчанию считаем, что оно левое
+    if (!anyAlign) {
+      const leftBtn = toolbar.querySelector('[data-cmd="justifyLeft"]');
+      if (leftBtn) leftBtn.classList.add('active');
+    }
+
+    // 3. Списки
+    ['insertUnorderedList','insertOrderedList'].forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
       try {
@@ -149,7 +170,7 @@ export function createRichEditor(target, options = {}) {
     content.classList.toggle('empty', empty);
   }
 
-  // Обычные команды (учитываем data-value для formatBlock)
+  // Обычные команды
   toolbar.querySelectorAll('button[data-cmd]').forEach(btn => {
     if (btn.classList.contains('rich-color-btn')) return;
     btn.addEventListener('mousedown', e => e.preventDefault());
@@ -158,24 +179,44 @@ export function createRichEditor(target, options = {}) {
       content.focus();
       const cmd = btn.dataset.cmd;
       const val = btn.dataset.value || null;
+      
+      // Если это выравнивание — сначала сбрасываем все остальные
+      if (cmd.startsWith('justify')) {
+        document.execCommand('justifyLeft', false, null); // сброс
+      }
+      
       document.execCommand(cmd, false, val);
       updateState();
     });
   });
 
-  // Дропдаун стилей (обычный текст / заголовки)
+  // Обработка "Ластика" (Очистка стилей)
+  const clearBtn = toolbar.querySelector('[data-action="clear"]');
+  if (clearBtn) {
+    clearBtn.addEventListener('mousedown', e => e.preventDefault());
+    clearBtn.addEventListener('click', e => {
+      e.preventDefault();
+      content.focus();
+      document.execCommand('removeFormat'); // Убирает жирный/курсив
+      document.execCommand('unlink');       // Убирает ссылки
+      document.execCommand('formatBlock', false, 'p'); // Убирает заголовки
+      document.execCommand('justifyLeft');  // Сбрасывает выравнивание
+      updateState();
+    });
+  }
+
+  // Дропдаун стилей
   const formatSelect = toolbar.querySelector('.rich-format-select');
   if (formatSelect) {
     formatSelect.addEventListener('mousedown', e => e.stopPropagation());
     formatSelect.addEventListener('change', (e) => {
       content.focus();
-      const val = e.target.value;
-      document.execCommand('formatBlock', false, val);
+      document.execCommand('formatBlock', false, e.target.value);
       updateState();
     });
   }
 
-  // Кнопка «Вставить ссылку»
+  // Ссылка (сделаем через prompt, но чуть аккуратнее)
   const linkBtn = toolbar.querySelector('[data-action="link"]');
   if (linkBtn) {
     linkBtn.addEventListener('mousedown', e => e.preventDefault());
@@ -207,7 +248,7 @@ export function createRichEditor(target, options = {}) {
     });
   }
 
-  // Кнопки выбора цвета → открывают кастомный пикер
+  // Кнопки выбора цвета
   toolbar.querySelectorAll('.rich-color-btn').forEach(btn => {
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
@@ -257,6 +298,7 @@ export function createRichEditor(target, options = {}) {
   content.addEventListener('mouseup', updateState);
   content.addEventListener('focus', updateState);
   content.addEventListener('input', updatePlaceholder);
+  
   content.addEventListener('paste', e => {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
@@ -264,8 +306,13 @@ export function createRichEditor(target, options = {}) {
     document.execCommand('insertHTML', false, html);
     updatePlaceholder();
   });
+  
   content.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      // Если это внутри списка, даем браузеру создать новый li
+      if (document.queryCommandState('insertUnorderedList') || document.queryCommandState('insertOrderedList')) {
+        return; 
+      }
       e.preventDefault();
       document.execCommand('insertHTML', false, '<br><br>');
       return;
@@ -286,7 +333,7 @@ export function createRichEditor(target, options = {}) {
   return {
     getContent: () => content.innerHTML,
     getText: () => content.innerText,
-    setContent: (html) => { content.innerHTML = html || ''; updatePlaceholder(); },
+    setContent: (html) => { content.innerHTML = html || ''; updatePlaceholder(); updateState(); },
     isEmpty: () => content.textContent.trim() === '' && content.innerHTML.replace(/<br\s*\/?>/gi, '').trim() === '',
     element: content,
     focus: () => content.focus()
