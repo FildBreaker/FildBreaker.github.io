@@ -216,7 +216,10 @@
 .rich-content.empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; font-style: italic; }
 .rich-display { white-space: pre-wrap; word-break: break-word; line-height: 1.7; }
 .rich-toolbar .rich-format-select { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 5px 26px 5px 10px; font-size: 0.82rem; cursor: pointer; outline: none; }
-
+.rich-content ul,
+.rich-content ol {padding-left: 24px; margin: 8px 0;}
+.rich-content li {margin-bottom: 4px;}
+.rich-content blockquote {border-left: 3px solid var(--accent); padding: 6px 14px; margin: 8px 0; background: var(--bg-hover); border-radius: 0 10px 10px 0; color: var(--text-secondary); font-style: italic;}
 /* ============================================================
    DATE PICKER И COLOR PICKER
    ============================================================ */
