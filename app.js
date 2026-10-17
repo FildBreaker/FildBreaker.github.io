@@ -14,7 +14,6 @@ const TG_WORKER_URL = 'https://jolly-violet-3d1eb31les.fildbreaker.workers.dev';
 
 async function tgNotify(message) {
   const user = getCurrentUser();
-  // Если мы не редактор, бот вообще не должен дёргаться
   if (!user || !isEditor()) return; 
 
   try {
@@ -301,7 +300,7 @@ async function renderSchedule() {
 
   if (!state.data.schedule) {
     const saved = await dataManager.load('schedule');
-    state.data.schedule = saved || {}; // Если пусто, то пустой объект
+    state.data.schedule = saved || {};
   }
   renderScheduleTable();
 
@@ -315,9 +314,9 @@ async function renderSchedule() {
       danger: true
     });
     if (!ok) return;
-    // Очищаем всё
     state.data.schedule = {};
-    await dataManager.save('schedule', state.data.schedule);
+    const success = await dataManager.save('schedule', state.data.schedule);
+    if (!success) return;
     renderScheduleTable();
     toastSuccess('Расписание очищено');
     tgNotify('🔄 <b>Расписание сброшено</b>');
@@ -438,7 +437,7 @@ async function saveScheduleEdit() {
   };
   
   const success = await dataManager.save('schedule', state.data.schedule);
-  if (!success) return; // Если не сохранилось, не показываем тост и не закрываем модалку
+  if (!success) return;
 
   renderScheduleTable();
   closeModal('scheduleEditModal');
@@ -889,7 +888,7 @@ function normalizeHomework(raw) {
     const tasksRaw = toArray(subj.tasks);
     const tasks = tasksRaw.map(t => {
       if (!t || typeof t !== 'object') return null;
-      return { id: t.id || String(Date.now() + Math.random()), desc: t.desc || '', links: toArray(t.links), tags: t.tags || '' };
+      return { id: t.id || String(Date.now() + Math.random()), desc: t.desc || '', links: toArray(t.links), tags: t.tags || '', deadline: t.deadline || null };
     }).filter(Boolean);
     return { id: subj.id || String(Date.now() + Math.random()), name: subj.name || 'Без названия', tasks };
   }).filter(Boolean);
@@ -949,7 +948,7 @@ async function renderHomework() {
   }
 }
 
-const homeworkState = { currentSubjectId: null, editSubjectId: null, editTaskId: null, taskEditor: null };
+const homeworkState = { currentSubjectId: null, editSubjectId: null, editTaskId: null, taskEditor: null, taskDeadline: null };
 
 function renderSubjects() {
   const container = document.getElementById('subjectsList');
@@ -1070,6 +1069,7 @@ function renderTasks(tasks) {
     return;
   }
   container.innerHTML = '';
+  
   tasks.forEach(task => {
     const card = document.createElement('div');
     card.className = 'task-card';
@@ -1083,8 +1083,32 @@ function renderTasks(tasks) {
       linksHtml += '</div>';
     }
     const tagsHtml = task.tags ? `<div class="task-tags"><i class="fas fa-tags"></i> ${esc(task.tags)}</div>` : '';
+    
+    // ЛОГИКА ДЕДЛАЙНОВ
+    let deadlineHtml = '';
+    if (task.deadline) {
+      const d = new Date(task.deadline);
+      const now = new Date();
+      const diffMs = d - now;
+      const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      
+      let badgeClass = 'deadline-safe';
+      let label = `До ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}`;
+      
+      if (diffMs < 0) {
+        badgeClass = 'deadline-danger';
+        label = 'ПРОСРОЧЕНО';
+      } else if (daysLeft <= 2) {
+        badgeClass = 'deadline-warning';
+        label = daysLeft === 0 ? 'Сегодня!' : `Осталось ${daysLeft} дн.`;
+      }
+      
+      deadlineHtml = `<div class="task-deadline ${badgeClass}"><i class="fas fa-clock"></i> ${label}</div>`;
+    }
+
     card.innerHTML = `
       <div class="task-content">
+        ${deadlineHtml}
         <div class="task-desc rich-display">${sanitizeHtml(task.desc)}</div>
         ${linksHtml}
         ${tagsHtml}
@@ -1208,6 +1232,31 @@ function openTaskModal(taskId = null) {
   if (linksVal.length) linksVal.forEach(l => addLinkGroup(l.url, l.title));
   else addLinkGroup('', '');
 
+  // Инициализация дедлайна
+  homeworkState.taskDeadline = task ? (task.deadline || null) : null;
+  const deadlineText = document.getElementById('taskDeadlineText');
+  if (deadlineText) {
+    deadlineText.textContent = homeworkState.taskDeadline 
+      ? formatDate(new Date(homeworkState.taskDeadline))
+      : 'Не указан';
+
+    document.getElementById('taskDeadlinePickerBtn').onclick = () => {
+      openDatePicker({
+        anchorEl: document.getElementById('taskDeadlinePickerBtn'),
+        initial: homeworkState.taskDeadline ? new Date(homeworkState.taskDeadline) : new Date(),
+        onPick: (date) => {
+          homeworkState.taskDeadline = date.toISOString();
+          deadlineText.textContent = formatDate(date);
+        }
+      });
+    };
+
+    document.getElementById('clearTaskDeadlineBtn').onclick = () => {
+      homeworkState.taskDeadline = null;
+      deadlineText.textContent = 'Не указан';
+    };
+  }
+
   const container = document.getElementById('taskDescEditor');
   container.innerHTML = '';
   homeworkState.taskEditor = createRichEditor(container, { placeholder: 'Подробное описание задания...', minHeight: '120px' });
@@ -1228,15 +1277,22 @@ async function saveTaskFromModal() {
     if (!subject) { toastError('Предмет не найден'); return; }
     if (!Array.isArray(subject.tasks)) subject.tasks = [];
     const isEdit = !!homeworkState.editTaskId;
+    
     if (isEdit) {
       const task = subject.tasks.find(t => t.id === homeworkState.editTaskId);
-      if (task) { task.desc = sanitizeHtml(descHtml); task.links = links; task.tags = tags; }
+      if (task) { 
+        task.desc = sanitizeHtml(descHtml); 
+        task.links = links; 
+        task.tags = tags; 
+        task.deadline = homeworkState.taskDeadline; 
+      }
     } else {
       subject.tasks.push({
         id: Date.now().toString() + Math.random().toString(36).substr(2, 6),
-        desc: sanitizeHtml(descHtml), links, tags
+        desc: sanitizeHtml(descHtml), links, tags, deadline: homeworkState.taskDeadline
       });
     }
+    
     const success = await dataManager.save('homework', state.data.homework);
     if (!success) return;
 
