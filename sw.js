@@ -3,7 +3,6 @@ const CACHE_NAME = 'b31les-cache-v1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css', // если у тебя остались прямые ссылки
   './css/main.css',
   './css/variables.css',
   './css/base.css',
