@@ -155,12 +155,15 @@ function setupTeacherModal() {
         
         await new Promise((resolve, reject) => {
           uploadTask.on('state_changed', 
-            null, 
+            (snapshot) => {
+              // Считаем проценты и пишем прямо в кнопку
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Загрузка фото: ${Math.round(progress)}%`;
+            },
             (error) => reject(error), 
             () => resolve()
           );
         });
-
         // Получаем прямую ссылку на загруженный файл
         photo = await getDownloadURL(fileRef);
       }
