@@ -6,6 +6,7 @@ import { toast, toastSuccess, toastError, toastWarning, toastInfo, confirmDialog
 import { renderEmpty } from './empty-states.js';
 import { applyCollapse, watchCollapse } from './collapse.js';
 import { isEditor, getCurrentUser } from './auth.js';
+import { initSearch } from './search.js';
 
 // ============================================================
 // TELEGRAM NOTIFICATIONS
@@ -116,6 +117,7 @@ async function navigate() {
       setTimeout(() => mc.classList.remove('route-enter'), 700);
     }
 
+    window.globalSearchData = state.data;
     applyCollapse();
     if (window.setStagger) window.setStagger();
   } catch (err) {
@@ -1642,6 +1644,7 @@ function init() {
   if (!location.hash) location.hash = '#/home';
   navigate();
   watchCollapse();
+  initSearch();
 
   window.addEventListener('resize', () => {
     document.querySelectorAll('.subject-item').forEach(setupSubjectScroll);
