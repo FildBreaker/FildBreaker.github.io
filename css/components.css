@@ -329,3 +329,21 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
 .deadline-safe { background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border-color); }
 .deadline-warning { background: rgba(255, 179, 71, 0.15); color: #ffb347; border: 1px solid rgba(255, 179, 71, 0.4); }
 .deadline-danger { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
+
+.search-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+.search-modal.active { opacity: 1; pointer-events: auto; }
+.search-modal-content { background: var(--card-bg); width: 100%; max-width: 600px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border-color); overflow: hidden; transform: translateY(-20px); transition: transform 0.2s ease; }
+.search-modal.active .search-modal-content { transform: translateY(0); }
+.search-input-wrap { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-hover); }
+.search-input-wrap i { color: var(--text-muted); font-size: 1.2rem; }
+.search-input-wrap input { flex: 1; background: transparent; border: none; outline: none; color: var(--text-color); font-size: 1.1rem; font-family: inherit; }
+.search-close { font-size: 0.75rem; background: var(--bg-active); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.search-results { max-height: 60vh; overflow-y: auto; padding: 10px 0; }
+.search-hint { padding: 30px; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+.search-result-item { display: flex; gap: 14px; padding: 12px 20px; text-decoration: none; color: var(--text-color); border-bottom: 1px solid var(--border-color); transition: background 0.2s ease; }
+.search-result-item:hover { background: var(--bg-hover); }
+.search-res-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-active); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.search-res-info { flex: 1; min-width: 0; }
+.search-res-type { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
+.search-res-title { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-res-text { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
