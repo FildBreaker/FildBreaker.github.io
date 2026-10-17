@@ -325,3 +325,7 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   .toast-container { top: auto; bottom: 20px; left: 20px; right: 20px; max-width: none; }
   .timers-container { grid-template-columns: 1fr; }
 }
+.task-deadline { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; align-self: flex-start; }
+.deadline-safe { background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border-color); }
+.deadline-warning { background: rgba(255, 179, 71, 0.15); color: #ffb347; border: 1px solid rgba(255, 179, 71, 0.4); }
+.deadline-danger { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
