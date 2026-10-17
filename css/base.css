@@ -19,6 +19,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+button, input, textarea, select {
+  font-family: inherit;
+  outline: none;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -88,41 +99,20 @@ body::after {
 }
 
 /* СКРОЛЛБАРЫ */
-html::-webkit-scrollbar, body::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
-  background: var(--bg-hover);
-  border-radius: 10px;
-}
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 12px; height: 12px; }
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track { background: var(--bg-hover); border-radius: 10px; }
 html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, transparent), var(--accent));
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000));
   border-radius: 10px;
   border: 3px solid var(--bg-hover);
   background-clip: padding-box;
 }
-html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000));
-  background-clip: padding-box;
-}
-html, body {
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) var(--bg-hover);
-}
+html, body { scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-hover); }
 
-.table-wrapper::-webkit-scrollbar, textarea::-webkit-scrollbar,
-.rich-content::-webkit-scrollbar, .icon-picker::-webkit-scrollbar,
-.date-picker-popover::-webkit-scrollbar, .modal-content::-webkit-scrollbar,
-#themeOptions::-webkit-scrollbar { width: 6px; height: 8px; }
-
-.table-wrapper::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb,
-.rich-content::-webkit-scrollbar-thumb, .icon-picker::-webkit-scrollbar-thumb,
-.date-picker-popover::-webkit-scrollbar-thumb, .modal-content::-webkit-scrollbar-thumb,
-#themeOptions::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-
-.table-wrapper, textarea, .rich-content, .icon-picker,
-.date-picker-popover, .modal-content, #themeOptions {
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) var(--bg-hover);
+.table-wrapper::-webkit-scrollbar, textarea::-webkit-scrollbar, .rich-content::-webkit-scrollbar,
+.icon-picker::-webkit-scrollbar, .date-picker-popover::-webkit-scrollbar, .modal-content::-webkit-scrollbar { width: 6px; height: 8px; }
+.table-wrapper::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, .rich-content::-webkit-scrollbar-thumb,
+.icon-picker::-webkit-scrollbar-thumb, .date-picker-popover::-webkit-scrollbar-thumb, .modal-content::-webkit-scrollbar-thumb {
+  background: var(--accent); border-radius: 10px;
 }
+.table-wrapper, textarea, .rich-content, .icon-picker, .date-picker-popover, .modal-content { scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-hover); }
