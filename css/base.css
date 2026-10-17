@@ -1,0 +1,128 @@
+/* ============================================================
+   БАЗОВЫЕ СТИЛИ И СЕТКА
+   ============================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--primary-bg);
+  color: var(--text-color);
+  line-height: 1.5;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  font-feature-settings: 'ss01' on, 'ss02' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--bg-image-url) center/cover no-repeat;
+  filter: blur(10px);
+  -webkit-filter: blur(10px);
+  transform: scale(1.05);
+  will-change: transform;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--bg-overlay);
+  pointer-events: none;
+}
+
+.app-grid {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+@media (max-width: 850px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: "header" "sidebar" "main" "footer";
+    gap: 20px;
+    padding: 16px;
+  }
+}
+
+/* ТИПОГРАФИКА */
+.logo h1, .logo-fx-text,
+.schedule-header h2, .exams-hero h2, .hero-resources h2,
+.homework-header h2, .teachers-section h2, .section-header h2,
+.welcome-strip h2, .info-block h3 {
+  font-family: 'Unbounded', 'Manrope', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.schedule-header h2, .exams-hero h2, .hero-resources h2, .section-header h2 { font-size: 1.7rem; }
+.homework-header h2 { font-size: 1.5rem; }
+.welcome-strip h2  { font-size: 1.8rem; }
+.logo h1           { font-size: 1.55rem; }
+
+.timer-display {
+  font-family: 'Manrope', monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* СКРОЛЛБАРЫ */
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 10px;
+}
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, transparent), var(--accent));
+  border-radius: 10px;
+  border: 3px solid var(--bg-hover);
+  background-clip: padding-box;
+}
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000));
+  background-clip: padding-box;
+}
+html, body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-hover);
+}
+
+.table-wrapper::-webkit-scrollbar, textarea::-webkit-scrollbar,
+.rich-content::-webkit-scrollbar, .icon-picker::-webkit-scrollbar,
+.date-picker-popover::-webkit-scrollbar, .modal-content::-webkit-scrollbar,
+#themeOptions::-webkit-scrollbar { width: 6px; height: 8px; }
+
+.table-wrapper::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb,
+.rich-content::-webkit-scrollbar-thumb, .icon-picker::-webkit-scrollbar-thumb,
+.date-picker-popover::-webkit-scrollbar-thumb, .modal-content::-webkit-scrollbar-thumb,
+#themeOptions::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+.table-wrapper, textarea, .rich-content, .icon-picker,
+.date-picker-popover, .modal-content, #themeOptions {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-hover);
+}
