@@ -140,15 +140,39 @@ function setupTeacherModal() {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
 
     try {
-      // Если выбран файл — грузим его в Firebase Storage
-      const file = fileInput.files[0];
-      if (file) {
-        if (file.size > 5 * 1024 * 1024) {
-          throw new Error('Файл слишком большой (макс. 5 МБ)');
-        }
+    // Если выбран файл — грузим его в Firebase Storage
+      const originalFile = fileInput.files[0];
+      if (originalFile) {
+        // Магия сжатия картинки
+        const compressImage = (file) => {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+              const img = new Image();
+              img.src = event.target.result;
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 500; // Максимальная ширина
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Конвертируем в blob (JPEG с качеством 0.8)
+                canvas.toBlob((blob) => {
+                  resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' }));
+                }, 'image/jpeg', 0.8);
+              };
+            };
+          });
+        };
+
+        // Сжимаем и дальше грузим уже сжатый файл
+        const file = await compressImage(originalFile);
         
-        const ext = file.name.split('.').pop();
-        const fileName = `teachers/teacher_${Date.now()}.${ext}`;
+        const fileName = `teachers/teacher_${Date.now()}.jpg`;
         const fileRef = storageRef(storage, fileName);
 
         const uploadTask = uploadBytesResumable(fileRef, file);
