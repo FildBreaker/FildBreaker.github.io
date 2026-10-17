@@ -2,10 +2,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAwMQhg9UAMo8wVzakwGWpdHSFrINQjQJw",
+  apiKey: "AIzaSyAwMQhg9UAMo8wVzakwGWpdHSrINQjQJw", // Твой настоящий ключ
   authDomain: "ibd2026-31a00.firebaseapp.com",
   databaseURL: "https://ibd2026-31a00-default-rtdb.firebaseio.com",
   projectId: "ibd2026-31a00",
@@ -18,4 +17,3 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getDatabase(app);
 export const auth = getAuth(app);
-export const storage = getStorage(app); // <-- ДОБАВИЛИ ЭТО
