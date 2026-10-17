@@ -200,6 +200,14 @@
       <button id="saveTaskBtn" type="button" class="save-btn">Сохранить задание</button>
       <button id="cancelTaskBtn" type="button" class="cancel-btn" data-close="taskModal">Отмена</button>
     </div>
+    <label>Дедлайн (опционально)</label>
+      <div style="display: flex; gap: 10px; align-items: flex-start; margin-top: 6px; flex-wrap: wrap;">
+        <button type="button" id="taskDeadlinePickerBtn" class="date-picker-trigger" style="flex: 1; margin-top: 0;">
+          <i class="fas fa-calendar-alt"></i>
+          <span id="taskDeadlineText">Не указан</span>
+        </button>
+        <button type="button" id="clearTaskDeadlineBtn" class="cancel-btn" style="padding: 12px 18px; margin-top: 0; height: 100%;">Сбросить</button>
+      </div>
   </div>
 </div>
 
