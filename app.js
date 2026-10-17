@@ -5,7 +5,7 @@ import { openDatePicker, formatDate } from './date-picker.js';
 import { toast, toastSuccess, toastError, toastWarning, toastInfo, confirmDialog } from './toast.js';
 import { renderEmpty } from './empty-states.js';
 import { applyCollapse, watchCollapse } from './collapse.js';
-import { isEditor } from './auth.js';
+import { isEditor, getCurrentUser } from './auth.js'; 
 
 // ============================================================
 // TELEGRAM NOTIFICATIONS
@@ -13,10 +13,18 @@ import { isEditor } from './auth.js';
 const TG_WORKER_URL = 'https://jolly-violet-3d1eb31les.fildbreaker.workers.dev';
 
 async function tgNotify(message) {
+  const user = getCurrentUser();
+  // Если мы не редактор, бот вообще не должен дёргаться
+  if (!user || !isEditor()) return; 
+
   try {
+    const token = await user.getIdToken();
     await fetch(TG_WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({ message }),
     });
   } catch (err) {
