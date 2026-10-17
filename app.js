@@ -1,29 +1,29 @@
 // app.js
 import { state } from './state.js';
-import { setupModalGlobals, showSkeletonMain, hideSkeletonMain } from './utils.js';
+import { setupModalGlobals } from './utils.js';
 import { setupGlobalSearch } from './search.js';
 import { applyCollapse, watchCollapse } from './collapse.js';
+import { setupSubjectScroll } from './routes/homework.js';
 
 // Импортируем рендеры страниц
 import { renderHome } from './routes/home.js';
-// TODO: Создай остальные файлы в папке routes по аналогии с home.js
-// import { renderSchedule } from './routes/schedule.js';
-// import { renderExam } from './routes/exam.js';
-// import { renderResources } from './routes/resources.js';
-// import { renderHomework } from './routes/homework.js';
-// import { renderExtracurricular } from './routes/extracurricular.js';
-// import { renderTeacher } from './routes/teacher.js';
+import { renderSchedule } from './routes/schedule.js';
+import { renderExam } from './routes/exam.js';
+import { renderResources } from './routes/resources.js';
+import { renderHomework } from './routes/homework.js';
+import { renderExtracurricular } from './routes/extracurricular.js';
+import { renderTeacher } from './routes/teacher.js';
 
 const ROUTES = ['home', 'schedule', 'exam', 'resources', 'homework', 'extracurricular', 'teacher'];
 
 const RENDERERS = {
   home: renderHome,
-  // schedule: renderSchedule,
-  // exam: renderExam,
-  // resources: renderResources,
-  // homework: renderHomework,
-  // extracurricular: renderExtracurricular,
-  // teacher: renderTeacher
+  schedule: renderSchedule,
+  exam: renderExam,
+  resources: renderResources,
+  homework: renderHomework,
+  extracurricular: renderExtracurricular,
+  teacher: renderTeacher
 };
 
 function parseRoute() {
@@ -83,9 +83,7 @@ function init() {
   watchCollapse();
 
   window.addEventListener('resize', () => {
-    document.querySelectorAll('.subject-item').forEach(item => {
-      // если у тебя есть setupSubjectScroll в homework.js, тебе нужно будет экспортировать его и импортировать сюда
-    });
+    document.querySelectorAll('.subject-item').forEach(setupSubjectScroll);
   });
 }
 
