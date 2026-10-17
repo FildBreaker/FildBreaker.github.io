@@ -3,20 +3,12 @@ import { openColorPicker } from './color-picker.js';
 
 const ALLOWED_TAGS = [
   'B','I','U','S','BR','SPAN','STRONG','EM','FONT','MARK','SUB','SUP',
-  'H1','H2','H3','H4','H5','H6',
-  'UL','OL','LI',
-  'BLOCKQUOTE','PRE','CODE',
-  'A','HR','P','DIV'
+  'H1','H2','H3','H4','H5','H6', 'UL','OL','LI', 'BLOCKQUOTE','PRE','CODE', 'A','HR','P','DIV'
 ];
 
 export function escapeHtml(str) {
   if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 export function sanitizeHtml(html) {
@@ -38,9 +30,7 @@ export function sanitizeHtml(html) {
       const value = attr.value;
       if (name.startsWith('on')) node.removeAttribute(attr.name);
       if (name === 'href' || name === 'src') {
-        if (/^\s*(javascript|data|vbscript):/i.test(value)) {
-          node.removeAttribute(attr.name);
-        }
+        if (/^\s*(javascript|data|vbscript):/i.test(value)) node.removeAttribute(attr.name);
       }
       if (name === 'class') {
         const safe = value.split(/\s+/).filter(c => c.startsWith('anim-')).join(' ');
@@ -48,14 +38,11 @@ export function sanitizeHtml(html) {
         else node.removeAttribute('class');
       }
       if (name === 'style') {
-        const safeStyle = value.split(';').filter(s => {
-          return /^\s*(color|background-color|text-align|font-size|font-weight|font-style|text-decoration)\s*:/i.test(s);
-        }).join(';');
+        const safeStyle = value.split(';').filter(s => /^\s*(color|background-color|text-align|font-size|font-weight|font-style|text-decoration)\s*:/i.test(s)).join(';');
         if (safeStyle) node.setAttribute('style', safeStyle);
         else node.removeAttribute('style');
       }
       if (name === 'target' && value !== '_blank') node.removeAttribute('target');
-      if (name === 'rel' && !/noopener|noreferrer/.test(value)) node.removeAttribute('rel');
     });
     [...node.childNodes].forEach(walk);
   }
@@ -121,48 +108,58 @@ export function createRichEditor(target, options = {}) {
   
   const content = container.querySelector('.rich-content');
   const toolbar = container.querySelector('.rich-toolbar');
+  const formatSelect = toolbar.querySelector('.rich-format-select');
 
   function updateState() {
-    // 1. Текстовые стили
+    // 1. Текст
     ['bold','italic','underline','strikeThrough','subscript','superscript'].forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
-      try {
-        if (document.queryCommandState(cmd)) btn.classList.add('active');
-        else btn.classList.remove('active');
-      } catch (_) {}
+      try { btn.classList.toggle('active', document.queryCommandState(cmd)); } catch (_) {}
     });
 
-    // 2. Выравнивание (фикс бага с двумя кнопками)
-    const alignCmds = ['justifyLeft','justifyCenter','justifyRight','justifyFull'];
-    let anyAlign = false;
-    alignCmds.forEach(cmd => {
+    // 2. Выравнивание (отключаем все, включаем нужное)
+    const aligns = ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'];
+    let hasAlign = false;
+    aligns.forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
       let isActive = false;
       try { isActive = document.queryCommandState(cmd); } catch (_) {}
-      if (isActive) {
-        anyAlign = true;
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+      if (isActive) { hasAlign = true; btn.classList.add('active'); } 
+      else { btn.classList.remove('active'); }
     });
-    // Если браузер тупит и не видит выравнивания, по умолчанию считаем, что оно левое
-    if (!anyAlign) {
-      const leftBtn = toolbar.querySelector('[data-cmd="justifyLeft"]');
-      if (leftBtn) leftBtn.classList.add('active');
-    }
+    // Если вообще ничего не выбрано, считаем что это Left
+    if (!hasAlign) toolbar.querySelector('[data-cmd="justifyLeft"]')?.classList.add('active');
 
     // 3. Списки
     ['insertUnorderedList','insertOrderedList'].forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
-      try {
-        if (document.queryCommandState(cmd)) btn.classList.add('active');
-        else btn.classList.remove('active');
-      } catch (_) {}
+      try { btn.classList.toggle('active', document.queryCommandState(cmd)); } catch (_) {}
     });
+
+    // 4. Блоки (Заголовки, Цитаты, Код)
+    let block = '';
+    try { block = document.queryCommandValue('formatBlock'); } catch (_) {}
+    block = (block || '').toLowerCase().replace(/[<>]/g, ''); // Иногда возвращает <pre>, иногда pre
+    
+    // Обновляем селект
+    if (formatSelect) {
+      if (['p', 'h1', 'h2', 'h3', 'h4'].includes(block)) {
+        formatSelect.value = block;
+      } else if (block === 'div' || block === '') {
+        formatSelect.value = 'p';
+      } else {
+        formatSelect.value = 'p'; // Fallback
+      }
+    }
+
+    // Подсвечиваем кнопки Цитаты и Кода
+    const preBtn = toolbar.querySelector('[data-value="pre"]');
+    const bqBtn = toolbar.querySelector('[data-value="blockquote"]');
+    if (preBtn) preBtn.classList.toggle('active', block === 'pre');
+    if (bqBtn) bqBtn.classList.toggle('active', block === 'blockquote');
   }
 
   function updatePlaceholder() {
@@ -180,9 +177,9 @@ export function createRichEditor(target, options = {}) {
       const cmd = btn.dataset.cmd;
       const val = btn.dataset.value || null;
       
-      // Если это выравнивание — сначала сбрасываем все остальные
       if (cmd.startsWith('justify')) {
-        document.execCommand('justifyLeft', false, null); // сброс
+        // Сброс перед применением, чтобы браузер не тупил
+        document.execCommand('justifyLeft', false, null); 
       }
       
       document.execCommand(cmd, false, val);
@@ -190,23 +187,23 @@ export function createRichEditor(target, options = {}) {
     });
   });
 
-  // Обработка "Ластика" (Очистка стилей)
+  // Ластик (Очистка ВСЕГО)
   const clearBtn = toolbar.querySelector('[data-action="clear"]');
   if (clearBtn) {
     clearBtn.addEventListener('mousedown', e => e.preventDefault());
     clearBtn.addEventListener('click', e => {
       e.preventDefault();
       content.focus();
-      document.execCommand('removeFormat'); // Убирает жирный/курсив
+      document.execCommand('removeFormat'); // Убирает bold/italic/цвет
       document.execCommand('unlink');       // Убирает ссылки
-      document.execCommand('formatBlock', false, 'p'); // Убирает заголовки
+      document.execCommand('formatBlock', false, 'p'); // Убирает заголовки/код/цитаты
       document.execCommand('justifyLeft');  // Сбрасывает выравнивание
+      document.execCommand('foreColor', false, 'inherit'); // Пытаемся сбросить цвет на наследуемый
       updateState();
     });
   }
 
   // Дропдаун стилей
-  const formatSelect = toolbar.querySelector('.rich-format-select');
   if (formatSelect) {
     formatSelect.addEventListener('mousedown', e => e.stopPropagation());
     formatSelect.addEventListener('change', (e) => {
@@ -216,7 +213,7 @@ export function createRichEditor(target, options = {}) {
     });
   }
 
-  // Ссылка (сделаем через prompt, но чуть аккуратнее)
+  // Ссылка
   const linkBtn = toolbar.querySelector('[data-action="link"]');
   if (linkBtn) {
     linkBtn.addEventListener('mousedown', e => e.preventDefault());
@@ -225,9 +222,7 @@ export function createRichEditor(target, options = {}) {
       e.stopPropagation();
       const sel = window.getSelection();
       let savedRange = null;
-      if (sel.rangeCount) {
-        try { savedRange = sel.getRangeAt(0).cloneRange(); } catch (_) {}
-      }
+      if (sel.rangeCount) { try { savedRange = sel.getRangeAt(0).cloneRange(); } catch (_) {} }
       const url = prompt('Введите URL ссылки:', 'https://');
       if (!url || !/^https?:\/\//i.test(url)) return;
       content.focus();
@@ -236,11 +231,9 @@ export function createRichEditor(target, options = {}) {
         s.removeAllRanges();
         s.addRange(savedRange);
       }
-      const sel2 = window.getSelection();
-      if (sel2.isCollapsed) {
+      if (window.getSelection().isCollapsed) {
         const text = prompt('Текст ссылки:', url) || url;
-        document.execCommand('insertHTML', false,
-          `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`);
+        document.execCommand('insertHTML', false, `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`);
       } else {
         document.execCommand('createLink', false, url);
       }
@@ -248,7 +241,7 @@ export function createRichEditor(target, options = {}) {
     });
   }
 
-  // Кнопки выбора цвета
+  // Цвета
   toolbar.querySelectorAll('.rich-color-btn').forEach(btn => {
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
@@ -257,13 +250,10 @@ export function createRichEditor(target, options = {}) {
       const cmd = btn.dataset.cmd;
       const swatch = toolbar.querySelector(`.rich-color-swatch[data-swatch="${cmd}"]`);
       const initial = swatch?.dataset.color || '#ffb347';
-
       const sel = window.getSelection();
       let savedRange = null;
-      if (sel.rangeCount) {
-        try { savedRange = sel.getRangeAt(0).cloneRange(); } catch (_) {}
-      }
-
+      if (sel.rangeCount) { try { savedRange = sel.getRangeAt(0).cloneRange(); } catch (_) {} }
+      
       openColorPicker({
         anchorEl: btn,
         initial,
@@ -275,17 +265,14 @@ export function createRichEditor(target, options = {}) {
             s.addRange(savedRange);
           }
           document.execCommand(cmd, false, color);
-          if (swatch) {
-            swatch.style.background = color;
-            swatch.dataset.color = color;
-          }
+          if (swatch) { swatch.style.background = color; swatch.dataset.color = color; }
           updateState();
         }
       });
     });
   });
 
-  // Анимации текста
+  // Анимации
   toolbar.querySelectorAll('[data-anim]').forEach(btn => {
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
@@ -309,10 +296,7 @@ export function createRichEditor(target, options = {}) {
   
   content.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      // Если это внутри списка, даем браузеру создать новый li
-      if (document.queryCommandState('insertUnorderedList') || document.queryCommandState('insertOrderedList')) {
-        return; 
-      }
+      if (document.queryCommandState('insertUnorderedList') || document.queryCommandState('insertOrderedList')) return; 
       e.preventDefault();
       document.execCommand('insertHTML', false, '<br><br>');
       return;
@@ -320,15 +304,12 @@ export function createRichEditor(target, options = {}) {
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
       const k = e.key.toLowerCase();
       const map = { b: 'bold', i: 'italic', u: 'underline' };
-      if (map[k]) {
-        e.preventDefault();
-        document.execCommand(map[k], false, null);
-        updateState();
-      }
+      if (map[k]) { e.preventDefault(); document.execCommand(map[k], false, null); updateState(); }
     }
   });
 
   updatePlaceholder();
+  updateState();
 
   return {
     getContent: () => content.innerHTML,
