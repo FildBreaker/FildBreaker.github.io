@@ -544,3 +544,60 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
 .search-res-type { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
 .search-res-title { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .search-res-text { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+@media (max-width: 650px) {
+  /* Увеличиваем базовый шрифт для мобилок */
+  body {
+    font-size: 16px;
+  }
+
+  /* Чуть уменьшаем паддинги карточек, чтобы текст не сжимался в узкую колонку */
+  .task-card, .exam-card, .resource-card, .poll-card, .event-card, .test-card {
+    padding: 16px;
+  }
+  
+  .exam-card .card-header, .exam-card .card-details {
+    padding: 12px 16px;
+  }
+
+  .teacher-info {
+    padding: 16px;
+  }
+
+  /* Делаем шрифты внутри карточек чуть крупнее */
+  .task-card .task-desc, 
+  .rich-display, 
+  .exam-card .detail-row, 
+  .resource-card .rich-display {
+    font-size: 0.95rem; 
+    line-height: 1.6;
+  }
+
+  .cell-content .subject {
+    font-size: 0.95rem;
+  }
+
+  /* Кнопки в меню делаем чуть выше, чтобы по ним было удобно попадать пальцем */
+  .nav-links a {
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+
+  .nav-btn, .filter-btn, .section-btn {
+    font-size: 0.9rem;
+    padding: 12px 16px;
+  }
+
+  /* Поправляем дату-пикер, чтобы он не вылезал за края экрана */
+  .date-picker-popover {
+    width: calc(100vw - 32px);
+    max-width: 320px;
+  }
+
+  /* Чуть уменьшаем заголовки, чтобы они не занимали пол-экрана */
+  .schedule-header h2, .exams-hero h2, .hero-resources h2, .section-header h2 { 
+    font-size: 1.4rem; 
+  }
+  .welcome-strip h2 { font-size: 1.5rem; }
+  .homework-header h2 { font-size: 1.3rem; }
+}
