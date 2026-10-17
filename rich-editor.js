@@ -110,15 +110,16 @@ export function createRichEditor(target, options = {}) {
   const toolbar = container.querySelector('.rich-toolbar');
   const formatSelect = toolbar.querySelector('.rich-format-select');
 
+  // Включаем CSS-стили вместо устаревших тегов <font>
+  try { document.execCommand('styleWithCSS', false, true); } catch (_) {}
+
   function updateState() {
-    // 1. Текст
     ['bold','italic','underline','strikeThrough','subscript','superscript'].forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
       try { btn.classList.toggle('active', document.queryCommandState(cmd)); } catch (_) {}
     });
 
-    // 2. Выравнивание (отключаем все, включаем нужное)
     const aligns = ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'];
     let hasAlign = false;
     aligns.forEach(cmd => {
@@ -129,33 +130,23 @@ export function createRichEditor(target, options = {}) {
       if (isActive) { hasAlign = true; btn.classList.add('active'); } 
       else { btn.classList.remove('active'); }
     });
-    // Если вообще ничего не выбрано, считаем что это Left
     if (!hasAlign) toolbar.querySelector('[data-cmd="justifyLeft"]')?.classList.add('active');
 
-    // 3. Списки
     ['insertUnorderedList','insertOrderedList'].forEach(cmd => {
       const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
       if (!btn) return;
       try { btn.classList.toggle('active', document.queryCommandState(cmd)); } catch (_) {}
     });
 
-    // 4. Блоки (Заголовки, Цитаты, Код)
     let block = '';
     try { block = document.queryCommandValue('formatBlock'); } catch (_) {}
-    block = (block || '').toLowerCase().replace(/[<>]/g, ''); // Иногда возвращает <pre>, иногда pre
+    block = (block || '').toLowerCase().replace(/[<>]/g, '');
     
-    // Обновляем селект
     if (formatSelect) {
-      if (['p', 'h1', 'h2', 'h3', 'h4'].includes(block)) {
-        formatSelect.value = block;
-      } else if (block === 'div' || block === '') {
-        formatSelect.value = 'p';
-      } else {
-        formatSelect.value = 'p'; // Fallback
-      }
+      if (['p', 'h1', 'h2', 'h3', 'h4'].includes(block)) formatSelect.value = block;
+      else formatSelect.value = 'p';
     }
 
-    // Подсвечиваем кнопки Цитаты и Кода
     const preBtn = toolbar.querySelector('[data-value="pre"]');
     const bqBtn = toolbar.querySelector('[data-value="blockquote"]');
     if (preBtn) preBtn.classList.toggle('active', block === 'pre');
@@ -167,7 +158,6 @@ export function createRichEditor(target, options = {}) {
     content.classList.toggle('empty', empty);
   }
 
-  // Обычные команды
   toolbar.querySelectorAll('button[data-cmd]').forEach(btn => {
     if (btn.classList.contains('rich-color-btn')) return;
     btn.addEventListener('mousedown', e => e.preventDefault());
@@ -176,34 +166,31 @@ export function createRichEditor(target, options = {}) {
       content.focus();
       const cmd = btn.dataset.cmd;
       const val = btn.dataset.value || null;
-      
-      if (cmd.startsWith('justify')) {
-        // Сброс перед применением, чтобы браузер не тупил
-        document.execCommand('justifyLeft', false, null); 
-      }
-      
+      if (cmd.startsWith('justify')) document.execCommand('justifyLeft', false, null); 
       document.execCommand(cmd, false, val);
       updateState();
     });
   });
 
-  // Ластик (Очистка ВСЕГО)
   const clearBtn = toolbar.querySelector('[data-action="clear"]');
   if (clearBtn) {
     clearBtn.addEventListener('mousedown', e => e.preventDefault());
     clearBtn.addEventListener('click', e => {
       e.preventDefault();
       content.focus();
-      document.execCommand('removeFormat'); // Убирает bold/italic/цвет
-      document.execCommand('unlink');       // Убирает ссылки
-      document.execCommand('formatBlock', false, 'p'); // Убирает заголовки/код/цитаты
-      document.execCommand('justifyLeft');  // Сбрасывает выравнивание
-      document.execCommand('foreColor', false, 'inherit'); // Пытаемся сбросить цвет на наследуемый
+      document.execCommand('removeFormat');
+      document.execCommand('unlink');
+      document.execCommand('formatBlock', false, 'p');
+      document.execCommand('justifyLeft');
+      
+      // Читаем цвет текущей темы и применяем его, чтобы не было темно-красного бреда
+      const defaultColor = getComputedStyle(document.body).getPropertyValue('--text-color').trim() || '#ffffff';
+      document.execCommand('foreColor', false, defaultColor);
+      document.execCommand('hiliteColor', false, 'transparent');
       updateState();
     });
   }
 
-  // Дропдаун стилей
   if (formatSelect) {
     formatSelect.addEventListener('mousedown', e => e.stopPropagation());
     formatSelect.addEventListener('change', (e) => {
@@ -213,7 +200,6 @@ export function createRichEditor(target, options = {}) {
     });
   }
 
-  // Ссылка
   const linkBtn = toolbar.querySelector('[data-action="link"]');
   if (linkBtn) {
     linkBtn.addEventListener('mousedown', e => e.preventDefault());
@@ -241,7 +227,6 @@ export function createRichEditor(target, options = {}) {
     });
   }
 
-  // Цвета
   toolbar.querySelectorAll('.rich-color-btn').forEach(btn => {
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
@@ -272,7 +257,6 @@ export function createRichEditor(target, options = {}) {
     });
   });
 
-  // Анимации
   toolbar.querySelectorAll('[data-anim]').forEach(btn => {
     btn.addEventListener('mousedown', e => e.preventDefault());
     btn.addEventListener('click', e => {
@@ -283,7 +267,10 @@ export function createRichEditor(target, options = {}) {
 
   content.addEventListener('keyup', updateState);
   content.addEventListener('mouseup', updateState);
-  content.addEventListener('focus', updateState);
+  content.addEventListener('focus', () => {
+    try { document.execCommand('styleWithCSS', false, true); } catch (_) {}
+    updateState();
+  });
   content.addEventListener('input', updatePlaceholder);
   
   content.addEventListener('paste', e => {
