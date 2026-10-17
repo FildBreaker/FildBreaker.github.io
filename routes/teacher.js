@@ -7,10 +7,6 @@ import { isEditor } from '../auth.js';
 import { state } from '../state.js';
 import { setSidebar, setMain, setSidebarNavHandlers, openModal, closeModal, tgNotify, showSkeletonMain, hideSkeletonMain } from '../utils.js';
 
-// Импортируем Firebase Storage
-import { storage } from '../firebase-config.js';
-import { ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
-
 const teacherEdit = { id: null };
 
 export async function renderTeacher() {
@@ -98,25 +94,6 @@ function renderTeachers() {
 }
 
 function setupTeacherModal() {
-  const fileInput = document.getElementById('teacherPhotoFile');
-  const previewContainer = document.getElementById('teacherPhotoPreview');
-  const previewImg = previewContainer.querySelector('img');
-  const urlInput = document.getElementById('teacherPhoto');
-
-  // Превью выбранного файла
-  if (fileInput) {
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files && fileInput.files[0]) {
-        const url = URL.createObjectURL(fileInput.files[0]);
-        previewImg.src = url;
-        previewContainer.style.display = 'block';
-        urlInput.value = ''; // Очищаем ручной ввод, если выбрали файл
-      } else {
-        previewContainer.style.display = 'none';
-      }
-    });
-  }
-
   document.getElementById('teacherForm').onsubmit = async (e) => {
     e.preventDefault();
     if (!isEditor()) { closeModal('teacherModal'); return; }
@@ -127,97 +104,31 @@ function setupTeacherModal() {
     const degree2 = document.getElementById('teacherDegree2').value.trim();
     const phone = document.getElementById('teacherPhone').value.trim();
     const email = document.getElementById('teacherEmail').value.trim();
-    let photo = document.getElementById('teacherPhoto').value.trim();
+    const photo = document.getElementById('teacherPhoto').value.trim();
 
     if (!name || !position || !degree || !degree2 || !phone || !email) {
       toastWarning('Заполните все поля'); 
       return; 
     }
 
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
+    const data = { name, position, degree, degree2, phone, email, photo };
+    const isEdit = !!teacherEdit.id;
 
-    try {
-    // Если выбран файл — грузим его в Firebase Storage
-      const originalFile = fileInput.files[0];
-      if (originalFile) {
-        // Магия сжатия картинки
-        const compressImage = (file) => {
-          return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-              const img = new Image();
-              img.src = event.target.result;
-              img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 500; // Максимальная ширина
-                const scaleSize = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scaleSize;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
-                // Конвертируем в blob (JPEG с качеством 0.8)
-                canvas.toBlob((blob) => {
-                  resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' }));
-                }, 'image/jpeg', 0.8);
-              };
-            };
-          });
-        };
-
-        // Сжимаем и дальше грузим уже сжатый файл
-        const file = await compressImage(originalFile);
-        
-        const fileName = `teachers/teacher_${Date.now()}.jpg`;
-        const fileRef = storageRef(storage, fileName);
-
-        const uploadTask = uploadBytesResumable(fileRef, file);
-        
-        await new Promise((resolve, reject) => {
-          uploadTask.on('state_changed', 
-            (snapshot) => {
-              // Считаем проценты и пишем прямо в кнопку
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Загрузка фото: ${Math.round(progress)}%`;
-            },
-            (error) => reject(error), 
-            () => resolve()
-          );
-        });
-        // Получаем прямую ссылку на загруженный файл
-        photo = await getDownloadURL(fileRef);
-      }
-
-      const data = { name, position, degree, degree2, phone, email, photo };
-      const isEdit = !!teacherEdit.id;
-
-      if (isEdit) {
-        const idx = state.data.teachers.findIndex(t => t.id === teacherEdit.id);
-        if (idx !== -1) state.data.teachers[idx] = { ...state.data.teachers[idx], ...data };
-      } else {
-        state.data.teachers.push({ id: Date.now().toString(), ...data });
-      }
-
-      const success = await dataManager.save('teachers', state.data.teachers);
-      if (!success) throw new Error('Ошибка сохранения в базу данных');
-
-      renderTeachers();
-      closeModal('teacherModal');
-      toastSuccess(isEdit ? 'Преподаватель обновлён' : 'Преподаватель добавлен');
-      
-      tgNotify(`👤 <b>Преподаватель ${isEdit ? 'изменён' : 'добавлен'}</b>\n🎓 ${name}\n💼 ${position}`);
-
-    } catch (err) {
-      console.error(err);
-      toastError(err.message || 'Ошибка при сохранении');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalBtnText;
+    if (isEdit) {
+      const idx = state.data.teachers.findIndex(t => t.id === teacherEdit.id);
+      if (idx !== -1) state.data.teachers[idx] = { ...state.data.teachers[idx], ...data };
+    } else {
+      state.data.teachers.push({ id: Date.now().toString(), ...data });
     }
+
+    const success = await dataManager.save('teachers', state.data.teachers);
+    if (!success) return; // Если база не сохранила, не закрываем модалку
+
+    renderTeachers();
+    closeModal('teacherModal');
+    toastSuccess(isEdit ? 'Преподаватель обновлён' : 'Преподаватель добавлен');
+    
+    tgNotify(`👤 <b>Преподаватель ${isEdit ? 'изменён' : 'добавлен'}</b>\n🎓 ${name}\n💼 ${position}`);
   };
 }
 
@@ -234,20 +145,6 @@ function openTeacherModal(id = null) {
   document.getElementById('teacherPhone').value = t ? (t.phone || '') : '';
   document.getElementById('teacherEmail').value = t ? (t.email || '') : '';
   document.getElementById('teacherPhoto').value = t ? (t.photo || '') : '';
-
-  // Сброс загрузки файла и превью
-  const fileInput = document.getElementById('teacherPhotoFile');
-  if (fileInput) fileInput.value = '';
-  document.getElementById('teacherPhotoFileText').textContent = 'Выбрать файл';
-  
-  const previewContainer = document.getElementById('teacherPhotoPreview');
-  const previewImg = previewContainer.querySelector('img');
-  if (t && t.photo) {
-    previewImg.src = t.photo;
-    previewContainer.style.display = 'block';
-  } else {
-    previewContainer.style.display = 'none';
-  }
 
   openModal('teacherModal');
 }
