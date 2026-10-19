@@ -688,17 +688,13 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   -webkit-appearance: none !important;
   width: 20px !important;
   height: 20px !important;
-  border: 2px solid #e74c3c !important; /* Сразу делаем красную рамку */
-  border-radius: 4px !important; /* Чуть меньше скругление */
+  border: 2px solid #e74c3c !important;
+  border-radius: 4px !important;
   background: transparent !important;
   cursor: pointer;
   margin: 0 !important; 
-  
-  /* Магия для центрирования галочки */
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  
+  position: relative !important; /* Ключевое: относительное позиционирование для родителя */
+  flex-shrink: 0 !important; /* Чтобы не сжимался */
   transition: all 0.2s ease;
 }
 
@@ -710,18 +706,29 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   background: #e74c3c !important;
 }
 
+/* Прячем дефолтную галочку */
 .schedule-cancel-label input[type="checkbox"]::after {
   content: '' !important;
-  display: none;
+  display: none !important;
 }
 
+/* Рисуем свою через абсолютное позиционирование */
 .schedule-cancel-label input[type="checkbox"]:checked::after {
   content: '' !important;
   display: block !important;
+  position: absolute !important;
+  top: 45% !important; /* Чуть поднимаем визуально */
+  left: 50% !important;
   width: 5px !important;
   height: 10px !important;
   border: solid white !important;
   border-width: 0 2px 2px 0 !important;
-  transform: rotate(45deg) !important;
-  margin-bottom: 2px !important; /* Чуть поднимаем визуально */
+  transform: translate(-50%, -50%) rotate(45deg) !important;
+}
+
+.schedule-cancel-label span {
+  color: #e74c3c !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1; /* Выравниваем текст по высоте с чекбоксом */
 }
