@@ -77,8 +77,18 @@ function renderScheduleTable() {
 
     for (let day = 0; day < 7; day++) {
       const td = document.createElement('td');
-      td.className = 'schedule-cell';
-      const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '' };
+      const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '', isCancelled: false };
+      
+      let cellClass = 'schedule-cell';
+      let cancelHtml = '';
+
+      if (lesson.isCancelled) {
+        cellClass += ' is-cancelled';
+        cancelHtml = `<div class="cancel-badge"><i class="fas fa-ban"></i> ОТМЕНА</div>`;
+      }
+
+      td.className = cellClass;
+      
       const subjectHtml = lesson.subject ? esc(lesson.subject) : '—';
       const roomHtml = lesson.room ? ` (${esc(lesson.room)})` : '';
       let typeIcon = '';
@@ -94,7 +104,16 @@ function renderScheduleTable() {
       let notesHtml = '';
       if (lesson.notes) notesHtml = `<div class="cell-notes rich-display">${sanitizeHtml(lesson.notes)}</div>`;
 
-      td.innerHTML = `<div class="cell-content"><div class="subject">${typeIcon}${subjectHtml}${roomHtml}</div>${dateHtml}${notesHtml}<div class="edit-icon"><i class="fas fa-pen"></i></div></div>`;
+      td.innerHTML = `
+        <div class="cell-content">
+          ${cancelHtml}
+          <div class="subject">${typeIcon}${subjectHtml}${roomHtml}</div>
+          ${dateHtml}
+          ${notesHtml}
+          <div class="edit-icon"><i class="fas fa-pen"></i></div>
+        </div>
+      `;
+      
       td.dataset.day = day;
       td.dataset.pair = pair;
       td.onclick = () => openScheduleEdit(day, pair);
@@ -134,11 +153,19 @@ function openScheduleEdit(day, pair) {
   if (!isEditor()) return;
   scheduleEdit.day = day;
   scheduleEdit.pair = pair;
-  const lesson = state.data.schedule[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '' };
+  const lesson = state.data.schedule[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '', isCancelled: false };
+  
   document.getElementById('scheduleEditSubject').value = lesson.subject || '';
   document.getElementById('scheduleEditRoom').value = lesson.room || '';
   document.getElementById('scheduleEditStartDate').value = lesson.startDate || '';
   document.getElementById('scheduleEditEndDate').value = lesson.endDate || '';
+  document.getElementById('scheduleEditCancelled').checked = lesson.isCancelled || false;
+
+  // Заполняем селекты для переноса
+  const daySelect = document.getElementById('scheduleEditDay');
+  const pairSelect = document.getElementById('scheduleEditPair');
+  if (daySelect) daySelect.value = day;
+  if (pairSelect) pairSelect.value = pair;
 
   scheduleEdit.type = lesson.type || '';
   ['scheduleTypeLecture', 'scheduleTypePractice', 'scheduleTypeNone'].forEach(id => document.getElementById(id).classList.remove('active'));
@@ -156,19 +183,44 @@ function openScheduleEdit(day, pair) {
 
 async function saveScheduleEdit() {
   if (!isEditor()) { closeModal('scheduleEditModal'); return; }
-  const day = scheduleEdit.day, pair = scheduleEdit.pair;
-  if (day === null || pair === null) return;
+  
+  const oldDay = scheduleEdit.day;
+  const oldPair = scheduleEdit.pair;
+  if (oldDay === null || oldPair === null) return;
+
+  const newDay = parseInt(document.getElementById('scheduleEditDay').value);
+  const newPair = parseInt(document.getElementById('scheduleEditPair').value);
+
   const newSubject = document.getElementById('scheduleEditSubject').value.trim();
   const newRoom = document.getElementById('scheduleEditRoom').value.trim();
   const newStartDate = document.getElementById('scheduleEditStartDate').value.trim();
   const newEndDate = document.getElementById('scheduleEditEndDate').value.trim();
+  const isCancelled = document.getElementById('scheduleEditCancelled').checked;
+  
   const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
   if (newStartDate && !datePattern.test(newStartDate)) { toastWarning('Дата начала в формате ДД.ММ.ГГГГ'); return; }
   if (newEndDate && !datePattern.test(newEndDate)) { toastWarning('Дата окончания в формате ДД.ММ.ГГГГ'); return; }
+  
   const newNotes = scheduleEdit.notesEditor ? sanitizeHtml(scheduleEdit.notesEditor.getContent()) : '';
   
-  if (!state.data.schedule[day]) state.data.schedule[day] = {};
-  state.data.schedule[day][pair] = { subject: newSubject, room: newRoom, startDate: newStartDate, endDate: newEndDate, type: scheduleEdit.type || '', notes: newNotes };
+  // Если пара переехала в другой день или на другую пару
+  if (oldDay !== newDay || oldPair !== newPair) {
+    if (state.data.schedule[oldDay] && state.data.schedule[oldDay][oldPair]) {
+      delete state.data.schedule[oldDay][oldPair];
+    }
+  }
+
+  // Создаем/обновляем новую
+  if (!state.data.schedule[newDay]) state.data.schedule[newDay] = {};
+  state.data.schedule[newDay][newPair] = { 
+    subject: newSubject, 
+    room: newRoom, 
+    startDate: newStartDate, 
+    endDate: newEndDate, 
+    type: scheduleEdit.type || '', 
+    notes: newNotes,
+    isCancelled: isCancelled
+  };
   
   const success = await dataManager.save('schedule', state.data.schedule);
   if (!success) return;
@@ -178,9 +230,13 @@ async function saveScheduleEdit() {
   toastSuccess('Пара сохранена');
 
   const typeText = scheduleEdit.type === 'lecture' ? '🎓 Лекция' : scheduleEdit.type === 'practice' ? '🛠 Практика' : '';
+  const actionText = (oldDay !== newDay || oldPair !== newPair) ? 'перенесена' : 'обновлена';
+  const cancelText = isCancelled ? '❌ ОТМЕНЕНА\n' : '';
+
   tgNotify(
-    `📅 <b>Расписание обновлено</b>\n` +
-    `📆 ${DAY_NAMES[day]}, ${pair}-я пара\n` +
+    `📅 <b>Расписание: пара ${actionText}</b>\n` +
+    `📆 ${DAY_NAMES[newDay]}, ${newPair}-я пара\n` +
+    cancelText +
     (newSubject ? `📖 ${newSubject}\n` : '') +
     (newRoom ? `🚪 Ауд.: ${newRoom}\n` : '') + (typeText ? typeText : '')
   );
