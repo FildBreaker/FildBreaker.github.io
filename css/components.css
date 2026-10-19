@@ -676,7 +676,7 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
 /* Кастомный чекбокс (жесткий фикс) */
 .schedule-cancel-label {
   display: flex;
-  align-items: center;
+  align-items: center; /* Центрируем по вертикали */
   gap: 10px;
   margin-top: 16px;
   cursor: pointer;
@@ -686,15 +686,15 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
 .schedule-cancel-label input[type="checkbox"] {
   appearance: none !important;
   -webkit-appearance: none !important;
-  width: 20px !important;
-  height: 20px !important;
+  width: 22px !important; /* Чуть увеличил для удобства */
+  height: 22px !important;
   border: 2px solid #e74c3c !important;
   border-radius: 4px !important;
   background: transparent !important;
   cursor: pointer;
   margin: 0 !important; 
-  position: relative !important; /* Ключевое: относительное позиционирование для родителя */
-  flex-shrink: 0 !important; /* Чтобы не сжимался */
+  position: relative !important; 
+  flex-shrink: 0 !important; 
   transition: all 0.2s ease;
 }
 
@@ -706,29 +706,28 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   background: #e74c3c !important;
 }
 
-/* Прячем дефолтную галочку */
 .schedule-cancel-label input[type="checkbox"]::after {
   content: '' !important;
   display: none !important;
 }
 
-/* Рисуем свою через абсолютное позиционирование */
 .schedule-cancel-label input[type="checkbox"]:checked::after {
   content: '' !important;
   display: block !important;
   position: absolute !important;
-  top: 45% !important; /* Чуть поднимаем визуально */
+  top: 50% !important; 
   left: 50% !important;
   width: 5px !important;
   height: 10px !important;
   border: solid white !important;
   border-width: 0 2px 2px 0 !important;
   transform: translate(-50%, -50%) rotate(45deg) !important;
+  margin-top: -2px; /* Небольшая компенсация для визуального центра */
 }
 
 .schedule-cancel-label span {
   color: #e74c3c !important;
   font-weight: 600;
   font-size: 0.95rem;
-  line-height: 1; /* Выравниваем текст по высоте с чекбоксом */
+  line-height: 22px; /* ЖЕСТКО привязываем высоту строки к высоте чекбокса */
 }
