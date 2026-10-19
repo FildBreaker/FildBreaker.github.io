@@ -4,7 +4,7 @@ import { getDatabase } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAwMQhg9UAMo8wVzakwGWpdHSrINQjQJw", // Твой настоящий ключ
+  apiKey: "AIzaSyAwMQhg9UAMo8wVzakwGWpdHSFrINQjQJw", // Твой настоящий ключ
   authDomain: "ibd2026-31a00.firebaseapp.com",
   databaseURL: "https://ibd2026-31a00-default-rtdb.firebaseio.com",
   projectId: "ibd2026-31a00",
