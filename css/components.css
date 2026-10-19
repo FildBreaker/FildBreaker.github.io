@@ -689,6 +689,7 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   width: 22px !important; /* Чуть увеличил для удобства */
   height: 22px !important;
   border: 2px solid #e74c3c !important;
+  outline: none !important; /* Убираем системный фокус */
   border-radius: 4px !important;
   background: transparent !important;
   cursor: pointer;
@@ -729,5 +730,7 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   color: #e74c3c !important;
   font-weight: 600;
   font-size: 0.95rem;
-  line-height: 22px; /* ЖЕСТКО привязываем высоту строки к высоте чекбокса */
+  line-height: 1; /* Сбрасываем жесткую высоту */
+  transform: translateY(-1px); /* Принудительно поднимаем текст на 1 пиксель вверх */
+  display: inline-block; /* Обязательно для работы transform */
 }
