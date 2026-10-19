@@ -673,64 +673,72 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   box-shadow: 0 0 0 3px var(--accent-glow) !important;
 }
 
-/* Кастомный чекбокс (жесткий фикс) */
+/* ============================================================
+   КАСТОМНЫЙ ЧЕКБОКС (АБСОЛЮТНЫЙ ФИКС)
+   ============================================================ */
 .schedule-cancel-label {
   display: flex;
-  align-items: center; /* Центрируем по вертикали */
+  align-items: center; /* Flexbox отцентрирует текст и квадратик идеально ровно */
   gap: 10px;
   margin-top: 16px;
   cursor: pointer;
   user-select: none;
 }
 
+/* Прячем стандартный инпут, но оставляем его для логики */
 .schedule-cancel-label input[type="checkbox"] {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  width: 22px !important; /* Чуть увеличил для удобства */
-  height: 22px !important;
-  border: 2px solid #e74c3c !important;
-  outline: none !important; /* Убираем системный фокус */
-  border-radius: 4px !important;
-  background: transparent !important;
+  position: absolute;
+  opacity: 0;
   cursor: pointer;
-  margin: 0 !important; 
-  position: relative !important; 
-  flex-shrink: 0 !important; 
-  transition: all 0.2s ease;
+  height: 0;
+  width: 0;
 }
 
-.schedule-cancel-label input[type="checkbox"]:hover {
-  background: rgba(231, 76, 60, 0.1) !important;
+/* Рисуем свой красивый квадратик */
+.custom-checkbox-ui {
+  position: relative;
+  height: 22px;
+  width: 22px;
+  background-color: transparent;
+  border: 2px solid #e74c3c;
+  border-radius: 4px;
+  flex-shrink: 0; /* Чтобы не сжимался, если текст длинный */
+  transition: background-color 0.2s ease;
 }
 
-.schedule-cancel-label input[type="checkbox"]:checked {
-  background: #e74c3c !important;
+/* Эффект при наведении на весь лейбл */
+.schedule-cancel-label:hover .custom-checkbox-ui {
+  background-color: rgba(231, 76, 60, 0.15);
 }
 
-.schedule-cancel-label input[type="checkbox"]::after {
-  content: '' !important;
-  display: none !important;
+/* Когда инпут нажат, красим квадратик */
+.schedule-cancel-label input:checked ~ .custom-checkbox-ui {
+  background-color: #e74c3c;
 }
 
-.schedule-cancel-label input[type="checkbox"]:checked::after {
-  content: '' !important;
-  display: block !important;
-  position: absolute !important;
-  top: 50% !important; 
-  left: 50% !important;
-  width: 5px !important;
-  height: 10px !important;
-  border: solid white !important;
-  border-width: 0 2px 2px 0 !important;
-  transform: translate(-50%, -50%) rotate(45deg) !important;
-  margin-top: -2px; /* Небольшая компенсация для визуального центра */
+/* Сама галочка (рисуем через псевдоэлемент) */
+.custom-checkbox-ui::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px; /* Позиционируем галочку ровно по центру */
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
-.schedule-cancel-label span {
+/* Показываем галочку, когда инпут отмечен */
+.schedule-cancel-label input:checked ~ .custom-checkbox-ui::after {
+  display: block;
+}
+
+/* Текст */
+.schedule-cancel-text {
   color: #e74c3c !important;
   font-weight: 600;
   font-size: 0.95rem;
-  line-height: 1; /* Сбрасываем жесткую высоту */
-  transform: translateY(-1px); /* Принудительно поднимаем текст на 1 пиксель вверх */
-  display: inline-block; /* Обязательно для работы transform */
+  line-height: 1; /* Убираем лишние отступы шрифта */
 }
