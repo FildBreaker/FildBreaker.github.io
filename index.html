@@ -100,6 +100,32 @@
     <span class="close-modal" data-close="scheduleEditModal">&times;</span>
     <h3><i class="fas fa-edit"></i> Редактировать пару</h3>
     <form id="scheduleEditForm">
+      <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px;">
+        <div style="flex:1; min-width:150px;">
+          <label>День недели:</label>
+          <select id="scheduleEditDay" style="width:100%; padding:10px; border-radius:40px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-color); margin-top:6px;">
+            <option value="0">Понедельник</option>
+            <option value="1">Вторник</option>
+            <option value="2">Среда</option>
+            <option value="3">Четверг</option>
+            <option value="4">Пятница</option>
+            <option value="5">Суббота</option>
+            <option value="6">Воскресенье</option>
+          </select>
+        </div>
+        <div style="flex:1; min-width:150px;">
+          <label>Номер пары:</label>
+          <select id="scheduleEditPair" style="width:100%; padding:10px; border-radius:40px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-color); margin-top:6px;">
+            <option value="1">1 пара (9:00 – 10:30)</option>
+            <option value="2">2 пара (10:45 – 12:15)</option>
+            <option value="3">3 пара (12:30 – 14:00)</option>
+            <option value="4">4 пара (14:40 – 16:10)</option>
+            <option value="5">5 пара (16:20 – 17:50)</option>
+            <option value="6">6 пара (18:00 – 19:30)</option>
+          </select>
+        </div>
+      </div>
+
       <label>Предмет:</label>
       <input type="text" id="scheduleEditSubject" placeholder="Название предмета">
       <label>Аудитория:</label>
@@ -108,14 +134,22 @@
       <input type="text" id="scheduleEditStartDate" placeholder="01.09.2025">
       <label>Дата окончания (ДД.ММ.ГГГГ) – опционально:</label>
       <input type="text" id="scheduleEditEndDate" placeholder="31.05.2026">
+      
       <label>Тип занятия:</label>
       <div style="display:flex; gap:12px; margin-top:6px; flex-wrap:wrap;">
         <button type="button" id="scheduleTypeLecture" class="type-toggle" data-type="lecture"><i class="fas fa-chalkboard-teacher"></i> Лекция</button>
         <button type="button" id="scheduleTypePractice" class="type-toggle" data-type="practice"><i class="fas fa-tools"></i> Практика</button>
         <button type="button" id="scheduleTypeNone" class="type-toggle active" data-type=""><i class="fas fa-ban"></i> Не указано</button>
       </div>
+
+      <label style="display:flex; align-items:center; gap:8px; margin-top:16px; cursor:pointer;">
+        <input type="checkbox" id="scheduleEditCancelled" style="width:20px; height:20px; cursor:pointer;">
+        <span style="color:#e74c3c; font-weight:600;">Отменить пару (Пара не состоится)</span>
+      </label>
+
       <label>Заметки (опционально):</label>
       <div id="scheduleEditNotesEditor"></div>
+      
       <div class="modal-buttons">
         <button type="submit" class="save-btn"><i class="fas fa-save"></i> Сохранить</button>
         <button type="button" class="cancel-btn" data-close="scheduleEditModal">Отмена</button>
