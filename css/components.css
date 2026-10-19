@@ -739,10 +739,11 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   display: block;
 }
 
-/* Текст */
 .schedule-cancel-text {
   color: #e74c3c !important;
   font-weight: 600;
   font-size: 0.95rem;
-  line-height: 1.2; /* Немного увеличил для читаемости */
+  line-height: 1.2;
+  transform: translateY(2px); /* Сдвиг вниз на 2 пикселя */
+  display: inline-block;      /* Обязательно для работы transform */
 }
