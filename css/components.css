@@ -634,3 +634,56 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* ============================================================
+   СТИЛИ ДЛЯ НОВЫХ ЭЛЕМЕНТОВ РАСПИСАНИЯ
+   ============================================================ */
+#scheduleEditDay, 
+#scheduleEditPair {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 6px;
+  border-radius: 40px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffb347' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+#scheduleEditDay:focus, 
+#scheduleEditPair:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.schedule-cancel-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.schedule-cancel-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #e74c3c;
+}
+
+.schedule-cancel-label span {
+  color: #e74c3c;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
