@@ -326,7 +326,19 @@
    ============================================================ */
 .rich-editor-wrapper { border: 1px solid var(--input-border); border-radius: 20px; background: var(--input-bg); margin-top: 6px; }
 .rich-editor-wrapper:focus-within { border-color: var(--input-focus); box-shadow: 0 0 0 3px var(--accent-glow); }
-.rich-toolbar { display: flex; flex-wrap: wrap; gap: 3px; padding: 6px 8px; background: var(--input-bg); border-bottom: 1px solid var(--border-color); align-items: center; position: sticky; top: -28px; z-index: 10; border-radius: 20px 20px 0 0; }
+.rich-toolbar { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 3px; 
+  padding: 6px 8px; 
+  background: var(--card-bg) !important; /* Непрозрачный фон вместо полупрозрачного */
+  border-bottom: 1px solid var(--border-color); 
+  align-items: center; 
+  position: sticky; 
+  top: -28px; 
+  z-index: 50 !important; /* Поднимаем выше текста */
+  border-radius: 20px 20px 0 0; 
+}
 .rich-toolbar button { background: transparent; border: 1px solid transparent; color: var(--text-secondary); padding: 5px 9px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.15s ease; min-width: 30px; }
 .rich-toolbar button:hover, .rich-toolbar button.active { background: var(--bg-active); color: var(--accent); border-color: var(--accent); }
 .rich-sep { width: 1px; height: 20px; background: var(--border-color); margin: 0 3px; }
