@@ -9,22 +9,30 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
     if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 
-        // ВСТРОЕННЫЙ RATE LIMIT ЧЕРЕЗ KV
-    const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-    const rateLimitKey = `limit_${ip}`;
+    // ВЕБХУК ТЕЛЕГРАМА: Telegram присылает secret_token из setWebhook в этом заголовке.
+    // Без совпадения ветка Телеграма не выполняется вовсе. Env-переменная: TG_WEBHOOK_SECRET.
+    const tgSecret = request.headers.get('X-Telegram-Bot-Api-Secret-Token');
+    const isTgWebhook = !!(tgSecret && env.TG_WEBHOOK_SECRET && tgSecret === env.TG_WEBHOOK_SECRET);
 
-    if (env.RATE_LIMIT_KV) {
-      // Получаем текущее количество запросов для этого IP
-      let currentCount = await env.RATE_LIMIT_KV.get(rateLimitKey);
-      currentCount = currentCount ? parseInt(currentCount) : 0;
+    // ВСТРОЕННЫЙ RATE LIMIT ЧЕРЕЗ KV (валидные вебхуки Телеграма не считаем —
+    // все апдейты ходят из общего пула IP Телеграма и легко поймают ложный 429)
+    if (!isTgWebhook) {
+      const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+      const rateLimitKey = `limit_${ip}`;
 
-      // Если больше 10 запросов — блок
-      if (currentCount >= 10) {
-        return new Response('Слишком много запросов. Подожди минуту.', { status: 429, headers: corsHeaders });
+      if (env.RATE_LIMIT_KV) {
+        // Получаем текущее количество запросов для этого IP
+        let currentCount = await env.RATE_LIMIT_KV.get(rateLimitKey);
+        currentCount = currentCount ? parseInt(currentCount) : 0;
+
+        // Если больше 10 запросов — блок
+        if (currentCount >= 10) {
+          return new Response('Слишком много запросов. Подожди минуту.', { status: 429, headers: corsHeaders });
+        }
+
+        // Увеличиваем счётчик и сохраняем на 60 секунд
+        await env.RATE_LIMIT_KV.put(rateLimitKey, (currentCount + 1).toString(), { expirationTtl: 60 });
       }
-
-      // Увеличиваем счётчик и сохраняем на 60 секунд
-      await env.RATE_LIMIT_KV.put(rateLimitKey, (currentCount + 1).toString(), { expirationTtl: 60 });
     }
 
     const authHeader = request.headers.get('Authorization');
@@ -56,41 +64,44 @@ export default {
       }
     }
 
-    // 2. ЗАПРОСЫ ОТ ТЕЛЕГРАМА
-    try {
-      const update = await request.json();
-      if (update.message) {
-        const chatId = update.message.chat.id;
-        const text = update.message.text || '';
-        const document = update.message.document;
-        const replyToMessage = update.message.reply_to_message;
+    // 2. ЗАПРОСЫ ОТ ТЕЛЕГРАМА (только с валидным секретом вебхука)
+    if (isTgWebhook) {
+      try {
+        const update = await request.json();
+        if (update.message) {
+          const chatId = update.message.chat.id;
+          const text = update.message.text || '';
+          const document = update.message.document;
+          const replyToMessage = update.message.reply_to_message;
 
-        if (chatId.toString() === env.TG_CHAT_ID.toString()) {
-          if (text.startsWith('/help')) {
-            await sendTgMessage(env, chatId, `🛠 <b>Команды бота:</b>\n/stats\n/backup\n/restore (ответом на файл)\n/help`);
-          } else if (text.startsWith('/stats')) {
-            const now = new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Omsk' });
-            await sendTgMessage(env, chatId, `📊 <b>Статус:</b>\nБот жив. Время: ${now}`);
-          } else if (text.startsWith('/backup')) {
-            await sendTgMessage(env, chatId, `⏳ <i>Собираю бэкап...</i>`);
-            await makeAndSendBackup(env, chatId);
-          } else if (text.startsWith('/restore') && replyToMessage && replyToMessage.document) {
-            const doc = replyToMessage.document;
-            if (!doc.file_name.endsWith('.json')) {
-              await sendTgMessage(env, chatId, `❌ <b>Ошибка:</b> Файл должен быть .json`);
-            } else {
-              await sendTgMessage(env, chatId, `⏳ <i>Восстанавливаю...</i>`);
-              try {
-                await restoreFromBackup(env, chatId, doc.file_id);
-              } catch (err) {
-                await sendTgMessage(env, chatId, `❌ <b>Ошибка:</b>\n${err.message}`);
+          if (chatId.toString() === env.TG_CHAT_ID.toString()) {
+            if (text.startsWith('/help')) {
+              await sendTgMessage(env, chatId, `🛠 <b>Команды бота:</b>\n/stats\n/backup\n/restore (ответом на файл)\n/help`);
+            } else if (text.startsWith('/stats')) {
+              const now = new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Omsk' });
+              await sendTgMessage(env, chatId, `📊 <b>Статус:</b>\nБот жив. Время: ${now}`);
+            } else if (text.startsWith('/backup')) {
+              await sendTgMessage(env, chatId, `⏳ <i>Собираю бэкап...</i>`);
+              await makeAndSendBackup(env, chatId);
+            } else if (text.startsWith('/restore') && replyToMessage && replyToMessage.document) {
+              const doc = replyToMessage.document;
+              if (!doc.file_name.endsWith('.json')) {
+                await sendTgMessage(env, chatId, `❌ <b>Ошибка:</b> Файл должен быть .json`);
+              } else {
+                await sendTgMessage(env, chatId, `⏳ <i>Восстанавливаю...</i>`);
+                try {
+                  await restoreFromBackup(env, chatId, doc.file_id);
+                } catch (err) {
+                  // escapeHtml: err.message с < или > сломал бы HTML-разметку и телега не доставила бы сообщение
+                  await sendTgMessage(env, chatId, `❌ <b>Ошибка:</b>\n${escapeHtml(err.message)}`);
+                }
               }
             }
           }
+          return new Response('OK', { status: 200 });
         }
-        return new Response('OK', { status: 200 });
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
 
     return new Response('Bad Request', { status: 400, headers: corsHeaders });
   },
@@ -108,6 +119,10 @@ export default {
 };
 
 // ФУНКЦИИ
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 async function sendTgMessage(env, chatId, text) {
   await fetch(`https://api.telegram.org/bot${env.TG_TOKEN}/sendMessage`, {
     method: 'POST',
