@@ -4,6 +4,7 @@ import { toastWarning, toastSuccess } from '../toast.js';
 import { isEditor } from '../auth.js';
 import { setSidebar, setMain, setSidebarNavHandlers, openModal, closeModal } from '../utils.js';
 import { state } from '../state.js';
+import { dataManager } from '../dataManager.js';
 
 export async function renderHome() {
   setSidebar(`
@@ -44,12 +45,21 @@ export async function renderHome() {
     </div>
   `);
 
-  let examTarget = localStorage.getItem('examTarget') || '2026-06-15T10:00';
-  let gradTarget = localStorage.getItem('gradTarget') || '2026-06-30T23:59';
+  // Общие даты: Firebase ключ 'settings' (dataManager сам кэширует в localStorage и ругается тостами).
+  // Легаси-миграция: раньше даты жили только в localStorage этого браузера — подхватываем их,
+  // чтобы редактор не потерял то, что уже настроил. Мертвые дефолты 2026-06 больше не нужны.
+  const settings = (await dataManager.load('settings')) || {};
+  let examTarget = settings.examTarget || null;
+  let gradTarget = settings.gradTarget || null;
+  const legacyExam = localStorage.getItem('examTarget');
+  const legacyGrad = localStorage.getItem('gradTarget');
+  if (!examTarget && legacyExam && new Date(legacyExam) > new Date()) examTarget = legacyExam;
+  if (!gradTarget && legacyGrad && new Date(legacyGrad) > new Date()) gradTarget = legacyGrad;
 
   function updateTimer(target, elementId) {
     const el = document.getElementById(elementId);
     if (!el) return;
+    if (!target) { el.textContent = '--:--:--'; return; } // дата не установлена
     const diff = new Date(target).getTime() - Date.now();
     if (diff <= 0) { el.textContent = '00:00:00'; return; }
     const days = Math.floor(diff / 86400000);
@@ -77,7 +87,7 @@ export async function renderHome() {
   function openDateModal(type) {
     activeTimer = type;
     const target = type === 'exam' ? examTarget : gradTarget;
-    selectedDate = new Date(target);
+    selectedDate = target ? new Date(target) : new Date(); // без даты стартуем с сегодняшней
     updateDatePickerText();
     document.getElementById('homeDateModalTitle').innerHTML = type === 'exam'
       ? '<i class="fas fa-graduation-cap"></i> Дата экзаменов'
@@ -96,13 +106,16 @@ export async function renderHome() {
     });
   };
 
-  document.getElementById('homeDateSaveBtn').onclick = () => {
+  document.getElementById('homeDateSaveBtn').onclick = async () => {
     if (!selectedDate) { toastWarning('Выберите дату'); return; }
     const iso = selectedDate.toISOString();
-    if (activeTimer === 'exam') { examTarget = iso; localStorage.setItem('examTarget', iso); }
-    else { gradTarget = iso; localStorage.setItem('gradTarget', iso); }
+    if (activeTimer === 'exam') { examTarget = iso; }
+    else { gradTarget = iso; }
+    // Сохраняем обе даты одним узлом: save() делает полный set, поэтому merged-объект
+    const ok = await dataManager.save('settings', { examTarget, gradTarget });
+    if (!ok) return; // тост с причиной уже показал dataManager, модалку не закрываем — можно повторить
     updateAll();
     closeModal('homeDateModal');
-    toastSuccess('Дата сохранена');
+    toastSuccess('Дата сохранена — теперь её видит вся группа');
   };
 }
