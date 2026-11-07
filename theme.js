@@ -1,5 +1,6 @@
 // theme.js
 import { dataManager } from './dataManager.js';
+import { isEditor } from './auth.js';
 
 export const THEMES = {
   'dark-gold':   '🌙 Тёмная золотая',
@@ -14,58 +15,66 @@ export const THEMES = {
   'light-red':   '☀️ Светлая красная'
 };
 
-// Все картинки — Pexels CDN, хотлинк разрешён, ВПН не мешает.
-// Формат: https://images.pexels.com/photos/{id}/pexels-photo-{id}.jpeg?auto=compress&cs=tinysrgb&w=1920
+// Фоны лежат ЛОКАЛЬНО в data/bg/ — внешние CDN (pexels) недоступны из РФ и
+// в какой-то момент отдали 404 на все фото, из-за чего фон сайта превратился в градиент.
+// Источник — Wikimedia Commons (свободные лицензии):
+//   bg-1: "Fog descending on a pine forest" (Unsplash, CC0) — серо-зеленый бор
+//   bg-2: "Mystical forest in fog" (Flickr, CC BY) — туманный лиственный лес
+//   bg-3: "Lake Mapourika, NZ" (Wikimedia, CC BY-SA) — синее озеро
+//   bg-4: "Dark fog" (Wikimedia, CC BY-SA) — сизый туманный холм
+//   bg-gold: "Fog in the Golden Valley - Falzarego Pass" (Wikimedia, CC BY-SA) — золото
+//   bg-heide: "Haltern am See, Westruper Heide" (Wikimedia, CC BY-SA) — рассветная пустошь
+//   bg-red: "Red Forest trees 2" (Wikimedia, CC BY-SA) — выгоревший лес, синее небо
 const THEME_BG_LIST = {
   'dark-gold': [
-    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-gold.jpg',
+    'data/bg/bg-heide.jpg',
+    'data/bg/bg-1.jpg'
   ],
   'dark-blue': [
-    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-3.jpg',
+    'data/bg/bg-4.jpg',
+    'data/bg/bg-red.jpg'
   ],
   'dark-green': [
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-1.jpg',
+    'data/bg/bg-2.jpg',
+    'data/bg/bg-3.jpg'
   ],
   'dark-purple': [
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-4.jpg',
+    'data/bg/bg-2.jpg',
+    'data/bg/bg-red.jpg'
   ],
   'dark-red': [
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-red.jpg',
+    'data/bg/bg-gold.jpg',
+    'data/bg/bg-4.jpg'
   ],
   'light-gold': [
-    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-heide.jpg',
+    'data/bg/bg-gold.jpg',
+    'data/bg/bg-1.jpg'
   ],
   'light-blue': [
-    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-3.jpg',
+    'data/bg/bg-red.jpg',
+    'data/bg/bg-4.jpg'
   ],
   'light-green': [
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-2.jpg',
+    'data/bg/bg-1.jpg',
+    'data/bg/bg-3.jpg'
   ],
   'light-purple': [
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-4.jpg',
+    'data/bg/bg-2.jpg',
+    'data/bg/bg-heide.jpg'
   ],
   'light-red': [
-    'https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'data/bg/bg-heide.jpg',
+    'data/bg/bg-gold.jpg',
+    'data/bg/bg-red.jpg'
   ]
 };
 
@@ -188,22 +197,26 @@ export async function cycleBackground() {
 }
 
 export async function loadTheme() {
+  // Тема — ЛИЧНАЯ настройка: localStorage всегда главный.
+  // Firebase хранит лишь «дефолтную тему сайта» (ее задает редактор) для тех,
+  // кто тему ни разу не выбирал. Раньше тема из Firebase перетирала локальный
+  // выбор при каждом заходе — из-за этого у зрителей она «не сохранялась».
   const localTheme = localStorage.getItem('b21-theme');
-  if (localTheme && THEMES[localTheme]) applyTheme(localTheme);
-  else applyTheme('dark-gold');
-  try {
-    const globalTheme = await dataManager.loadTheme();
-    if (globalTheme && THEMES[globalTheme]) {
-      const activeInDOM = readThemeFromDOM();
-      if (globalTheme !== activeInDOM) applyTheme(globalTheme);
-    }
-  } catch (e) { console.warn('Не удалось загрузить тему:', e); }
+  if (localTheme && THEMES[localTheme]) { applyTheme(localTheme); return; }
+  let globalTheme = null;
+  try { globalTheme = await dataManager.loadTheme(); } catch (e) { console.warn('Не удалось загрузить тему:', e); }
+  applyTheme(globalTheme && THEMES[globalTheme] ? globalTheme : 'dark-gold');
 }
 
 export async function saveTheme(themeName) {
   if (!THEMES[themeName]) return;
-  applyTheme(themeName);
-  try { await dataManager.saveTheme(themeName); } catch (e) {}
+  applyTheme(themeName); // applyTheme сохраняет выбор в localStorage — этого достаточно зрителю
+  // В Firebase пишем только редакторы: это дефолт для новых посетителей.
+  // Обычным пользователям писать в базу некуда (правила разрешают запись только редакторам),
+  // а их выбор и так живет у них в localStorage.
+  if (isEditor()) {
+    try { await dataManager.saveTheme(themeName); } catch (e) {}
+  }
 }
 
 function createThemeModal() {

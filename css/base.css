@@ -17,6 +17,9 @@ body {
   font-feature-settings: 'ss01' on, 'ss02' on;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Стековый контекст: иначе body::before с z-index:-1 красится ПОД собственный
+     фон body и лес-картинка не видна вовсе. Проверено вживую. */
+  isolation: isolate;
 }
 
 button, input, textarea, select {
