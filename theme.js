@@ -150,7 +150,11 @@ async function setBackgroundForTheme(themeName, startIndex = 0) {
   }
   const result = await findWorkingBg(themeName, startIndex);
   if (result) {
-    document.documentElement.style.setProperty('--bg-image-url', `url("${result.url}")`);
+    // ВАЖНО: абсолютный URL. Относительный путь в css-переменной браузер
+    // резолвит относительно файла стилей (css/base.css), а не страницы —
+    // получалось /css/data/bg/... и 404.
+    const absoluteUrl = new URL(result.url, location.href).href;
+    document.documentElement.style.setProperty('--bg-image-url', `url("${absoluteUrl}")`);
     currentBgIndex = result.index;
     await new Promise(resolve => {
       const img = new Image();
