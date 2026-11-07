@@ -9,11 +9,13 @@ const SECTION_NAMES = {
   exams: 'Экзамены',
   resources: 'Ресурсы',
   extracurricular: 'Внеурочка',
-  teachers: 'Преподаватели'
+  teachers: 'Преподаватели',
+  settings: 'Общие настройки'
 };
 
 function countItems(key, value) {
   if (!value) return '';
+  if (key === 'settings') return 'даты таймеров';
   if (key === 'homework' && value.subjects) return value.subjects.length + ' предметов';
   if (Array.isArray(value)) return value.length + ' шт.';
   if (typeof value === 'object') return Object.keys(value).length + ' шт.';
@@ -27,9 +29,10 @@ export function exportData() {
     dataManager.load('exams'),
     dataManager.load('resources'),
     dataManager.load('extracurricular'),
-    dataManager.load('teachers')
-  ]).then(([schedule, homework, exams, resources, extracurricular, teachers]) => {
-    const data = { schedule, homework, exams, resources, extracurricular, teachers };
+    dataManager.load('teachers'),
+    dataManager.load('settings')
+  ]).then(([schedule, homework, exams, resources, extracurricular, teachers, settings]) => {
+    const data = { schedule, homework, exams, resources, extracurricular, teachers, settings };
     const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
