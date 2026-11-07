@@ -27,6 +27,7 @@ export async function renderExam() {
       <div class="hero-text"><h2><i class="fas fa-chalkboard"></i> Стенд экзаменов</h2></div>
       <div style="display:flex; gap:12px; align-items:center;">
         <span class="hero-badge"><i class="fas fa-calendar-alt"></i> Зимняя сессия 2026</span>
+        <button id="exportIcsBtn" class="ics-btn"><i class="fas fa-calendar-plus"></i> В календарь (.ics)</button>
         <button id="addExamBtn" class="reset-btn"><i class="fas fa-plus"></i> Добавить экзамен</button>
       </div>
     </div>
@@ -42,6 +43,7 @@ export async function renderExam() {
   renderExams();
 
   document.getElementById('addExamBtn').onclick = () => openExamModal();
+  document.getElementById('exportIcsBtn').onclick = () => exportExamsIcs();
   setupExamModal();
 
   const grid = document.getElementById('examsGrid');
@@ -102,6 +104,65 @@ function renderExams() {
     card.querySelector('.delete-exam').onclick = (e) => { e.stopPropagation(); deleteExam(exam.id); };
     grid.appendChild(card);
   });
+}
+
+// ===== ЭКСПОРТ В КАЛЕНДАРЬ (.ics) =====
+
+// Дата экзамена из свободного текста: ДД.ММ.ГГГГ [ЧЧ:ММ] или ISO; без времени считаем 9:00
+function parseExamDateIcs(s) {
+  if (typeof s !== 'string') return null;
+  let m = s.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if (m) return new Date(+m[3], +m[2] - 1, +m[1], m[4] ? +m[4] : 9, m[5] ? +m[5] : 0);
+  m = s.trim().match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{1,2}):(\d{2}))?/);
+  return m ? new Date(+m[1], +m[2] - 1, +m[3], m[4] ? +m[4] : 9, m[5] ? +m[5] : 0) : null;
+}
+
+function icsEscape(s) {
+  return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+}
+function pad2(n) { return String(n).padStart(2, '0'); }
+function icsDate(d) { return `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`; }
+
+function exportExamsIcs() {
+  const exams = Array.isArray(state.data.exams) ? state.data.exams : [];
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//B31LES//Portal//RU', 'CALSCALE:GREGORIAN'];
+  let count = 0;
+  exams.forEach(ex => {
+    if (!ex || typeof ex !== 'object') return;
+    const d = parseExamDateIcs(ex.date);
+    if (!d) return;
+    count++;
+    lines.push('BEGIN:VEVENT');
+    lines.push(`UID:${(ex.id || Date.now())}@b31les`);
+    lines.push(`DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`);
+    if (typeof ex.date === 'string' && /^\d{2}\.\d{2}\.\d{4}$/.test(ex.date.trim())) {
+      // Время не указано — событие на весь день
+      lines.push(`DTSTART;VALUE=DATE:${icsDate(d)}`);
+      const next = new Date(d); next.setDate(next.getDate() + 1);
+      lines.push(`DTEND;VALUE=DATE:${icsDate(next)}`);
+    } else {
+      const end = new Date(d.getTime() + 90 * 60000);
+      lines.push(`DTSTART:${icsDate(d)}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`);
+      lines.push(`DTEND:${icsDate(end)}T${pad2(end.getHours())}${pad2(end.getMinutes())}00`);
+    }
+    lines.push(`SUMMARY:Экзамен: ${icsEscape(ex.subject || 'Без названия')}`);
+    if (ex.room) lines.push(`LOCATION:${icsEscape(ex.room)}`);
+    const descParts = [];
+    if (ex.teacher) descParts.push(`Преподаватель: ${ex.teacher}`);
+    if (ex.format) descParts.push(`Формат: ${ex.format}`);
+    if (descParts.length) lines.push(`DESCRIPTION:${icsEscape(descParts.join('; '))}`);
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  if (!count) { toastWarning('Нет экзаменов с распознанной датой (ДД.ММ.ГГГГ)'); return; }
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'exams-b31les.ics';
+  a.click();
+  URL.revokeObjectURL(url);
+  toastSuccess(`Экзаменов в календаре: ${count}`);
 }
 
 function setupExamModal() {

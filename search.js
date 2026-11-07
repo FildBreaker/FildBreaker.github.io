@@ -24,6 +24,24 @@ export function setupGlobalSearch() {
   const closeBtn = document.getElementById('globalSearchClose');
   const openBtn = document.getElementById('openSearchBtn');
 
+  // Клавиатурная навигация по результатам: стрелки вверх/вниз, Enter — переход
+  let activeResultIdx = -1;
+  input.addEventListener('keydown', (e) => {
+    const items = Array.from(resultsBox.querySelectorAll('.search-result-item'));
+    if (!items.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeResultIdx = e.key === 'ArrowDown'
+        ? (activeResultIdx + 1) % items.length
+        : (activeResultIdx - 1 + items.length) % items.length;
+      items.forEach((el, i) => el.classList.toggle('active', i === activeResultIdx));
+      items[activeResultIdx].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter' && activeResultIdx >= 0) {
+      e.preventDefault();
+      items[activeResultIdx].click();
+    }
+  });
+
   if (openBtn) {
     openBtn.onclick = () => {
       modal.classList.add('active');
@@ -48,6 +66,7 @@ export function setupGlobalSearch() {
   modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
   input.addEventListener('input', (e) => {
+    activeResultIdx = -1; // результаты пересобираются — сбрасываем выбор
     const query = e.target.value.trim().toLowerCase();
     if (query.length < 2) {
       resultsBox.innerHTML = '<div class="search-hint">Введите хотя бы 2 символа...</div>';

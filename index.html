@@ -28,18 +28,19 @@
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/main.css?v=11">
-  <link rel="icon" href="data/icon.ico?v=11">
-  <script src="logo-fx.js?v=11"></script>
-  <script src="page-animations.js?v=11"></script>
-  <script src="card-tilt.js?v=11"></script>
-  <script src="drag-sort.js?v=11"></script>
-  <script type="module" src="firebase-config.js?v=11"></script>
-  <script type="module" src="dataManager.js?v=11"></script>
-  <script type="module" src="rich-editor.js?v=11"></script>
-  <script type="module" src="theme.js?v=11"></script>
+  <link rel="stylesheet" href="css/main.css?v=12">
+  <link rel="icon" href="data/icon.ico?v=12">
+  <script src="logo-fx.js?v=12"></script>
+  <script src="page-animations.js?v=12"></script>
+  <script src="card-tilt.js?v=12"></script>
+  <script src="drag-sort.js?v=12"></script>
+  <script type="module" src="firebase-config.js?v=12"></script>
+  <script type="module" src="dataManager.js?v=12"></script>
+  <script type="module" src="rich-editor.js?v=12"></script>
+  <script type="module" src="theme.js?v=12"></script>
 </head>
 <body>
+<div id="offlineBanner" class="offline-banner" style="display:none"><i class="fas fa-plug-circle-xmark"></i> Нет сети — показаны кэшированные данные</div>
 <div id="bgWaves"></div>
 <div class="app-grid">
   <header class="site-header">
@@ -300,8 +301,8 @@
   </div>
 </div>
 
-<script type="module" src="app-settings.js?v=11"></script>
-<script type="module" src="app.js?v=11"></script>
+<script type="module" src="app-settings.js?v=12"></script>
+<script type="module" src="app.js?v=12"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

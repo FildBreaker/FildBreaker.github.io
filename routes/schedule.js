@@ -63,11 +63,19 @@ export async function renderSchedule() {
   };
 }
 
+// Дата ДД.ММ.ГГГГ (формат редактора расписания) — или null
+function parseRuDateCell(s) {
+  if (typeof s !== 'string') return null;
+  const m = s.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+}
+
 function renderScheduleTable() {
   const tbody = document.getElementById('scheduleBody');
   if (!tbody) return;
   tbody.innerHTML = '';
   const scheduleData = state.data.schedule;
+  const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
   for (let pair = 1; pair <= MAX_PAIR; pair++) {
     const tr = document.createElement('tr');
     const tdTime = document.createElement('td');
@@ -78,9 +86,14 @@ function renderScheduleTable() {
     for (let day = 0; day < 7; day++) {
       const td = document.createElement('td');
       const lesson = scheduleData[day]?.[pair] || { subject: '', room: '', startDate: '', endDate: '', type: '', notes: '', isCancelled: false };
-      
+
       let cellClass = 'schedule-cell';
       let cancelHtml = '';
+
+      // Диапазон дат: не начавшаяся пара — приглушаем, закончившаяся — гасим сильнее
+      const sD = parseRuDateCell(lesson.startDate), eD = parseRuDateCell(lesson.endDate);
+      if (sD && todayMid < sD) cellClass += ' is-future';
+      if (eD && todayMid > eD) cellClass += ' is-expired';
 
       if (lesson.isCancelled) {
         cellClass += ' is-cancelled';

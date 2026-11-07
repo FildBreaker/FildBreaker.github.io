@@ -38,6 +38,7 @@ export async function renderHomework() {
   setMain(`
     <div class="homework-header">
       <h2 id="currentSubjectTitle"><i class="fas fa-folder"></i> Выберите предмет</h2>
+      <span class="hw-deadline-chip" id="hwDeadlineChip" style="display:none;"></span>
       <button class="add-task-btn" id="addTaskBtn" disabled><i class="fas fa-plus"></i> Добавить задание</button>
     </div>
     <div class="tasks-container" id="tasksContainer">
@@ -49,6 +50,7 @@ export async function renderHomework() {
     const saved = await dataManager.load('homework');
     state.data.homework = normalizeHomework(saved);
   }
+  updateDeadlineChip();
 
   homeworkState.currentSubjectId = sessionStorage.getItem('activeSubjectId');
   if (homeworkState.currentSubjectId && !state.data.homework.subjects.find(s => s.id === homeworkState.currentSubjectId)) homeworkState.currentSubjectId = null;
@@ -164,6 +166,32 @@ function clearTasksView() {
   if (btn) btn.disabled = true;
 }
 
+// Чип в шапке домашки: сколько дедлайнов просрочено и на ближайшей неделе
+function updateDeadlineChip() {
+  const chip = document.getElementById('hwDeadlineChip');
+  if (!chip) return;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let soon = 0, overdue = 0;
+  state.data.homework.subjects.forEach(subj => {
+    if (!subj) return;
+    (subj.tasks || []).forEach(t => {
+      if (!t || !t.deadline) return;
+      const d = new Date(t.deadline);
+      if (isNaN(d)) return;
+      const diffDays = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - today) / 86400000);
+      if (diffDays < 0) overdue++;
+      else if (diffDays <= 7) soon++;
+    });
+  });
+  if (!soon && !overdue) { chip.style.display = 'none'; return; }
+  chip.style.display = 'inline-flex';
+  chip.classList.toggle('has-overdue', overdue > 0);
+  chip.innerHTML = `<i class="fas fa-hourglass-half"></i> ` +
+    (overdue ? `<b>просрочено: ${overdue}</b>` : '') +
+    (overdue && soon ? ' · ' : '') +
+    (soon ? `<b>${soon}</b> на этой неделе` : '');
+}
+
 function renderTasks(tasks) {
   const container = document.getElementById('tasksContainer');
   if (!container) return;
@@ -203,6 +231,10 @@ function renderTasks(tasks) {
       else if (diffDays === 0) { badgeClass = 'deadline-warning'; label = 'Сегодня!'; }
       else if (diffDays === 1) { badgeClass = 'deadline-warning'; label = 'Завтра'; }
       else if (diffDays <= 3) { badgeClass = 'deadline-warning'; label = `Осталось ${diffDays} дн.`; }
+
+      // Срочность цветом на самой карточке — видно и без чтения бейджа
+      if (diffMs < 0 || diffDays <= 3) card.classList.add('task-card--urgent');
+      else if (diffDays <= 7) card.classList.add('task-card--soon');
       
       deadlineHtml = `<div class="task-deadline ${badgeClass}"><i class="fas fa-clock"></i> ${label}</div>`;
     }
@@ -364,6 +396,7 @@ async function saveTaskFromModal() {
     const success = await dataManager.save('homework', state.data.homework);
     if (!success) return;
     renderTasks(subject.tasks);
+    updateDeadlineChip();
     closeModal('taskModal');
     toastSuccess(isEdit ? 'Задание обновлено' : 'Задание добавлено');
     tgNotify(`📝 <b>Задание ${isEdit ? 'изменено' : 'добавлено'}</b>\n📚 ${subject.name}\n💬 ${descText.slice(0, 150)}${descText.length > 150 ? '…' : ''}`);
@@ -386,6 +419,7 @@ async function deleteTask(taskId) {
   const success = await dataManager.save('homework', state.data.homework);
   if (!success) return;
   renderTasks(subject.tasks);
+  updateDeadlineChip();
   toastSuccess('Задание удалено');
   tgNotify(`🗑 <b>Задание удалено</b>\n📚 ${subject.name}`);
 }

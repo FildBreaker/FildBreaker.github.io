@@ -75,7 +75,14 @@ async function navigate() {
 function init() {
   setupModalGlobals();
   setupGlobalSearch();
-  
+
+  // Офлайн-плашка: если сеть пропала, честно говорим, что данные из кэша
+  const offlineBanner = document.getElementById('offlineBanner');
+  const syncOffline = () => { if (offlineBanner) offlineBanner.style.display = navigator.onLine ? 'none' : 'flex'; };
+  window.addEventListener('online', syncOffline);
+  window.addEventListener('offline', syncOffline);
+  syncOffline();
+
   if (!location.hash) location.hash = '#/home';
   window.addEventListener('hashchange', navigate);
   

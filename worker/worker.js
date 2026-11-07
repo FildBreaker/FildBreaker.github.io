@@ -109,6 +109,12 @@ export default {
   // 3. CRON
   async scheduled(event, env, ctx) {
     try {
+      // Утренняя сводка на отдельном триггере (см. CRON_DIGEST в конце файла),
+      // остальные триггеры — как раньше: проверка + бэкап
+      if (event.cron === CRON_DIGEST) {
+        await sendDailyDigest(env);
+        return;
+      }
       const now = new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Omsk' });
       await sendTgMessage(env, env.TG_CHAT_ID, `🤖 <b>Плановая проверка:</b>\nВсё работает. Время: ${now}`);
       await makeAndSendBackup(env, env.TG_CHAT_ID);
@@ -119,8 +125,75 @@ export default {
 };
 
 // ФУНКЦИИ
+const DB_URL = 'https://ibd2026-31a00-default-rtdb.firebaseio.com/IBD2026.json';
+// Сводка приходит в 7:30 по Омску (1:30 UTC). Триггер добавить в CF: Triggers → Cron Triggers.
+const CRON_DIGEST = '30 1 * * *';
+const OMSK_TZ = 'Asia/Omsk';
+const DIGEST_PAIR_TIMES = { 1: '9:00–10:30', 2: '10:45–12:15', 3: '12:30–14:00', 4: '14:40–16:10', 5: '16:20–17:50', 6: '18:00–19:30' };
+const WEEKDAY_INDEX = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+
 function escapeHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Дата ДД.ММ.ГГГГ (формат редактора расписания) — или null
+function parseRuDateW(s) {
+  if (typeof s !== 'string') return null;
+  const m = s.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+}
+
+// Утренняя сводка: сегодня по Омску (пары с учетом дат и отмен) + дедлайны на неделю
+async function sendDailyDigest(env) {
+  const dbResponse = await fetch(DB_URL);
+  if (!dbResponse.ok) throw new Error(`Firebase: ${dbResponse.statusText}`);
+  const data = await dbResponse.json();
+
+  const weekday = new Intl.DateTimeFormat('en-US', { timeZone: OMSK_TZ, weekday: 'short' }).format(new Date());
+  const dayIndex = WEEKDAY_INDEX[weekday] ?? 0;
+  const label = new Intl.DateTimeFormat('ru-RU', { timeZone: OMSK_TZ, day: 'numeric', month: 'long', weekday: 'long' }).format(new Date());
+  const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
+
+  const lines = [`🌅 <b>Доброе утро, Б-31ЛЕС!</b>`, `📆 Сегодня ${label}\n`];
+
+  const schedule = data.schedule || {};
+  let pairCount = 0;
+  for (let pair = 1; pair <= 6; pair++) {
+    const l = schedule[dayIndex] ? schedule[dayIndex][pair] : null;
+    if (!l || !l.subject) continue;
+    const sD = parseRuDateW(l.startDate), eD = parseRuDateW(l.endDate);
+    if (sD && todayMid < sD) continue; // пара еще не началась
+    if (eD && todayMid > eD) continue; // пара уже закончилась
+    pairCount++;
+    const cancel = l.isCancelled ? ' 🚫 <b>ОТМЕНА</b>' : '';
+    lines.push(`${pair}. ${DIGEST_PAIR_TIMES[pair] || ''} — ${escapeHtml(l.subject)}${l.room ? ` (ауд. ${escapeHtml(l.room)})` : ''}${cancel}`);
+  }
+  if (!pairCount) lines.push('🌴 Пар сегодня нет. Гуляй, лесник.');
+
+  const subjects = (data.homework && Array.isArray(data.homework.subjects)) ? data.homework.subjects : [];
+  const items = [];
+  subjects.forEach(subj => {
+    if (!subj) return;
+    (Array.isArray(subj.tasks) ? subj.tasks : []).forEach(t => {
+      if (!t || !t.deadline) return;
+      const d = new Date(t.deadline);
+      if (isNaN(d)) return;
+      const diffDays = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - todayMid) / 86400000);
+      if (diffDays < 0 || diffDays > 7) return;
+      const text = String(t.desc || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+      items.push({ diffDays, name: subj.name || '', text });
+    });
+  });
+  if (items.length) {
+    items.sort((a, b) => a.diffDays - b.diffDays);
+    lines.push('\n⏰ <b>Дедлайны:</b>');
+    items.slice(0, 5).forEach(t => {
+      const when = t.diffDays === 0 ? 'сегодня!' : t.diffDays === 1 ? 'завтра' : `через ${t.diffDays} дн.`;
+      lines.push(`• ${escapeHtml(t.name)} — ${escapeHtml(t.text || 'задание')} (${when})`);
+    });
+  }
+
+  await sendTgMessage(env, env.TG_CHAT_ID, lines.join('\n'));
 }
 
 async function sendTgMessage(env, chatId, text) {
@@ -132,8 +205,7 @@ async function sendTgMessage(env, chatId, text) {
 }
 
 async function makeAndSendBackup(env, chatId) {
-  const dbUrl = 'https://ibd2026-31a00-default-rtdb.firebaseio.com/IBD2026.json';
-  const dbResponse = await fetch(dbUrl);
+  const dbResponse = await fetch(DB_URL);
   if (!dbResponse.ok) throw new Error(`Firebase: ${dbResponse.statusText}`);
   
   const dbData = await dbResponse.json();

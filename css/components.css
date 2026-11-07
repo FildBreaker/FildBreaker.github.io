@@ -770,3 +770,141 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   transform: translateY(1px); /* Сдвиг вниз на 2 пикселя */
   display: inline-block;      /* Обязательно для работы transform */
 }
+
+/* ============================================================
+   ВИДЖЕТ «СЕГОДНЯ» НА ГЛАВНОЙ
+   ============================================================ */
+.today-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.today-card h3 {
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.today-card h3 .today-date { color: var(--accent); text-transform: capitalize; }
+.today-pair {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+}
+.today-pair + .today-pair { margin-top: 6px; }
+.today-pair.now {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+.today-pair.cancelled { opacity: 0.45; }
+.today-pair.cancelled .today-subject { text-decoration: line-through; }
+.today-time { color: var(--text-muted); font-size: 0.82rem; min-width: 96px; white-space: nowrap; }
+.today-subject { flex: 1; color: var(--text-color); font-weight: 600; }
+.today-badge { font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.today-badge.now { background: var(--accent); color: var(--badge-color); font-weight: 700; }
+.today-badge.next { background: var(--bg-active); color: var(--text-secondary); border: 1px solid var(--border-color); }
+.today-badge.cancel { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
+.today-empty { color: var(--text-muted); font-style: italic; padding: 10px 4px; }
+.today-deadlines-title {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.today-deadline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  padding: 8px 12px;
+  margin-top: 6px;
+  border-radius: 10px;
+  background: var(--bg-hover);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.today-deadline b { color: var(--accent); white-space: nowrap; }
+.today-deadline.overdue { background: rgba(231, 76, 60, 0.12); }
+.today-deadline.overdue b { color: #e74c3c; }
+.today-deadline.soon b { color: #f5d742; }
+
+/* Подстрочник под таймером экзаменов */
+.timer-sub { margin-top: 6px; font-size: 0.78rem; color: var(--text-muted); min-height: 1em; }
+
+/* ============================================================
+   ДОМАШКА: ЧИП ДЕДЛАЙНОВ И СРОЧНОСТЬ КАРТОЧЕК
+   ============================================================ */
+.hw-deadline-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.hw-deadline-chip b { color: var(--accent); }
+.hw-deadline-chip.has-overdue { border-color: #e74c3c; }
+.hw-deadline-chip.has-overdue b { color: #e74c3c; }
+.task-card--urgent { border-left: 3px solid #e74c3c; }
+.task-card--soon { border-left: 3px solid var(--accent); }
+
+/* ============================================================
+   РАСПИСАНИЕ: ГАШЕНИЕ ПРОШЕДШИХ И БУДУЩИХ ПАР
+   ============================================================ */
+.schedule-cell.is-expired .cell-content { opacity: 0.4; }
+.schedule-cell.is-future .cell-content { opacity: 0.55; }
+
+/* ============================================================
+   КНОПКА ЭКСПОРТА В КАЛЕНДАРЬ (видна всем, в отличие от .reset-btn)
+   ============================================================ */
+.ics-btn {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 40px;
+  padding: 8px 18px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.ics-btn:hover { background: var(--bg-active); border-color: var(--accent); color: var(--text-color); }
+
+/* ============================================================
+   ОФЛАЙН-ПЛАШКА
+   ============================================================ */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(231, 76, 60, 0.92);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Активный результат поиска при клавиатурной навигации */
+.search-result-item.active { background: var(--bg-hover); }
