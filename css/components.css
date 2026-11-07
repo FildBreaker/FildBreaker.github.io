@@ -264,6 +264,15 @@
 .schedule-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; background: var(--card-bg); transition: background 0.2s; }
 .schedule-table tr:last-child td { border-bottom: none; }
 .schedule-table td:first-child { font-weight: 600; color: var(--text-secondary); background: var(--bg-hover); width: 160px; }
+/* Липкая колонка «Пара»: при горизонтальном свайпе таблицы время остается на виду */
+.schedule-table th:first-child,
+.schedule-table td:first-child { position: sticky; left: 0; z-index: 2; }
+.schedule-table td:first-child {
+  /* --bg-hover полупрозрачен — подмешиваем непрозрачную подложку card-bg, иначе клетки просвечивают */
+  background-color: var(--card-bg);
+  background-image: linear-gradient(var(--bg-hover), var(--bg-hover));
+  box-shadow: inset -1px 0 0 var(--border-color);
+}
 .schedule-cell { cursor: pointer; }
 .schedule-cell:hover { background: var(--table-row-hover); }
 .cell-content { display: flex; flex-direction: column; gap: 4px; position: relative; }
@@ -558,6 +567,9 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
   .hw-deadline-chip { max-width: 100%; }
   .exams-hero > div { flex-wrap: wrap; }
   .pair-time { font-size: 0.8rem; }
+  /* Липкую колонку «Пара» на телефоне сужаем — 160px съедают почти пол-экрана */
+  .schedule-table th:first-child,
+  .schedule-table td:first-child { width: 120px; min-width: 120px; }
 }
 
 .task-deadline { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; align-self: flex-start; }
