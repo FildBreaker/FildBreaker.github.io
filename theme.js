@@ -142,30 +142,50 @@ function ensureBgLayer() {
   return bgLayer;
 }
 
+let bgSwitching = false;
+
 async function setBackgroundForTheme(themeName, startIndex = 0) {
-  const layer = ensureBgLayer();
-  if (layer.classList.contains('visible')) {
-    layer.classList.remove('visible');
-    await new Promise(r => setTimeout(r, 550));
-  }
-  const result = await findWorkingBg(themeName, startIndex);
-  if (result) {
-    // ВАЖНО: абсолютный URL. Относительный путь в css-переменной браузер
-    // резолвит относительно файла стилей (css/base.css), а не страницы —
-    // получалось /css/data/bg/... и 404.
-    const absoluteUrl = new URL(result.url, location.href).href;
-    document.documentElement.style.setProperty('--bg-image-url', `url("${absoluteUrl}")`);
-    currentBgIndex = result.index;
-    await new Promise(resolve => {
-      const img = new Image();
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
-      img.src = result.url;
-    });
-    requestAnimationFrame(() => layer.classList.add('visible'));
-  } else {
-    document.documentElement.style.setProperty('--bg-image-url', THEME_BG_FALLBACK[themeName] || 'none');
-    layer.classList.remove('visible');
+  if (bgSwitching) return; // защита от долбления «Сменить фоновую картинку»
+  bgSwitching = true;
+  try {
+    const layer = ensureBgLayer();
+    // 1. Если слой показывал старую картинку — плавно гасим его (под ним та же
+    //    картинка в body::before, так что гашение глазу не видно)
+    if (layer.classList.contains('visible')) {
+      layer.classList.remove('visible');
+      await new Promise(r => setTimeout(r, 500));
+    }
+    const result = await findWorkingBg(themeName, startIndex);
+    if (result) {
+      // ВАЖНО: абсолютный URL. Относительный путь в css-переменной браузер
+      // резолвит относительно файла стилей (css/base.css), а не страницы —
+      // получалось /css/data/bg/... и 404.
+      const absoluteUrl = new URL(result.url, location.href).href;
+      currentBgIndex = result.index;
+      // 2. Дожидаемся загрузки картинки — никаких вспышек пустоты
+      await new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = absoluteUrl;
+      });
+      // 3. Кладем НОВУЮ картинку в слой (он прозрачен) и плавно проявляем
+      //    поверх старой — получается кроссфейд под общим затемнением body::after
+      layer.style.backgroundImage = `url("${absoluteUrl}")`;
+      requestAnimationFrame(() => layer.classList.add('visible'));
+      // 4. Когда проявился — перекладываем картинку в базовый body::before,
+      //    это происходит под непрозрачным слоем и глазу не видно
+      setTimeout(() => {
+        document.documentElement.style.setProperty('--bg-image-url', `url("${absoluteUrl}")`);
+      }, 700);
+    } else {
+      // Фолбэк: градиент сразу в базовый слой, слой гасим
+      layer.style.backgroundImage = 'none';
+      document.documentElement.style.setProperty('--bg-image-url', THEME_BG_FALLBACK[themeName] || 'none');
+      layer.classList.remove('visible');
+    }
+  } finally {
+    bgSwitching = false;
   }
 }
 

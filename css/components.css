@@ -937,3 +937,24 @@ body.is-editor #authBtn { border-color: var(--accent); color: var(--accent); }
 
 /* Активный результат поиска при клавиатурной навигации */
 .search-result-item.active { background: var(--bg-hover); }
+
+/* ============================================================
+   СЛОЙ ПЛАВНОЙ СМЕНЫ ФОНОВ (crossfade)
+   theme.js показывает в нем новую картинку поверх старой (body::before),
+   затем незаметно перекладывает ее в базовый слой. Лежит ПОД body::after
+   (общее затемнение) — порядок краски: ::before → слой → ::after.
+   ============================================================ */
+#bgImageLayer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-position: center;
+  background-size: cover;
+  filter: blur(10px);
+  -webkit-filter: blur(10px);
+  transform: scale(1.05);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+#bgImageLayer.visible { opacity: 1; }

@@ -3,7 +3,7 @@
    ============================================================ */
 :root {
   --bg-image-url: none;
-  --bg-overlay: rgba(0, 0, 0, 0.65);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
   --primary-bg: #22223b;
   --header-bg: #4a4e69;
   --sidebar-bg: #4f627a;
@@ -42,7 +42,7 @@
 
 /* ТЁМНЫЕ ТЕМЫ */
 .theme-dark-gold {
-  --bg-overlay: rgba(0, 0, 0, 0.75);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
   --primary-bg: #1a1a2e;
   --header-bg: #2a2a42;
   --sidebar-bg: #22223a;
@@ -74,7 +74,7 @@
 }
 
 .theme-dark-blue {
-  --bg-overlay: rgba(10, 22, 40, 0.85);
+  --bg-overlay: rgba(10, 22, 40, 0.55);
   --primary-bg: #0a1628;
   --header-bg: #1a2a42;
   --sidebar-bg: #142234;
@@ -106,7 +106,7 @@
 }
 
 .theme-dark-green {
-  --bg-overlay: rgba(10, 31, 10, 0.85);
+  --bg-overlay: rgba(10, 31, 10, 0.55);
   --primary-bg: #0a1f0a;
   --header-bg: #1a3a22;
   --sidebar-bg: #142e1a;
@@ -138,7 +138,7 @@
 }
 
 .theme-dark-purple {
-  --bg-overlay: rgba(26, 10, 42, 0.85);
+  --bg-overlay: rgba(26, 10, 42, 0.55);
   --primary-bg: #1a0a2a;
   --header-bg: #2a1a42;
   --sidebar-bg: #221436;
@@ -170,7 +170,7 @@
 }
 
 .theme-dark-red {
-  --bg-overlay: rgba(42, 10, 10, 0.85);
+  --bg-overlay: rgba(42, 10, 10, 0.55);
   --primary-bg: #2a0a0a;
   --header-bg: #421a1a;
   --sidebar-bg: #361414;
@@ -203,7 +203,7 @@
 
 /* СВЕТЛЫЕ ТЕМЫ */
 .theme-light-gold {
-  --bg-overlay: rgba(255, 248, 235, 0.85);
+  --bg-overlay: rgba(255, 248, 235, 0.6);
   --primary-bg: #f5f0e8;
   --header-bg: #ffffff;
   --sidebar-bg: #e8e0d8;
@@ -237,7 +237,7 @@
 }
 
 .theme-light-blue {
-  --bg-overlay: rgba(235, 245, 255, 0.85);
+  --bg-overlay: rgba(235, 245, 255, 0.6);
   --primary-bg: #f0f5ff;
   --header-bg: #ffffff;
   --sidebar-bg: #dce8f5;
@@ -271,7 +271,7 @@
 }
 
 .theme-light-green {
-  --bg-overlay: rgba(235, 255, 240, 0.85);
+  --bg-overlay: rgba(235, 255, 240, 0.6);
   --primary-bg: #f0faf2;
   --header-bg: #ffffff;
   --sidebar-bg: #dceee0;
@@ -305,7 +305,7 @@
 }
 
 .theme-light-purple {
-  --bg-overlay: rgba(245, 240, 255, 0.85);
+  --bg-overlay: rgba(245, 240, 255, 0.6);
   --primary-bg: #f5f0ff;
   --header-bg: #ffffff;
   --sidebar-bg: #e8e0f5;
@@ -339,7 +339,7 @@
 }
 
 .theme-light-red {
-  --bg-overlay: rgba(255, 240, 240, 0.85);
+  --bg-overlay: rgba(255, 240, 240, 0.6);
   --primary-bg: #faf0f0;
   --header-bg: #ffffff;
   --sidebar-bg: #f5e0e0;
